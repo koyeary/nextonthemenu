@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-primary: oklch(87.2% 0.01 258.338);
+    --color-secondary: oklch(98.5% 0.002 247.839);
+    --color-text: oklch(21% 0.034 264.665);
+  }
+
+  [data-theme="dark"] {
+    --color-primary: oklch(27.8% 0.033 256.848);
+    --color-secondary: #1e2939;
+    --color-text: oklch(87.2% 0.01 258.338);
+  }
+}
+
+body {
+  background: var(--color-secondary);
+  color: var(--color-text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
