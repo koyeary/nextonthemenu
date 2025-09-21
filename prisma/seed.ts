@@ -1,5 +1,31 @@
 import client from "@/lib/db/connection";
 
+//SEED USERS
+const users = [
+  { name: "Kat Yeary", pin: "8085", role: "admin" },
+  { name: "Agapios", pin: "1234", role: "admin" },
+  { name: "Stavros", pin: "5678", role: "admin" },
+  { name: "FOH", pin: "9101", role: "kitchen" },
+];
+
+const seedUsers = async () => {
+  // Clear existing data
+  await client.user.deleteMany();
+  console.log("🗑️ Cleared existing users");
+
+  try {
+    await client.user.createMany({ data: users });
+
+    console.log(`✅ Successfully seeded ${users.length} users`);
+  } catch (error) {
+    console.error("❌ Error seeding orders:", error);
+    throw error;
+  } finally {
+    await client.$disconnect();
+  }
+};
+
+//SEED ORDERS
 const statuses = ["pending", "ready", "complete"] as const;
 const sizes = ['7"', '8"', '10"', "QS", "HS", "FS"] as const;
 const cakeTypes = [
@@ -130,6 +156,8 @@ const seedOrders = async (): Promise<void> => {
       data: orders,
     });
 
+    await seedUsers();
+
     console.log(`✅ Successfully seeded ${orders.length} orders`);
   } catch (error) {
     console.error("❌ Error seeding orders:", error);
@@ -142,6 +170,7 @@ const seedOrders = async (): Promise<void> => {
 // Execute seed function
 const main = async (): Promise<void> => {
   await seedOrders();
+  await seedUsers();
 };
 
 main().catch((error) => {

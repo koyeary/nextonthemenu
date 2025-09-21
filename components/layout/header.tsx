@@ -1,7 +1,12 @@
 import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 
-const Header = () => {
+type HeaderProps = {
+  handleClick: () => void;
+  seeComplete: boolean;
+};
+
+const Header = ({ handleClick, seeComplete }: HeaderProps) => {
   return (
     <div className="flex items-center justify-between border-b pb-4">
       <div>
@@ -16,15 +21,19 @@ const Header = () => {
             <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
             Live
           </Badge> */}
-        <Button size="sm" variant="default">
+        {/*         <Button size="sm" variant="default">
           Test Square
         </Button>
         <Button size="sm" variant="default">
           Test Print
-        </Button>
-        <Button size="sm">
-          <Plus className="w-4 h-4 mr-2" />
-          New Order
+        </Button> */}
+        <Button size="sm" onClick={handleClick} variant="default">
+          {seeComplete ? (
+            <Minus className="w-4 h-4" />
+          ) : (
+            <Plus className="w-4 h-4" />
+          )}
+          See Completed Orders
         </Button>
       </div>
     </div>
