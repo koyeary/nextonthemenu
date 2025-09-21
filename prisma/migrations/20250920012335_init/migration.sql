@@ -18,6 +18,7 @@ CREATE TABLE "public"."User" (
     "id" SERIAL NOT NULL,
     "pin" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "role" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -27,6 +28,7 @@ CREATE TABLE "public"."Item" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "price" DECIMAL(65,30) NOT NULL,
+    "quantity" INTEGER NOT NULL,
 
     CONSTRAINT "Item_pkey" PRIMARY KEY ("id")
 );

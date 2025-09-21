@@ -10,6 +10,7 @@ type User = {
 
 const Login = () => {
   const [pin, setPin] = React.useState<string>("");
+
   const router = useRouter();
 
   const maxLength = 4;
@@ -33,19 +34,17 @@ const Login = () => {
     setPin(newPin);
   };
 
-  const handleSubmit = () => {
-    router.push("/orders");
-    //const users = data;
-    //console.log(users);
-    // authenticateUser(pin);
-    /*   if (users.find((user: User) => user.pin === pin)) {
-                router.push("/kds");
-              }
-          
-              if (pin.length === maxLength) {
-                if (users.find((user: User) => user.pin === pin)) {
-                  router.push("/kds");
-                } */
+  const handleSubmit = async () => {
+    const authenticatedUser = await fetch(`/api/users`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ pin: pin }),
+    });
+
+    console.log(authenticatedUser);
+    return router.push("/orders");
   };
 
   return (

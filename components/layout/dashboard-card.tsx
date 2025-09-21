@@ -45,7 +45,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        return response.json();
+        response.json();
+        return window.location.reload();
       })
       .then((data) => {
         console.log("Order updated successfully:", data);
@@ -91,7 +92,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
             <Button
               size="sm"
               variant="outline"
-              className="mr-1 bg-stone-400 text-white"
+              className="mr-1 bg-yellow-500 text-white"
               onClick={() => handleUpdate(Number(order.id), "pending")}
             >
               Undo
@@ -100,7 +101,13 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           <Button
             size="sm"
             variant="outline"
-            className=" bg-green-600 text-white"
+            className={
+              status === "pending"
+                ? "bg-green-600 text-white"
+                : status === "ready"
+                  ? "bg-blue-500 text-white"
+                  : "bg-red-400 text-white"
+            }
             onClick={() => {
               console.log(order.id, status);
               handleUpdate(

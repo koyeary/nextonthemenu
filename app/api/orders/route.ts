@@ -5,7 +5,11 @@ import prisma from "@/lib/db/connection"; // Adjust path based on your project s
 // GET handler to fetch all orders
 export async function GET(req: NextRequest) {
   try {
-    const orders = await prisma.order.findMany();
+    const orders = await prisma.order.findMany({
+      orderBy: {
+        due: "asc",
+      },
+    });
     return NextResponse.json(orders, { status: 200 });
   } catch (error) {
     console.error("Error fetching orders:", error);
