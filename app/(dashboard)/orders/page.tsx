@@ -36,7 +36,8 @@ const Orders = () => {
   };
 
   const handleTestSquare = () => {
-    fetch("/api/webhooks/square", {
+    alert("Testing Square webhook endpoint");
+    /*    fetch("/api/webhooks/square", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +55,7 @@ const Orders = () => {
       })
       .catch((error) => {
         console.error("Error in Square test:", error);
-      });
+      }); */
   };
 
   useEffect(() => {
