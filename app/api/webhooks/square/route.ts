@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 
 // app/api/webhooks/square/route.ts
 export default async function POST(req: NextRequest) {
-  console.log("POST request received in /api/webhooks/square");
+  console.log(req.json());
+  return new Response("Webhook received", { status: 200 });
   /*  try {
     const payload = await req.json();
 

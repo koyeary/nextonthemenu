@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export default async function handler(req: NextRequest) {
+  return NextResponse.json({ message: "Logged out" }, { status: 200 });
   /*   console.log("Check for user");
   try {
     const { pin } = await req.json();
