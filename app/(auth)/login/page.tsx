@@ -30,7 +30,7 @@ const Login = () => {
   };
 
   const handleSubmit = async () => {
-    const authenticatedUser = await fetch(`/api/users`, {
+    const authenticatedUser = await fetch(`/api/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
