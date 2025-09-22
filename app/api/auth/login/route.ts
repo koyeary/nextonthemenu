@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 //make a small memory store for attempts and lockout?
 
-export default async function handler(req: NextRequest) {
+export default async function POST(req: NextRequest) {
   console.log("Check for user");
   try {
     const { pin } = await req.json();
@@ -23,8 +23,6 @@ export default async function handler(req: NextRequest) {
     if (existingUser) {
       NextResponse.json({ data: existingUser }, { status: 200 });
     }
-
-    return NextResponse.json({ message: "Login successful" });
   } catch (err) {
     console.error(err);
   }
