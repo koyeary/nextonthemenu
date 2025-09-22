@@ -21,8 +21,10 @@ export default async function handler(req: NextRequest) {
     console.log(existingUser);
 
     if (existingUser) {
-      return NextResponse.json({ data: existingUser }, { status: 200 });
+      NextResponse.json({ data: existingUser }, { status: 200 });
     }
+
+    return NextResponse.json({ message: "Login successful" });
   } catch (err) {
     console.error(err);
   }
