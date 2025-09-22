@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import DashboardCard from "@/components/layout/dashboard-card";
+import dynamic from "next/dynamic";
 import Order from "@/types/Order";
 import Header from "@/components/layout/header";
 /* 
@@ -8,6 +8,12 @@ const { rows: orders }: QueryResult<Order> = await pool.query(
     "SELECT * FROM orders"
   ); */
 
+const DashboardCard = dynamic(
+  () => import("@/components/layout/dashboard-card"),
+  { ssr: false, loading: () => <div>{/* add skeleton */}</div> }
+);
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formatDate = (due: string | number | Date) => {
   const date = new Date(due);
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -19,7 +25,7 @@ const formatDate = (due: string | number | Date) => {
 };
 
 const Orders = () => {
-  const [seeComplete, setSeeComplete] = useState(true);
+  const [seeComplete, setSeeComplete] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
 
   //const { data, isLoading, isError } = useOrders();
@@ -133,7 +139,6 @@ const Orders = () => {
           )}
         </div>
       </div>
-      {/* Complete Column */}
     </>
   );
 };

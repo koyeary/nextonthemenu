@@ -5,9 +5,7 @@ const Dashboard = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  /* 
-        setPin("");
-      }; */ return <div>{children}</div>;
+  return <div>{children}</div>;
 };
 
 export default Dashboard;
