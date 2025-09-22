@@ -3,11 +3,6 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import PinLoginForm from "@/components/forms/pin-login-form";
 
-type User = {
-  pin: string;
-  // add other user properties if needed
-};
-
 const Login = () => {
   const [pin, setPin] = React.useState<string>("");
 

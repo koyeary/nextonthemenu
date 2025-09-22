@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/connection"; // Adjust path based on your project structure
 
 // GET handler to fetch all orders
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const orders = await prisma.order.findMany({
       orderBy: {
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest, res: NextResponse) {
+export async function PUT(req: NextRequest) {
   console.log("PUT request received");
   console.log(req.url);
   /* 

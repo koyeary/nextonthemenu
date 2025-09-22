@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const id = url.pathname.split("/").pop();
   if (!id) {
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     );
   }
 }
-export async function PUT(req: NextRequest, res: NextResponse) {
+export async function PUT(req: NextRequest) {
   const id = req.url.split("/").pop();
   const { status } = await req.json();
   console.log("PUT request received for ID:", id);
