@@ -1,5 +1,4 @@
 import React from "react";
-import Orders from "./orders/page";
 
 const Dashboard = ({
   children,
