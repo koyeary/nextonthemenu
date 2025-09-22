@@ -1,9 +1,12 @@
 "use client";
 import { useState } from "react";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import DashboardCard from "./dashboard-card";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Order from "@/types/Order";
 // Add the following import for QueryResult if you are using 'pg'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formatDate = (due: string | number | Date) => {
   const date = new Date(due);
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -15,7 +18,7 @@ const formatDate = (due: string | number | Date) => {
 };
 
 const OrderDisplay = () => {
-  const [seeComplete, setSeeComplete] = useState(false);
+  const [seeComplete] = useState(false);
   //const { data, isLoading, isError } = useOrders();
 
   /*   if (isLoading) return <p>Loading orders...</p>;

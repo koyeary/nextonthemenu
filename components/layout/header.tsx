@@ -3,10 +3,11 @@ import { Minus, Plus } from "lucide-react";
 
 type HeaderProps = {
   handleClick: () => void;
+  handleTest?: () => void;
   seeComplete: boolean;
 };
 
-const Header = ({ handleClick, seeComplete }: HeaderProps) => {
+const Header = ({ handleClick, handleTest, seeComplete }: HeaderProps) => {
   return (
     <div className="flex items-center justify-between border-b pb-4">
       <div>
@@ -21,10 +22,10 @@ const Header = ({ handleClick, seeComplete }: HeaderProps) => {
             <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
             Live
           </Badge> */}
-        {/*         <Button size="sm" variant="default">
+        <Button size="sm" variant="default" onClick={handleTest}>
           Test Square
         </Button>
-        <Button size="sm" variant="default">
+        {/* <Button size="sm" variant="default">
           Test Print
         </Button> */}
         <Button size="sm" onClick={handleClick} variant="default">

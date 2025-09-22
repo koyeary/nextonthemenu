@@ -35,6 +35,29 @@ const Orders = () => {
     setSeeComplete(!seeComplete);
   };
 
+  const handleTestSquare = () => {
+    alert("Testing Square webhook endpoint");
+    /*    fetch("/api/webhooks/square", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Square test successful:", data);
+      })
+      .catch((error) => {
+        console.error("Error in Square test:", error);
+      }); */
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch("/api/orders");
@@ -47,7 +70,11 @@ const Orders = () => {
   return (
     <>
       <div className="space-y-4 p-6 mx-5">
-        <Header handleClick={handleClick} seeComplete={seeComplete} />
+        <Header
+          handleClick={handleClick}
+          handleTest={handleTestSquare}
+          seeComplete={seeComplete}
+        />
 
         <div
           className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6`}
