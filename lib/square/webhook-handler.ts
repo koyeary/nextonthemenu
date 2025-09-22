@@ -1,4 +1,4 @@
-import { WebhooksHelper } from "square";
+/* import { WebhooksHelper } from "square";
 
 const signatureKey = process.env.SIGNATURE_KEY || "";
 const notificationUrl =
@@ -22,7 +22,7 @@ export default async function handler(req: any, res: any) {
     body += chunk;
   });
 
-  req.on("end", async function () { */
+  req.on("end", async function () { 
   const signature = req.headers["x-square-hmacsha256-signature"];
   if (await isFromSquare(signature, body)) {
     // Signature is valid. Return 200 OK.
@@ -35,3 +35,4 @@ export default async function handler(req: any, res: any) {
   }
   res.end();
 }
+ */
