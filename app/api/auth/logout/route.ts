@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+//import { NextRequest, NextResponse } from "next/server";
 
-export default async function handler(req: NextRequest) {
-  return NextResponse.json({ message: "Logged out" }, { status: 200 });
+export default async function handler() {
+  console.log("Logout user");
   /*   console.log("Check for user");
   try {
     const { pin } = await req.json();

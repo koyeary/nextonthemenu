@@ -6,6 +6,10 @@ export default async function handler(req: NextRequest) {
   console.log("Check for user");
   try {
     const { pin } = await req.json();
+
+    if (typeof pin !== "string")
+      return NextResponse.json({ message: "Bad request" }, { status: 400 });
+
     const existingUser = await fetch(`/api/users`, {
       method: "POST",
       headers: {
@@ -15,9 +19,6 @@ export default async function handler(req: NextRequest) {
     });
     // Parse
     console.log(existingUser);
-
-    if (typeof pin !== "string")
-      return NextResponse.json({ message: "Bad request" }, { status: 400 });
 
     if (existingUser) {
       return NextResponse.json({ data: existingUser }, { status: 200 });
