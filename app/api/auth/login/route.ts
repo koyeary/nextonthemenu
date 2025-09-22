@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 //make a small memory store for attempts and lockout?
 
 export default async function POST(req: NextRequest) {
-  console.log("Check for user");
   try {
     const { pin } = await req.json();
 

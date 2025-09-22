@@ -38,6 +38,7 @@ const Login = () => {
       body: JSON.stringify({ pin: pin }),
     });
 
+    console.log(authenticatedUser);
     return router.push("/orders");
   };
 

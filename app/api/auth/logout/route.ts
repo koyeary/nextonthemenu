@@ -1,6 +1,6 @@
 //import { NextRequest, NextResponse } from "next/server";
 
-export default async function handler() {
+export default async function POST() {
   console.log("Logout user");
   /*   console.log("Check for user");
   try {
