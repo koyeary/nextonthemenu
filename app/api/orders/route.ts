@@ -1,6 +1,6 @@
 // app/api/orders/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db/connection"; // Adjust path based on your project structure
+import prisma from "@/lib/db/connection";
 
 // GET handler to fetch all orders
 export async function GET() {
@@ -37,31 +37,3 @@ try {
     return NextResponse.json({ message: "Failed to update order" }, { status: 500 });
   } */
 }
-
-// POST handler to create a new order
-/* export async function POST(req: NextRequest) {
-  try {
-    const { name, email } = await req.json();
-
-    if (!name || !email) {
-      return NextResponse.json(
-        { message: "Name and email are required" },
-        { status: 400 }
-      );
-    }
-
-    const neworder = await prisma.order.create({
-      data: {
-        name,
-        email,
-      },
-    });
-    return NextResponse.json(neworder, { status: 201 });
-  } catch (error) {
-    console.error("Error creating order:", error);
-    return NextResponse.json(
-      { message: "Failed to create order" },
-      { status: 500 }
-    );
-  }
- */
