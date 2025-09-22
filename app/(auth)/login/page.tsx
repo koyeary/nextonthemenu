@@ -30,7 +30,7 @@ const Login = () => {
   };
 
   const handleSubmit = async () => {
-    const authenticatedUser = await fetch(`/api/auth/login`, {
+    /*     const authenticatedUser = await fetch(`/api/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +38,7 @@ const Login = () => {
       body: JSON.stringify({ pin: pin }),
     });
 
-    console.log(authenticatedUser);
+    console.log(authenticatedUser); */
     return router.push("/orders");
   };
 
