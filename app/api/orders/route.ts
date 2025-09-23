@@ -4,12 +4,17 @@ import prisma from "@/lib/db/connection";
 
 // GET handler to fetch all orders
 export async function GET() {
+  console.log("GET request received for orders");
   try {
     const orders = await prisma.order.findMany({
       orderBy: {
         due: "asc",
       },
     });
+    if (!orders) {
+      return NextResponse.json({ message: "No orders found" }, { status: 404 });
+    }
+
     return NextResponse.json(orders, { status: 200 });
   } catch (error) {
     console.error("Error fetching orders:", error);

@@ -10,7 +10,7 @@ const { rows: orders }: QueryResult<Order> = await pool.query(
 
 const DashboardCard = dynamic(
   () => import("@/components/layout/dashboard-card"),
-  { ssr: false, loading: () => <div>{/* add skeleton */}</div> }
+  { loading: () => <div>{/* add skeleton */}</div> }
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
