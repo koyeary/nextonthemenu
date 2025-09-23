@@ -68,76 +68,74 @@ const Orders = () => {
     const fetchData = async () => {
       const res = await fetch("/api/orders");
       const data = await res.json();
-      setOrders(data);
+      return setOrders(data);
     };
     fetchData();
   }, []);
 
   return (
     <>
-      <div className="space-y-4 p-6 mx-5">
-        <Header
-          handleClick={handleClick}
-          handleTest={handleTestSquare}
-          seeComplete={seeComplete}
-        />
+      <Header
+        handleClick={handleClick}
+        handleTest={handleTestSquare}
+        seeComplete={seeComplete}
+      />
 
-        <div
-          className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6`}
-        >
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Pending</h3>
-              {/*  <Badge variant="secondary">3</Badge>  */}
-            </div>
-            <div className="space-y-3">
-              {pending.map((order: Order) => (
-                <DashboardCard
-                  key={order.id}
-                  order={order}
-                  formatDate={formatDate}
-                  status="pending"
-                />
-              ))}
-            </div>
+      <div
+        className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6`}
+      >
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold">Pending</h3>
+            {/*  <Badge variant="secondary">3</Badge>  */}
           </div>
-          {/* In Progress Column */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Ready</h3>
-              {/*  <Badge variant="secondary">3</Badge>  */}
-            </div>
-            <div className="space-y-3">
-              {ready.map((order: Order) => (
-                <DashboardCard
-                  key={order.id}
-                  order={order}
-                  formatDate={formatDate}
-                  status="ready"
-                />
-              ))}
-            </div>
+          <div className="space-y-3">
+            {pending.map((order: Order) => (
+              <DashboardCard
+                key={order.id}
+                order={order}
+                formatDate={formatDate}
+                status="pending"
+              />
+            ))}
           </div>
-
-          {seeComplete && (
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">Completed</h3>
-                {/*     <Badge variant="secondary">2</Badge>  */}
-              </div>
-              <div className="space-y-3">
-                {complete.map((order: Order) => (
-                  <DashboardCard
-                    key={order.id}
-                    order={order}
-                    formatDate={formatDate}
-                    status="complete"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
+        {/* In Progress Column */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold">Ready</h3>
+            {/*  <Badge variant="secondary">3</Badge>  */}
+          </div>
+          <div className="space-y-3">
+            {ready.map((order: Order) => (
+              <DashboardCard
+                key={order.id}
+                order={order}
+                formatDate={formatDate}
+                status="ready"
+              />
+            ))}
+          </div>
+        </div>
+
+        {seeComplete && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold">Completed</h3>
+              {/*     <Badge variant="secondary">2</Badge>  */}
+            </div>
+            <div className="space-y-3">
+              {complete.map((order: Order) => (
+                <DashboardCard
+                  key={order.id}
+                  order={order}
+                  formatDate={formatDate}
+                  status="complete"
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

@@ -5,7 +5,7 @@ const Dashboard = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  return <div>{children}</div>;
+  return <div className="space-y-4 p-6 mx-5">{children}</div>;
 };
 
 export default Dashboard;
