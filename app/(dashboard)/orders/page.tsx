@@ -65,7 +65,9 @@ const Orders = () => {
   };
 
   useEffect(() => {
+    console.log("Mounted Orders component");
     const fetchData = async () => {
+      console.log("Fetching orders...");
       try {
         const res = await fetch("/api/orders");
         const data = await res.json();
