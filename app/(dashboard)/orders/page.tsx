@@ -66,9 +66,14 @@ const Orders = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch("/api/orders");
-      const data = await res.json();
-      return setOrders(data);
+      try {
+        const res = await fetch("/api/orders");
+        const data = await res.json();
+        return setOrders(data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        setOrders([]); // Set to empty array on error
+      }
     };
     fetchData();
   }, []);
