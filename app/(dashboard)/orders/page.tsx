@@ -8,9 +8,9 @@ const { rows: orders }: QueryResult<Order> = await pool.query(
     "SELECT * FROM orders"
   ); */
 
-const DashboardCard = dynamic(
-  () => import("@/components/layout/dashboard-card"),
-  { loading: () => <div>{/* add skeleton */}</div> }
+const DashboardShell = dynamic(
+  () => import("@/components/layout/dashboard-shell"),
+  { loading: () => <div>Loading...</div> }
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -70,6 +70,7 @@ const Orders = () => {
       console.log("Fetching orders...");
       try {
         const res = await fetch("/api/orders");
+
         const data = await res.json();
         return setOrders(data);
       } catch (error) {
@@ -87,14 +88,20 @@ const Orders = () => {
         handleTest={handleTestSquare}
         seeComplete={seeComplete}
       />
-
-      <div
+      <DashboardShell
+        seeComplete={seeComplete}
+        pending={pending}
+        ready={ready}
+        complete={complete}
+        formatDate={formatDate}
+      />
+      {/*     <div
         className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6`}
       >
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">Pending</h3>
-            {/*  <Badge variant="secondary">3</Badge>  */}
+           <Badge variant="secondary">3</Badge>
           </div>
           <div className="space-y-3">
             {pending.map((order: Order) => (
@@ -107,11 +114,11 @@ const Orders = () => {
             ))}
           </div>
         </div>
-        {/* In Progress Column */}
+   
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">Ready</h3>
-            {/*  <Badge variant="secondary">3</Badge>  */}
+            <Badge variant="secondary">3</Badge>  
           </div>
           <div className="space-y-3">
             {ready.map((order: Order) => (
@@ -129,7 +136,7 @@ const Orders = () => {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">Completed</h3>
-              {/*     <Badge variant="secondary">2</Badge>  */}
+              <Badge variant="secondary">2</Badge>  
             </div>
             <div className="space-y-3">
               {complete.map((order: Order) => (
@@ -142,8 +149,8 @@ const Orders = () => {
               ))}
             </div>
           </div>
-        )}
-      </div>
+        )} 
+      </div> */}
     </>
   );
 };
