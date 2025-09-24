@@ -8,11 +8,6 @@ const { rows: orders }: QueryResult<Order> = await pool.query(
     "SELECT * FROM orders"
   ); */
 
-const DashboardShell = dynamic(
-  () => import("@/components/layout/dashboard-shell"),
-  { loading: () => <div>Loading...</div> }
-);
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formatDate = (due: string | number | Date) => {
   const date = new Date(due);
@@ -36,6 +31,11 @@ const Orders = () => {
   const pending = orders.filter((order: Order) => order.status === "pending");
   const ready = orders.filter((order: Order) => order.status === "ready");
   const complete = orders.filter((order: Order) => order.status === "complete");
+
+  const DashboardShell = dynamic(
+    () => import("@/components/layout/dashboard-shell"),
+    { loading: () => <div>Loading...</div> }
+  );
 
   const handleClick = () => {
     setSeeComplete(!seeComplete);
@@ -88,13 +88,15 @@ const Orders = () => {
         handleTest={handleTestSquare}
         seeComplete={seeComplete}
       />
-      <DashboardShell
-        seeComplete={seeComplete}
-        pending={pending}
-        ready={ready}
-        complete={complete}
-        formatDate={formatDate}
-      />
+      {orders.length > 0 && (
+        <DashboardShell
+          seeComplete={seeComplete}
+          pending={pending}
+          ready={ready}
+          complete={complete}
+          formatDate={formatDate}
+        />
+      )}
       {/*     <div
         className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6`}
       >
