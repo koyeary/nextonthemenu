@@ -89,13 +89,15 @@ const Orders = () => {
         handleTest={handleTestSquare}
         seeComplete={seeComplete}
       />
-      <DashboardShell
-        seeComplete={seeComplete}
-        pending={pending}
-        ready={ready}
-        complete={complete}
-        formatDate={formatDate}
-      />
+      {pending.length > 0 && (
+        <DashboardShell
+          seeComplete={seeComplete}
+          pending={pending}
+          ready={ready}
+          complete={complete}
+          formatDate={formatDate}
+        />
+      )}
       {/*     <div
         className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6`}
       >
