@@ -21,12 +21,13 @@ const formatDate = (due: string | number | Date) => {
 
 const Orders = () => {
   const [seeComplete, setSeeComplete] = useState(false);
-  const [orders, setOrders] = useState<Order[]>([]);
-
+  const [orders, setOrders] = useState([]);
   //const { data, isLoading, isError } = useOrders();
 
   /*   if (isLoading) return <p>Loading orders...</p>;
   if (isError) return <p>Failed to load orders.</p>; */
+
+  //const orders = await fetchData();
 
   const pending = orders.filter((order: Order) => order.status === "pending");
   const ready = orders.filter((order: Order) => order.status === "ready");
@@ -39,6 +40,13 @@ const Orders = () => {
 
   const handleClick = () => {
     setSeeComplete(!seeComplete);
+  };
+
+  const fetchData = async () => {
+    const results = await fetch("/api/orders");
+
+    const data = await results.json();
+    setOrders(data);
   };
 
   const handleTestSquare = () => {
@@ -65,20 +73,13 @@ const Orders = () => {
   };
 
   useEffect(() => {
-    console.log("Mounted Orders component");
-    const fetchData = async () => {
-      console.log("Fetching orders...");
-      try {
-        const res = await fetch("/api/orders");
-
-        const data = await res.json();
-        return setOrders(data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        setOrders([]); // Set to empty array on error
-      }
-    };
     fetchData();
+    const cleanup = async () => {
+      await fetch("");
+    };
+    return () => {
+      cleanup();
+    };
   }, []);
 
   return (
@@ -88,15 +89,13 @@ const Orders = () => {
         handleTest={handleTestSquare}
         seeComplete={seeComplete}
       />
-      {orders.length > 0 && (
-        <DashboardShell
-          seeComplete={seeComplete}
-          pending={pending}
-          ready={ready}
-          complete={complete}
-          formatDate={formatDate}
-        />
-      )}
+      <DashboardShell
+        seeComplete={seeComplete}
+        pending={pending}
+        ready={ready}
+        complete={complete}
+        formatDate={formatDate}
+      />
       {/*     <div
         className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6`}
       >
