@@ -4,19 +4,19 @@ import DashboardCard from "./dashboard-card";
 
 type DashboardShellProps = {
   seeComplete: boolean;
-  pending: Order[];
-  ready: Order[];
-  complete: Order[];
+  orders: Order[];
   formatDate: (date: string | Date) => string;
 };
 
 const DashboardShell: React.FC<DashboardShellProps> = ({
   seeComplete,
-  pending,
-  ready,
-  complete,
+  orders,
   formatDate,
 }) => {
+  const pending = orders.filter((order: Order) => order.status === "pending");
+  const ready = orders.filter((order: Order) => order.status === "ready");
+  const complete = orders.filter((order: Order) => order.status === "complete");
+
   return (
     <div
       className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6`}

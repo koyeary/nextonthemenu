@@ -22,16 +22,20 @@ const formatDate = (due: string | number | Date) => {
 const Orders = () => {
   const [seeComplete, setSeeComplete] = useState(false);
   const [orders, setOrders] = useState([]);
+
+  const fetchData = async () => {
+    const results = await fetch("/api/orders");
+
+    const data = await results.json();
+    setOrders(data);
+    return data;
+  };
   //const { data, isLoading, isError } = useOrders();
 
   /*   if (isLoading) return <p>Loading orders...</p>;
   if (isError) return <p>Failed to load orders.</p>; */
 
   //const orders = await fetchData();
-
-  const pending = orders.filter((order: Order) => order.status === "pending");
-  const ready = orders.filter((order: Order) => order.status === "ready");
-  const complete = orders.filter((order: Order) => order.status === "complete");
 
   const DashboardShell = dynamic(
     () => import("@/components/layout/dashboard-shell"),
@@ -40,13 +44,6 @@ const Orders = () => {
 
   const handleClick = () => {
     setSeeComplete(!seeComplete);
-  };
-
-  const fetchData = async () => {
-    const results = await fetch("/api/orders");
-
-    const data = await results.json();
-    setOrders(data);
   };
 
   const handleTestSquare = () => {
@@ -74,9 +71,7 @@ const Orders = () => {
 
   useEffect(() => {
     fetchData();
-    const cleanup = async () => {
-      await fetch("");
-    };
+    const cleanup = async () => {};
     return () => {
       cleanup();
     };
@@ -89,12 +84,10 @@ const Orders = () => {
         handleTest={handleTestSquare}
         seeComplete={seeComplete}
       />
-      {pending.length > 0 && (
+      {orders.length > 0 && (
         <DashboardShell
           seeComplete={seeComplete}
-          pending={pending}
-          ready={ready}
-          complete={complete}
+          orders={orders}
           formatDate={formatDate}
         />
       )}
