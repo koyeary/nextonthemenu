@@ -27,6 +27,7 @@ const Orders = () => {
     const results = await fetch("/api/orders");
 
     const data = await results.json();
+    console.log(data);
     setOrders(data);
     return data;
   };

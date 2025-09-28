@@ -12,7 +12,7 @@ interface DashboardCardProps {
     quantity: number;
     notes: string;
     due: string | Date;
-    customer_name: string;
+    customerName: string;
     contact: string;
     price: number;
   };
@@ -77,7 +77,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       <div className="space-y-1 text-sm">
         <p>Quantity: {order.quantity}</p>
         <p className="text-sm text-muted-foreground">
-          Name: <span className="font-semibold">{order.customer_name}</span>
+          Name: <span className="font-semibold">{order.customerName}</span>
         </p>
         <p>
           Contact: <span className="font-semibold">{order.contact}</span>
