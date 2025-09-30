@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-
 const prisma = new PrismaClient();
+import { SquareClient, SquareEnvironment } from "square";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -10,9 +10,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "ID is required" }, { status: 400 });
   }
   try {
-    const order = await prisma.order.findUnique({
-      where: { id: Number(id) },
+    const client = new SquareClient({
+      environment: SquareEnvironment.Sandbox,
+      token: "EAAAl--4VCDk9CkrwDu52BvR3qgQPvGYfgQZW4yJY_cx598zpcESeHZ6F7Y4iTiT",
     });
+    const order = await client.orders.get({
+      orderId: "r73JaxIfRU7AJN3auhFn0N13S99YY",
+    });
+
     if (!order) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
     } else {
@@ -26,6 +31,7 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 export async function PUT(req: NextRequest) {
   const id = req.url.split("/").pop();
   const { status } = await req.json();

@@ -22,6 +22,8 @@ const formatDate = (due: string | number | Date) => {
 const Orders = () => {
   const [seeComplete, setSeeComplete] = useState(false);
   const [orders, setOrders] = useState([]);
+  const [show, setShow] = useState(false);
+  const [message, setMessage] = useState("");
 
   const fetchData = async () => {
     const results = await fetch("/api/orders");
@@ -47,20 +49,35 @@ const Orders = () => {
     setSeeComplete(!seeComplete);
   };
 
-  const handleTestSquare = () => {
-    alert("Testing Square webhook endpoint");
-    /*    fetch("/api/webhooks/square", {
-      method: "POST",
+  const handleTestSquare = async () => {
+    try {
+      const getOrder = await fetch("/api/webhooks/square/", {
+        headers: { "Content-type": "application/json", method: "GET" },
+      });
+
+      setMessage(
+        getOrder.status === 200
+          ? "Success"
+          : getOrder.status === 500
+            ? "Square connection failure"
+            : `Error: ${getOrder.status}`
+      );
+      setShow(true);
+    } catch (err) {
+      console.error(err);
+    }
+    /*     fetch("/api/webhooks/square/t03dXZyPQRss0lP8k9Ud7y6AeSeZY", {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({}),
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        return response.json();
+        const results = response.json();
+        return console.log(results);
       })
       .then((data) => {
         console.log("Square test successful:", data);

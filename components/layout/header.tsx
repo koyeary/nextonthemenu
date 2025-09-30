@@ -1,5 +1,6 @@
 import { Button } from "../ui/button";
 import { Minus, Plus } from "lucide-react";
+import Alert from "../ui/alert-dialog";
 
 type HeaderProps = {
   handleClick: () => void;
@@ -22,12 +23,16 @@ const Header = ({ handleClick, handleTest, seeComplete }: HeaderProps) => {
             <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
             Live
           </Badge> */}
-        <Button size="sm" variant="default" onClick={handleTest}>
-          Test Square
-        </Button>
         {/* <Button size="sm" variant="default">
           Test Print
         </Button> */}
+        <Alert
+          command="Test Square"
+          message="This is a test of the square webhook listener and prisma database."
+          description="Status 200: Success! New order: new order information"
+          responseB="Ok"
+          handleConfirm={handleClick}
+        />
         <Button size="sm" onClick={handleClick} variant="default">
           {seeComplete ? (
             <Minus className="w-4 h-4" />

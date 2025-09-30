@@ -1,5 +1,7 @@
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
+import Alert from "../ui/alert-dialog";
+import { Printer } from "lucide-react";
 //import { updateOrderStatus } from "@/utils/API";
 
 interface DashboardCardProps {
@@ -84,9 +86,21 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         </p>
       </div>
       <div className="flex items-center justify-between mt-3">
-        <span className="text-sm text-muted-foreground">
+        {/*       <span className="text-sm text-muted-foreground">
           ${order.price * order.quantity}
-        </span>
+        </span> */}
+
+        {status === "pending" && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="mr-1 bg-violet-500 text-white"
+            onClick={() => handleUpdate(Number(order.id), "pending")}
+          >
+            <Printer /> Reprint
+          </Button>
+        )}
+
         <div>
           {status === "ready" && (
             <Button

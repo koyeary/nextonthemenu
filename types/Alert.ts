@@ -1,4 +1,4 @@
-interface Order {
+interface Alert {
   id: string | number;
   /* orderId: string; */
   items: string;
@@ -11,4 +11,4 @@ interface Order {
   status: "pending" | "ready" | "complete";
 }
 
-export default Order;
+export default Alert;
