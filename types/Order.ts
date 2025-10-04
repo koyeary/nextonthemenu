@@ -2,10 +2,10 @@ interface Order {
   id: string | number;
   orderId: string;
   status: "pending" | "ready" | "complete";
-  due: Date;
-  location: string;
   item: string;
   notes: string;
+  due: Date;
+  location: string;
   quantity: number;
   price: number;
   customerName: string;

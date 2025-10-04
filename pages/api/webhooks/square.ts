@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import client from "@/lib/db/connection";
+import { Prisma } from "@prisma/client";
 import { SquareClient, SquareEnvironment } from "square";
 
 const squareClient = new SquareClient({
@@ -9,23 +10,25 @@ const squareClient = new SquareClient({
 
 const squareQuery = async (orderId: string) => {
   const sqObject = await squareClient.orders.get({
-    orderId: "l2mloBgEq9SCpHzfIIC2b9dLcXVZY",
+    orderId: orderId,
   });
 
+  console.log(sqObject.order.lineItems);
   //need pickup details, notes, basePriceMoney
   const { order } = sqObject;
   const newOrder = await prisma.order.update({
-    where: { id: 284 },
+    where: { orderId: orderId },
     data: {
-      item: order?.lineItems?.name ?? "",
-      notes: order?.lineItems?.note ?? "",
-      due: new Date(Date.now()),
+      item: order?.lineItems[0].name ?? "",
+      notes: order?.lineItems[0].note ?? "",
+      due: order?.fulfillments[0].pickupDetails.pickup_at,
       location: order?.locationId ?? "",
-      quantity: order?.lineItems?.quantity ?? 1, // Provide actual quantity or a default value
-      price: 10,
-      customerName: "Test Square Customer", // Provide actual customer name or a default
-      phone: "555-555-5555",
-      email: "sqtestemail@gmail.com",
+      quantity: parseInt(order?.lineItems[0].quantity ?? "1"), // Provide actual quantity or a default value
+      price: new Prisma.Decimal(order?.lineItems[0].basePriceMoney?.amount),
+      customerName:
+        order?.fulfillments[0].pickupDetails?.recipient?.displayName, // Provide actual customer name or a default
+      phone: order?.fulfillments[0].pickupDetails?.recipient?.phoneNumber,
+      email: order?.fulfillments[0].pickupDetails?.recipient?.emailAddress,
     },
   });
 
@@ -74,6 +77,7 @@ export default async function handler(
           orderId: orderId,
           status: "pending",
           item: "",
+          notes: "",
           due: new Date(Date.now()),
           location: "",
           quantity: 1, // Provide actual quantity or a default value
@@ -83,72 +87,6 @@ export default async function handler(
           email: "",
         },
       });
-
-      // const itemData = await squareQuery(orderId);
-      /* SAVE FOR LATER
-               orderId: orderId,
-              status: "pending",
-              item: sqObject.order.line_items.line_items[0].name ?? "",
-              due:
-                sqObject.order.fulfillments.fulfillments[0].pickup_details
-                  .pickup_at ?? "",
-              location: sqObject.order.location_id ?? "",
-              quantity: sqObject.order.line_items.line_items[0].quantity ?? 1, // Provide actual quantity or a default value
-              price: sqObject.order.line_items.line_items[0].base_price_money ?? 0, // Provide actual price or a default value
-              customerName:
-                sqObject.order.fulfillments[0].pickup_details.recipient
-                  .display_name ?? "Unknown Customer", // Provide actual customer name or a default
-              phone:
-                sqObject.order.fulfillments.fulfillments[0].pickup_details.recipient
-                  .phone_number ?? "",
-              email:
-                sqObject.order.fulfillments.fulfillments[0].pickup_details.recipient
-                  .email ?? "",
-                   */
-
-      /* if (orderId) {
-        // Only create if not exists
-        const existing = await prisma.order.findUnique({
-          where: { orderId: orderId },
-        });
-  
-        if (!existing) {
-          await prisma.order.create({
-            data: {
-              orderId: orderId,
-              status: "pending",
-              item: sqObject.order.line_items.line_items[0].name ?? "",
-              due:
-                sqObject.order.fulfillments.fulfillments[0].pickup_details
-                  .pickup_at ?? "",
-              location: sqObject.order.location_id ?? "",
-              quantity: sqObject.order.line_items.line_items[0].quantity ?? 1, // Provide actual quantity or a default value
-              price: sqObject.order.line_items.line_items[0].base_price_money ?? 0, // Provide actual price or a default value
-              customerName:
-                sqObject.order.fulfillments[0].pickup_details.recipient
-                  .display_name ?? "Unknown Customer", // Provide actual customer name or a default
-              number:
-                sqObject.order.fulfillments.fulfillments[0].pickup_details.recipient
-                  .phone_number ?? "",
-              email:
-                sqObject.order.fulfillments.fulfillments[0].pickup_details.recipient
-                  .email ?? "",
-            },
-          });
-          console.log("Created new order:", orderId);
-        } else {
-          console.log("Order already exists:", orderId);
-        }
-      }
-  
-      //save to cross index under webhooks
-      await prisma.webhookEvent.create({
-        data: {
-          provider: "square",
-          eventType: "order.create",
-          payload: { id: sqObject.order.id, location_id: sqObject.order.location_id },
-        },
-      }); */
 
       if (template) {
         squareQuery(orderId);
