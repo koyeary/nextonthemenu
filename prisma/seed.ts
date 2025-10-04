@@ -1,6 +1,6 @@
 import client from "@/lib/db/connection";
 import { SquareClient, SquareEnvironment } from "square";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 //SEED USERS
 const users = [
@@ -266,27 +266,6 @@ export async function importSquareItemsSimple(squareResponse: unknown) {
         quantity: 0,
       });
     }
-    // Process each variation as a separate item
-    /*     for (const variation of itemData.variations) {
-      const varData = variation.item_variation_data;
-
-      // Combine item name with variation name if it exists
-      const fullName = varData.name
-        ? `${itemData.name} - ${varData.name}`
-        : itemData.name;
-
-      // Convert Square price (cents) to decimal dollars
-      const price = varData.price_money
-        ? new Prisma.Decimal(varData.price_money.amount / 100)
-        : new Prisma.Decimal(0);
-
-      itemsToCreate.push({
-        id: parseInt(variation.id.replace(/\D/g, "").slice(0, 9)) || 0,
-        name: fullName,
-        price: price,
-        quantity: 0, // Default quantity, update as needed
-      });
-    } */
   }
 
   try {
@@ -306,7 +285,6 @@ export async function importSquareItemsSimple(squareResponse: unknown) {
 
 // Alternative: Upsert items one by one (slower but handles updates)
 export async function upsertSquareItems(squareResponse: SquareCatalogResponse) {
-  let imported = 0;
   let updated = 0;
 
   for (const squareItem of squareResponse.items) {
@@ -362,9 +340,6 @@ const main = async (): Promise<void> => {
   const squareData = await squareClient.catalog.searchItems({});
   const items = squareData.map((item) => item.itemData.variations);
   console.log(items);
-  //await importSquareItemsSimple(squareData.items);
-  //await seedOrders();
-  //await seedUsers();
 };
 
 main().catch((error) => {

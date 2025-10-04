@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import Order from "@/types/Order";
 import Header from "@/components/layout/header";
 /* 
 const { rows: orders }: QueryResult<Order> = await pool.query(
@@ -38,12 +37,6 @@ const Orders = () => {
     setOrders(data);
     return data;
   };
-  //const { data, isLoading, isError } = useOrders();
-
-  /*   if (isLoading) return <p>Loading orders...</p>;
-  if (isError) return <p>Failed to load orders.</p>; */
-
-  //const orders = await fetchData();
 
   const DashboardShell = dynamic(
     () => import("@/components/layout/dashboard-shell"),

@@ -13,8 +13,7 @@ const squareQuery = async (orderId: string) => {
     orderId: orderId,
   });
 
-  console.log(sqObject.order.lineItems);
-  //need pickup details, notes, basePriceMoney
+  console.log(sqObject?.order?.lineItems);
   const { order } = sqObject;
   const newOrder = await prisma.order.update({
     where: { orderId: orderId },
@@ -80,9 +79,9 @@ export default async function handler(
           notes: "",
           due: new Date(Date.now()),
           location: "",
-          quantity: 1, // Provide actual quantity or a default value
-          price: 0, // Provide actual price or a default value
-          customerName: "Unknown Customer", // Provide actual customer name or a default
+          quantity: 1,
+          price: 0,
+          customerName: "Unknown Customer",
           phone: "",
           email: "",
         },
