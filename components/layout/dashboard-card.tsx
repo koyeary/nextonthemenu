@@ -1,21 +1,14 @@
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
+import Alert from "../ui/alert-dialog";
+import { Printer } from "lucide-react";
+import Order from "@/types/Order";
 //import { updateOrderStatus } from "@/utils/API";
 
 interface DashboardCardProps {
   formatDate: (date: string | Date) => string;
   status: string;
-  order: {
-    id: string | number;
-    /*    orderId: string; */
-    items: string;
-    quantity: number;
-    notes: string;
-    due: string | Date;
-    customer_name: string;
-    contact: string;
-    price: number;
-  };
+  order: Order;
 }
 
 const DashboardCard: React.FC<DashboardCardProps> = ({
@@ -63,7 +56,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       <div className="flex items-start justify-between mb-2">
         <div>
           <h1 className="font-semibold ">
-            {order.quantity} {order.items}{" "}
+            {order.quantity} {order.item}{" "}
           </h1>
           <p>
             Modifications: <span className="font-semibold">{order.notes}</span>
@@ -77,16 +70,31 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       <div className="space-y-1 text-sm">
         <p>Quantity: {order.quantity}</p>
         <p className="text-sm text-muted-foreground">
-          Name: <span className="font-semibold">{order.customer_name}</span>
+          Name: <span className="font-semibold">{order.customerName}</span>
         </p>
         <p>
-          Contact: <span className="font-semibold">{order.contact}</span>
+          Email: <span className="font-semibold">{order.email}</span>
+        </p>
+        <p>
+          Phone: <span className="font-semibold">{order.phone}</span>
         </p>
       </div>
       <div className="flex items-center justify-between mt-3">
-        <span className="text-sm text-muted-foreground">
+        {/*       <span className="text-sm text-muted-foreground">
           ${order.price * order.quantity}
-        </span>
+        </span> */}
+
+        {status === "pending" && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="mr-1 bg-violet-500 text-white"
+            onClick={() => handleUpdate(Number(order.id), "pending")}
+          >
+            <Printer /> Reprint
+          </Button>
+        )}
+
         <div>
           {status === "ready" && (
             <Button

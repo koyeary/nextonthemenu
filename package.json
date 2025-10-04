@@ -16,9 +16,11 @@
   "type": "module",
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
+    "@clerk/nextjs": "^6.33.1",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "^6.16.2",
     "@prisma/extension-accelerate": "^2.0.2",
+    "@radix-ui/themes": "^3.2.1",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
