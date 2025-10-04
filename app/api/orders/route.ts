@@ -4,7 +4,6 @@ import prisma from "@/lib/db/connection";
 
 // GET handler to fetch all orders
 export async function GET() {
-  console.log("GET request received for orders");
   try {
     const orders = await prisma.order.findMany({
       orderBy: {
@@ -25,20 +24,11 @@ export async function GET() {
   }
 }
 
-export async function PUT(req: NextRequest) {
-  console.log("PUT request received");
-  console.log(req.url);
-  /* 
-  if (!id || !status) {
-    return NextResponse.json({ message: "ID and status are required" }, { status: 400 });
-  }
-  
-
-try {
-  const updatedOrder = await prisma.order.update({
-    where: { id: Number(id), status:  }, return NextResponse.json(updatedOrder, { status: 200 })
-  }); } catch (error) {
-    console.error("Error updating order:", error);
-    return NextResponse.json({ message: "Failed to update order" }, { status: 500 });
-  } */
+export async function POST() {
+  const webhookEvent = await fetch("/api/webhooks/square", {
+    headers: { "Content-type": "application/json", method: "POST" },
+  });
+  console.log(webhookEvent);
+  //const orders = prisma.order.findMany({ where: { orderId: webhookEvent.id } });
+  return NextResponse.json(webhookEvent, { status: 200 });
 }

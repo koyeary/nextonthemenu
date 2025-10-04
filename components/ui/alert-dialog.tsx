@@ -8,6 +8,7 @@ type AlertProps = {
   description: string;
   responseA?: string;
   responseB: string;
+  handleAction: () => void;
   handleConfirm: () => void;
 };
 const Alert: React.FC<AlertProps> = ({
@@ -16,11 +17,12 @@ const Alert: React.FC<AlertProps> = ({
   description,
   responseA,
   responseB,
+  handleAction,
   handleConfirm,
 }) => (
   <AlertDialog.Root>
     <AlertDialog.Trigger asChild>
-      <Button size="sm" variant="default">
+      <Button size="sm" variant="default" onClick={handleAction}>
         {command}
       </Button>
     </AlertDialog.Trigger>

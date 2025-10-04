@@ -23,7 +23,7 @@ const DashboardShell: React.FC<DashboardShellProps> = ({
     >
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold">Pending</h3>
+          <h2 className="font-semibold">Pending</h2>
           {/*  <Badge variant="secondary">3</Badge>  */}
         </div>
         <div className="space-y-3">
@@ -40,7 +40,7 @@ const DashboardShell: React.FC<DashboardShellProps> = ({
       {/* In Progress Column */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold">Ready</h3>
+          <h2 className="font-semibold">Ready</h2>
           {/*  <Badge variant="secondary">3</Badge>  */}
         </div>
         <div className="space-y-3">
@@ -58,7 +58,7 @@ const DashboardShell: React.FC<DashboardShellProps> = ({
       {seeComplete && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">Completed</h3>
+            <h2 className="font-semibold">Completed</h2>
             {/*     <Badge variant="secondary">2</Badge>  */}
           </div>
           <div className="space-y-3">

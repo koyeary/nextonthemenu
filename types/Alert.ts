@@ -1,14 +1,10 @@
-interface Alert {
-  id: string | number;
-  /* orderId: string; */
-  items: string;
-  quantity: number;
-  notes: string;
-  due: string | Date;
-  customerName: string;
-  contact: string;
-  price: number;
-  status: "pending" | "ready" | "complete";
+interface AlertDialogInterface {
+  command: string;
+  message: string;
+  description: string;
+  responseA?: string;
+  responseB: string;
+  handleConfirm: () => void;
 }
 
-export default Alert;
+export default AlertDialogInterface;

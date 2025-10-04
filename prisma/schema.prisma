@@ -14,18 +14,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model WebhookEvent {
+  id           Int      @id @default(autoincrement())
+  provider  String
+  eventType String
+  payload   Json
+  createdAt DateTime @default(now())
+}
+
 model Order {
   id           Int      @id @default(autoincrement())
   orderId      String   @unique
-  due          DateTime?
   status       String
-  items        String
-  size         String
+  due          DateTime?
+  location     String
+  item         String
   notes        String?
   quantity     Int
   price        Decimal  @db.Decimal(8, 2)
   customerName String   @map("customer_name")
-  contact      String
+  email      String
+  phone       String
   createdAt    DateTime @default(now()) @map("created_at")
 
   @@index([status])
@@ -44,4 +53,5 @@ model Item {
   id    Int @id @default(autoincrement())
   name  String
   price Decimal
+  quantity Int
 }

@@ -26,6 +26,12 @@ h1 {
   color: var(--color-text);
 }
 
+h2 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
 @import "@radix-ui/colors/black-alpha.css";
 @import "@radix-ui/colors/mauve.css";
 @import "@radix-ui/colors/red.css";

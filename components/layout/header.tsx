@@ -4,7 +4,7 @@ import Alert from "../ui/alert-dialog";
 
 type HeaderProps = {
   handleClick: () => void;
-  handleTest?: () => void;
+  handleTest: () => void;
   seeComplete: boolean;
 };
 
@@ -31,6 +31,7 @@ const Header = ({ handleClick, handleTest, seeComplete }: HeaderProps) => {
           message="This is a test of the square webhook listener and prisma database."
           description="Status 200: Success! New order: new order information"
           responseB="Ok"
+          handleAction={handleTest}
           handleConfirm={handleClick}
         />
         <Button size="sm" onClick={handleClick} variant="default">

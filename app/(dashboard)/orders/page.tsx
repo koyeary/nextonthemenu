@@ -26,10 +26,12 @@ const Orders = () => {
   const [message, setMessage] = useState("");
 
   const fetchData = async () => {
-    const results = await fetch("/api/orders");
+    const results = await fetch("/api/orders", {
+      headers: { "Content-type": "application/json", method: "GET" },
+    });
 
     const data = await results.json();
-    console.log(data);
+
     setOrders(data);
     return data;
   };
@@ -50,22 +52,16 @@ const Orders = () => {
   };
 
   const handleTestSquare = async () => {
-    try {
-      const getOrder = await fetch("/api/webhooks/square/", {
-        headers: { "Content-type": "application/json", method: "GET" },
-      });
+    const results = await fetch("/api/webhooks/square", {
+      headers: { "Content-type": "application/json", method: "GET" },
+    });
 
-      setMessage(
-        getOrder.status === 200
-          ? "Success"
-          : getOrder.status === 500
-            ? "Square connection failure"
-            : `Error: ${getOrder.status}`
-      );
-      setShow(true);
-    } catch (err) {
-      console.error(err);
-    }
+    const data = await results.json();
+    console.log(data);
+    setShow(true);
+    // setOrders(data);
+    return data;
+
     /*     fetch("/api/webhooks/square/t03dXZyPQRss0lP8k9Ud7y6AeSeZY", {
       method: "GET",
       headers: {
