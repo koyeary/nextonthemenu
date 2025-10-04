@@ -47,8 +47,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       .catch((error) => {
         console.error("Error updating order:", error);
       });
-
-    // window.location.reload();
   };
 
   return (
@@ -80,10 +78,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         </p>
       </div>
       <div className="flex items-center justify-between mt-3">
-        {/*       <span className="text-sm text-muted-foreground">
-          ${order.price * order.quantity}
-        </span> */}
-
         {status === "pending" && (
           <Button
             size="sm"
