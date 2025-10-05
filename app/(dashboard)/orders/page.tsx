@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Header from "@/components/layout/header";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formatDate = (due: string | number | Date) => {
   const date = new Date(due);
   const month = String(date.getMonth() + 1).padStart(2, "0");

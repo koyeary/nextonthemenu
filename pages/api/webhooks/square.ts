@@ -13,7 +13,6 @@ const squareQuery = async (orderId: string) => {
     orderId: orderId,
   });
 
-  console.log(sqObject?.order?.lineItems);
   const { order } = sqObject;
   const newOrder = await prisma.order.update({
     where: { orderId: orderId },
@@ -30,8 +29,6 @@ const squareQuery = async (orderId: string) => {
       email: order?.fulfillments[0].pickupDetails?.recipient?.emailAddress,
     },
   });
-
-  console.log("new order");
 
   return newOrder;
 };
@@ -54,61 +51,45 @@ export default async function handler(
     const body = JSON.parse(rawBody);
 
     const orderId = body?.data?.id;
-
-    /*    await prisma.webhookEvent.create({
+    await prisma.webhookEvent.create({
       data: {
         provider: "square",
         eventType: "order.create",
-        payload: { id: orderId, location_id: body.data.object.location_id },
+        payload: { id: orderId, ...body.data },
       },
-    }); */
+    });
 
     const alreadyExists = await prisma.order.findUnique({
       where: { orderId: orderId },
     });
 
     if (alreadyExists) {
+      squareQuery(orderId);
       return res.status(400).json("Template Item already exists");
     }
+    if (!alreadyExists) {
+      const template = await prisma.order.create({
+        data: {
+          orderId: orderId,
+          status: "pending",
+          item: "",
+          notes: "",
+          due: new Date(Date.now()),
+          location: "",
+          quantity: 1,
+          price: 0,
+          customerName: "Unknown Customer",
+          phone: "",
+          email: "",
+        },
+      });
 
-    /*     const template = await prisma.order.create({
-      data: {
-        orderId: orderId,
-        status: "pending",
-        item: "",
-        notes: "",
-        due: new Date(Date.now()),
-        location: "",
-        quantity: 1,
-        price: 0,
-        customerName: "Unknown Customer",
-        phone: "",
-        email: "",
-      },
-    }); */
+      if (template) {
+        squareQuery(orderId);
 
-    const sqObject = await squareClient.orders.get({
-      orderId: orderId,
-    });
-    const { order } = sqObject;
-
-    const newOrder = await prisma.order.create({
-      where: { orderId: orderId },
-      data: {
-        item: order?.lineItems[0].name ?? "",
-        notes: order?.lineItems[0].note ?? "",
-        due: order?.fulfillments[0].pickupDetails.pickup_at,
-        location: order?.locationId ?? "",
-        quantity: parseInt(order?.lineItems[0].quantity ?? "1"), // Provide actual quantity or a default value
-        price: new Prisma.Decimal(order?.lineItems[0].basePriceMoney?.amount),
-        customerName:
-          order?.fulfillments[0].pickupDetails?.recipient?.displayName, // Provide actual customer name or a default
-        phone: order?.fulfillments[0].pickupDetails?.recipient?.phoneNumber,
-        email: order?.fulfillments[0].pickupDetails?.recipient?.emailAddress,
-      },
-    });
-
-    return res.status(200).json(newOrder);
+        return res.status(200).json(template); //temporary
+      }
+    }
   } catch (err) {
     console.error("Webhook error:", err);
     return res.status(400).json({ error: "Webhook handler failed" });
