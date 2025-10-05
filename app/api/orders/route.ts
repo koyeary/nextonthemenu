@@ -14,7 +14,7 @@ export async function GET() {
       return NextResponse.json({ message: "No orders found" }, { status: 404 });
     }
 
-    return NextResponse.json(orders, { status: 200 });
+    return NextResponse.json(orders);
   } catch (error) {
     console.error("Error fetching orders:", error);
     return NextResponse.json(
@@ -28,7 +28,6 @@ export async function POST() {
   const webhookEvent = await fetch("/api/webhooks/square", {
     headers: { "Content-type": "application/json", method: "POST" },
   });
-  console.log(webhookEvent);
-  //const orders = prisma.order.findMany({ where: { orderId: webhookEvent.id } });
+
   return NextResponse.json(webhookEvent, { status: 200 });
 }

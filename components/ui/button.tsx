@@ -48,6 +48,7 @@ function Button({
 
   return (
     <Comp
+      aria-hidden="false"
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
