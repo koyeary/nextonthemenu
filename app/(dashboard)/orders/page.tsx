@@ -2,12 +2,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Header from "@/components/layout/header";
-/* 
-const { rows: orders }: QueryResult<Order> = await pool.query(
-    "SELECT * FROM orders"
-  ); */
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formatDate = (due: string | number | Date) => {
   const date = new Date(due);
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -24,8 +19,6 @@ const formatDate = (due: string | number | Date) => {
 const Orders = () => {
   const [seeComplete, setSeeComplete] = useState(false);
   const [orders, setOrders] = useState([]);
-  const [show, setShow] = useState(false);
-  const [message, setMessage] = useState("");
 
   const fetchData = async () => {
     const results = await fetch("/api/orders", {

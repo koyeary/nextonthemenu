@@ -6,10 +6,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
-//import { useUsers } from "@/hooks/useUsers";
-//import { authenticateUser } from "@/utils/API";
-//import KeyPad from "@/features/signIn/KeyPad";
-
 const Home: React.FC = () => {
   const router = useRouter();
 
@@ -32,6 +28,7 @@ const Home: React.FC = () => {
             </CardContent>
             <CardFooter>
               <Button
+                aria-hidden="false"
                 onClick={handleClick}
                 className="bg-gray-800 text-gray-50 m-auto w-24"
               >

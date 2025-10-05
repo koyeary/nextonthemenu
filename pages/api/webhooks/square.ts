@@ -13,7 +13,6 @@ const squareQuery = async (orderId: string) => {
     orderId: orderId,
   });
 
-  console.log(sqObject?.order?.lineItems);
   const { order } = sqObject;
   const newOrder = await prisma.order.update({
     where: { orderId: orderId },
@@ -30,8 +29,6 @@ const squareQuery = async (orderId: string) => {
       email: order?.fulfillments[0].pickupDetails?.recipient?.emailAddress,
     },
   });
-
-  console.log("new order");
 
   return newOrder;
 };
@@ -58,7 +55,7 @@ export default async function handler(
       data: {
         provider: "square",
         eventType: "order.create",
-        payload: { id: orderId, location_id: body.data.object.location_id },
+        payload: { id: orderId, ...body.data },
       },
     });
 
@@ -89,7 +86,7 @@ export default async function handler(
 
       if (template) {
         squareQuery(orderId);
-        console.log("completing request");
+
         return res.status(200).json(template); //temporary
       }
     }

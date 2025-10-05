@@ -16,16 +16,6 @@ const Header = ({ handleClick, handleTest, seeComplete }: HeaderProps) => {
         <p className="text-muted-foreground">Order Management Dashboard</p>
       </div>
       <div className="flex items-center gap-2">
-        {/*           <Badge
-            variant="outline"
-            className="bg-green-50 text-green-700 border-green-200"
-          >
-            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-            Live
-          </Badge> */}
-        {/* <Button size="sm" variant="default">
-          Test Print
-        </Button> */}
         <Alert
           command="Test Square"
           message="This is a test of the square webhook listener and prisma database."
@@ -34,7 +24,12 @@ const Header = ({ handleClick, handleTest, seeComplete }: HeaderProps) => {
           handleAction={handleTest}
           handleConfirm={handleClick}
         />
-        <Button size="sm" onClick={handleClick} variant="default">
+        <Button
+          aria-hidden="false"
+          size="sm"
+          onClick={handleClick}
+          variant="default"
+        >
           {seeComplete ? (
             <Minus className="w-4 h-4" />
           ) : (

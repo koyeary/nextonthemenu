@@ -59,6 +59,7 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
                   // Clear button
                   return (
                     <Button
+                      aria-hidden="false"
                       key={`${rowIndex}-${colIndex}`}
                       variant="outline"
                       size="lg"
@@ -73,6 +74,7 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
                   // Delete button
                   return (
                     <Button
+                      aria-hidden="false"
                       key={`${rowIndex}-${colIndex}`}
                       variant="outline"
                       size="lg"
@@ -90,6 +92,7 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
 
               return (
                 <Button
+                  aria-hidden="false"
                   key={`${rowIndex}-${colIndex}`}
                   variant="outline"
                   size="lg"
@@ -106,6 +109,7 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
 
         {/* Submit Button */}
         <Button
+          aria-hidden="false"
           onClick={onSubmit}
           className="w-full mt-10 mb-5"
           disabled={pin.length < maxLength}

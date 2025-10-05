@@ -1,4 +1,4 @@
-import client from "@/lib/db/connection";
+/* import client from "@/lib/db/connection";
 import { SquareClient, SquareEnvironment } from "square";
 import { Prisma } from "@prisma/client";
 
@@ -348,3 +348,4 @@ main().catch((error) => {
 });
 
 export default seedOrders;
+ */
