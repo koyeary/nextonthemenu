@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import Navbar from "../components/layout/navbar";
+
 import { Theme } from "@radix-ui/themes";
 import ReactQueryProvider from "./providers/ReactQueryProvider";
 import "./globals.css";
@@ -29,6 +31,11 @@ export default function RootLayout({
               </div>
             </header>
             {children}
+            <Script src="/StarWebPrintTrader.js" strategy="beforeInteractive" />
+            <Script
+              src="/StarWebPrintBuilder.js"
+              strategy="beforeInteractive"
+            />
           </body>
         </html>
       </ReactQueryProvider>
