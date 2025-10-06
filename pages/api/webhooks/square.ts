@@ -15,11 +15,12 @@ export default async function handler(
   }
   const rawBody = Buffer.concat(chunks).toString("utf-8");
 
-  let body: any;
+  let body;
   try {
     body = JSON.parse(rawBody);
     if (typeof body === "string") body = JSON.parse(body);
   } catch (err) {
+    console.error(err);
     return res.status(400).json({ error: "Invalid JSON", raw: rawBody });
   }
 

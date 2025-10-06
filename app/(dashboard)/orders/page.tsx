@@ -29,7 +29,6 @@ const Orders = () => {
     data: orders,
     error,
     isLoading,
-    refetch,
   } = useQuery({
     queryKey: ["orders"],
     queryFn: fetchOrders,
@@ -45,6 +44,7 @@ const Orders = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
+    console.log(searchTerm);
     setSearchTerm(term);
 
     const results = orders.filter((order) =>

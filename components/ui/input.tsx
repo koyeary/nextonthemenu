@@ -1,5 +1,4 @@
 import React, { FC, ChangeEvent } from "react";
-import Order from "@/types/Order";
 
 interface InputProps {
   searchTerm: string;

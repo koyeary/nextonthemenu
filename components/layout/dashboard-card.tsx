@@ -1,6 +1,5 @@
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import Alert from "../ui/alert-dialog";
 import { Printer } from "lucide-react";
 import Order from "@/types/Order";
 import { useUpdateOrder } from "@/hooks/useUpdateOrder";

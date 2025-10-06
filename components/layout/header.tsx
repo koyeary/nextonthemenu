@@ -1,7 +1,5 @@
-import { useState, ChangeEvent } from "react";
 import { Button } from "../ui/button";
 import { Minus, Plus } from "lucide-react";
-import Order from "@/types/Order";
 import Input from "../ui/input";
 
 type HeaderProps = {
