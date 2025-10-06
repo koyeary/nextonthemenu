@@ -15,7 +15,9 @@ const DashboardShell: React.FC<DashboardShellProps> = ({
 }) => {
   const pending = orders.filter((order: Order) => order.status === "pending");
   const ready = orders.filter((order: Order) => order.status === "ready");
-  const complete = orders.filter((order: Order) => order.status === "complete");
+  const completed = orders.filter(
+    (order: Order) => order.status === "completed"
+  );
 
   return (
     <div
@@ -62,12 +64,12 @@ const DashboardShell: React.FC<DashboardShellProps> = ({
             {/*     <Badge variant="secondary">2</Badge>  */}
           </div>
           <div className="space-y-3">
-            {complete.map((order: Order) => (
+            {completed.map((order: Order) => (
               <DashboardCard
                 key={order.id}
                 order={order}
                 formatDate={formatDate}
-                status="complete"
+                status="completed"
               />
             ))}
           </div>

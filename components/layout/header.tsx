@@ -7,28 +7,21 @@ import Input from "../ui/input";
 type HeaderProps = {
   handleClick: () => void;
   seeComplete: boolean;
-  //filterObjects: () => void;
-  //searchTerm: string;
 };
 
 const Header = ({
   handleClick,
   seeComplete,
-  //searchTerm,
-  /*   handleChange,
-  handleSubmit, */
+  searchTerm,
+  handleChange,
 }: HeaderProps) => {
   return (
     <div className="flex items-center justify-between border-b pb-4">
       <div>
-        <h2 className="text-2xl font-semibold">Order Management Dashboard</h2>
+        <h2 className="text-1xl font-semibold">Order Management Dashboard</h2>
       </div>
-      <div className="flex items-center gap-2 w-fit">
-        {/*        <Input
-          handleChange={handleChange}
-          handleSubmit={handleSubmit} 
-          searchTerm={searchTerm}
-        /> */}
+      <div className="flex items-center gap-2 w-3lg">
+        <Input handleChange={handleChange} searchTerm={searchTerm} />
         <Button
           aria-hidden="false"
           size="sm"

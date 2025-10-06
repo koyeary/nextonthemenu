@@ -25,7 +25,6 @@ const formatDate = (due: string | number | Date) => {
 };
 
 const Orders = () => {
-  const [seeComplete, setSeeComplete] = useState<boolean>(false);
   const {
     data: orders,
     error,
@@ -36,24 +35,31 @@ const Orders = () => {
     queryFn: fetchOrders,
     refetchInterval: 5000, // optional: auto-refresh every 5s
   });
-
-  const pending = orders?.filter((order: Order) => order.status === "pending");
-  const ready = orders?.filter((order: Order) => order.status === "ready");
-  const complete = orders?.filter(
-    (order: Order) => order.status === "complete"
-  );
+  const [seeComplete, setSeeComplete] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>(orders);
 
   const handleClick = () => {
     setSeeComplete(!seeComplete);
   };
 
-  if (isLoading) return <p>Loading orders…</p>;
-  if (error) return <p>Error loading orders</p>;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+
+    const results = orders.filter((order) =>
+      Object.values(order).some((val) =>
+        String(val).toLowerCase().includes(term)
+      )
+    );
+
+    setFilteredOrders(results);
+  };
 
   /*   const [seeComplete, setSeeComplete] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>(""); */
-  /* 
+  /*
   const fetchData = useCallback(async () => {
     const results = await fetch("/api/orders", {
       headers: { "Content-type": "application/json", method: "GET" },
@@ -101,23 +107,28 @@ const Orders = () => {
     fetchData();
   }, []); */
 
+  if (isLoading) return <p>Loading orders…</p>;
+  if (!orders) return <p>Filtering...</p>;
+  if (error) return <p>Error loading orders</p>;
+
+  const isFiltered = filteredOrders ? filteredOrders : orders;
+  const pending = isFiltered.filter(
+    (order: Order) => order.status === "pending"
+  );
+  const ready = isFiltered.filter((order: Order) => order.status === "ready");
+  const complete = isFiltered.filter(
+    (order: Order) => order.status === "completed"
+  );
+
   return (
     <>
-      <Header
-        handleClick={handleClick}
-        /*         
-        seeComplete={seeComplete}
-         handleChange={handleChange}
-        handleSubmit={handleSubmit} 
-        searchTerm={searchTerm} */
-      />
+      <Header handleClick={handleClick} handleChange={handleChange} />
       <div
         className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6`}
       >
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold">Pending</h2>
-            {/*  <Badge variant="secondary">3</Badge>  */}
           </div>
           <div className="space-y-3">
             {pending.map((order: Order) => (
@@ -160,7 +171,7 @@ const Orders = () => {
                   key={order.id}
                   order={order}
                   formatDate={formatDate}
-                  status="complete"
+                  status="completed"
                 />
               ))}
             </div>

@@ -28,7 +28,7 @@ const seedUsers = async () => {
 };
 
 //SEED ORDERS
-const statuses = ["pending", "ready", "complete"] as const;
+const statuses = ["pending", "ready", "completed"] as const;
 const sizes = ['7"', '8"', '10"', "QS", "HS", "FS"] as const;
 const cakeTypes = [
   "Tres Leches",
