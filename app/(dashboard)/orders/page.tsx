@@ -44,68 +44,33 @@ const Orders = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
-    console.log(searchTerm);
     setSearchTerm(term);
 
     const results = orders.filter((order) =>
-      Object.values(order).some((val) =>
-        String(val).toLowerCase().includes(term)
-      )
+      Object.entries(order).some(([key, val]) => {
+        // If field looks like a date or timestamp
+        if (
+          key.toLowerCase().includes("date") ||
+          key.toLowerCase().includes("due") ||
+          key.toLowerCase().includes("created") ||
+          key.toLowerCase().includes("updated") ||
+          key.toLowerCase().includes("time")
+        ) {
+          try {
+            const formatted = formatDate(val as string).toLowerCase();
+            return formatted.includes(term);
+          } catch {
+            return false;
+          }
+        }
+
+        // Default string match for non-date fields
+        return String(val).toLowerCase().includes(term);
+      })
     );
 
     setFilteredOrders(results);
   };
-
-  /*   const [seeComplete, setSeeComplete] = useState(false);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>(""); */
-  /*
-  const fetchData = useCallback(async () => {
-    const results = await fetch("/api/orders", {
-      headers: { "Content-type": "application/json", method: "GET" },
-    });
-
-    const data = await results.json();
-
-    return setOrders(data);
-  }, []); */
-
-  /*   const handleSubmit = async (orders: Order[], searchTerm: string) => {
-    if (searchTerm === "" || searchTerm === " ") {
-      return;
-    }
-    const term = searchTerm.toLowerCase();
-
-    const filtered = orders.filter((order) =>
-      Object.values(order).some((val) =>
-        String(val).toLowerCase().includes(term)
-      )
-    );
-
-    console.log(filtered);
-    return setOrders(filtered);
-  }; */
-
-  /*  const DashboardShell = dynamic(
-    () => import("@/components/layout/dashboard-shell"),
-    { loading: () => <div>Loading...</div> }
-  ); */
-
-  /*  const handleClick = () => {
-    setSeeComplete(!seeComplete);
-  }; */
-
-  /*   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
-    setSearchTerm(event.target.value);
-    console.log(searchTerm);
-
-    return searchTerm;
-  }; */
-
-  /*   useEffect(() => {
-    fetchData();
-  }, []); */
 
   if (isLoading) return <p>Loading orders…</p>;
   if (!orders) return <p>Filtering...</p>;
@@ -122,13 +87,17 @@ const Orders = () => {
 
   return (
     <>
-      <Header handleClick={handleClick} handleChange={handleChange} />
+      <Header
+        handleClick={handleClick}
+        handleChange={handleChange}
+        seeComplete={seeComplete}
+      />
       <div
-        className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6`}
+        className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6 max-w-11/12 mx-auto flex-wrap`}
       >
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold">Pending</h2>
+          <div className="flex items-center justify-between mb-4 ml-5 text-xl">
+            <div className="font-bold">PENDING</div>
           </div>
           <div className="space-y-3">
             {pending.map((order: Order) => (
@@ -143,9 +112,8 @@ const Orders = () => {
         </div>
         {/* In Progress Column */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold">Ready</h2>
-            {/*  <Badge variant="secondary">3</Badge>  */}
+          <div className="flex items-center justify-between mb-4 ml-5 text-xl">
+            <div className="font-bold">READY</div>
           </div>
           <div className="space-y-3">
             {ready.map((order: Order) => (
@@ -161,9 +129,8 @@ const Orders = () => {
 
         {seeComplete && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold">Completed</h2>
-              {/*     <Badge variant="secondary">2</Badge>  */}
+            <div className="flex items-center justify-between mb-4 ml-5 text-xl">
+              <div className="font-bold">COMPLETED</div>
             </div>
             <div className="space-y-3">
               {complete.map((order: Order) => (

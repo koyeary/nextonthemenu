@@ -14,7 +14,7 @@ const Header = ({
   handleChange,
 }: HeaderProps) => {
   return (
-    <div className="flex items-center justify-between border-b pb-4">
+    <div className="flex items-center justify-between border-b pb-4 ">
       <div>
         <h2 className="text-1xl font-semibold">Order Management Dashboard</h2>
       </div>

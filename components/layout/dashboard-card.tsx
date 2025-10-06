@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Printer } from "lucide-react";
@@ -10,11 +11,27 @@ interface DashboardCardProps {
   order: Order;
 }
 
+const fetchOrders = async () => {
+  const res = await fetch("/api/orders");
+  if (!res.ok) throw new Error("Failed to fetch orders");
+  return res.json();
+};
+
 const DashboardCard: React.FC<DashboardCardProps> = ({
   order,
   status,
   formatDate,
 }) => {
+  const {
+    data: orders,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["orders"],
+    queryFn: fetchOrders,
+    refetchInterval: 5000, // optional: auto-refresh every 5s
+  });
+
   const getColor =
     status === "pending"
       ? "border-l-yellow-400"
@@ -30,6 +47,9 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   const handleStatusChange = (newStatus: string) => {
     updateOrder.mutate({ id: order.orderId, status: newStatus });
   };
+
+  if (isLoading) return <p>Updating order status…</p>;
+  if (error) return <p>Error updating order</p>;
 
   return (
     <Card key={order.id} className={`p-4 border-l-4 ${getColor}`}>
@@ -84,6 +104,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
               Undo
             </Button>
           )}
+        </div>
+        <div>
           <Button
             aria-hidden="false"
             size="sm"

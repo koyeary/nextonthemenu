@@ -46,8 +46,10 @@ const Login = () => {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  h-full">
       <div className="text-center space-y-8 h-fit mt-30">
         <div className="space-y-4">
-          <h1 className="text-gray-900">Sign In</h1>
-          <h2 className="text-gray-900">Enter your pin below</h2>
+          <div className="text-gray-900 text-3xl ">
+            Welcome to Your Kitchen Display System{" "}
+          </div>
+          <div className="text-gray-900 text-2xl">Staff Sign-In</div>
 
           <PinLoginForm
             onPinChange={onPinChange}
