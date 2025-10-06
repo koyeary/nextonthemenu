@@ -1,7 +1,7 @@
 interface Order {
   id: string | number;
   orderId: string;
-  status: "pending" | "ready" | "complete";
+  status: "pending" | "ready" | "completed";
   item: string;
   notes: string;
   due: Date;

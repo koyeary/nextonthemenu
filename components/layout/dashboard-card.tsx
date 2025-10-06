@@ -3,7 +3,7 @@ import { Card } from "../ui/card";
 import Alert from "../ui/alert-dialog";
 import { Printer } from "lucide-react";
 import Order from "@/types/Order";
-//import { updateOrderStatus } from "@/utils/API";
+import { useUpdateOrder } from "@/hooks/useUpdateOrder";
 
 interface DashboardCardProps {
   formatDate: (date: string | Date) => string;
@@ -26,27 +26,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   const getCommand =
     status === "pending" ? "Ready" : status === "ready" ? "Pick Up" : "Undo";
 
-  const handleUpdate = (id: number, status: string) => {
-    fetch(`/api/orders/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status: status }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        response.json();
-        return window.location.reload();
-      })
-      .then((data) => {
-        console.log("Order updated successfully:", data);
-      })
-      .catch((error) => {
-        console.error("Error updating order:", error);
-      });
+  const updateOrder = useUpdateOrder();
+
+  const handleStatusChange = (newStatus: string) => {
+    updateOrder.mutate({ id: order.orderId, status: newStatus });
   };
 
   return (
@@ -84,7 +67,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
             size="sm"
             variant="outline"
             className="mr-1 bg-violet-500 text-white"
-            onClick={() => handleUpdate(Number(order.id), "pending")}
+            onClick={() => handleStatusChange("pending")}
           >
             <Printer /> Reprint
           </Button>
@@ -97,7 +80,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
               size="sm"
               variant="outline"
               className="mr-1 bg-yellow-500 text-white"
-              onClick={() => handleUpdate(Number(order.id), "pending")}
+              onClick={() => handleStatusChange("pending")}
             >
               Undo
             </Button>
@@ -114,9 +97,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                   : "bg-red-400 text-white"
             }
             onClick={() => {
-              console.log(order.id, status);
-              handleUpdate(
-                Number(order.id),
+              handleStatusChange(
                 status === "pending"
                   ? "ready"
                   : status === "ready"

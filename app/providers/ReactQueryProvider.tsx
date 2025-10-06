@@ -3,8 +3,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 
-export default function ReactQueryProvider({ children }: { children: ReactNode }) {
-  // Create the QueryClient once per app load
+export default function ReactQueryProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -17,6 +20,7 @@ export default function ReactQueryProvider({ children }: { children: ReactNode }
       })
   );
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
 }
-
