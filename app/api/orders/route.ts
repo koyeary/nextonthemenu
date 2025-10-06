@@ -1,4 +1,14 @@
-// app/api/orders/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/db/connection";
+
+export async function GET() {
+  const orders = await prisma.order.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  return NextResponse.json(orders);
+}
+
+/* // app/api/orders/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/connection";
 
@@ -29,5 +39,4 @@ export async function POST() {
     headers: { "Content-type": "application/json", method: "POST" },
   });
 
-  return NextResponse.json(webhookEvent, { status: 200 });
-}
+  return NextResponse.json(webhookEvent, { status: 200 }); */

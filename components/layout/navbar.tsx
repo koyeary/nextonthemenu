@@ -21,7 +21,7 @@ const Navbar = () => {
         <ChefHat className="h-8 w-8 text-primary" />
 
         <div>
-          <h1 className="text-text">KDS Pro - Mia&apos;s Bakery</h1>
+          <h1 className="text-text">Mia&apos;s Bakery</h1>
         </div>
       </div>
       <div className="w-fit flex-row">

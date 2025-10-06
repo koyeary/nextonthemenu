@@ -1,29 +1,34 @@
+import { useState, ChangeEvent } from "react";
 import { Button } from "../ui/button";
 import { Minus, Plus } from "lucide-react";
-import Alert from "../ui/alert-dialog";
+import Order from "@/types/Order";
+import Input from "../ui/input";
 
 type HeaderProps = {
   handleClick: () => void;
-  handleTest: () => void;
   seeComplete: boolean;
+  //filterObjects: () => void;
+  //searchTerm: string;
 };
 
-const Header = ({ handleClick, handleTest, seeComplete }: HeaderProps) => {
+const Header = ({
+  handleClick,
+  seeComplete,
+  //searchTerm,
+  /*   handleChange,
+  handleSubmit, */
+}: HeaderProps) => {
   return (
     <div className="flex items-center justify-between border-b pb-4">
       <div>
-        <h1 className="text-2xl font-semibold"> Kitchen Display System</h1>
-        <p className="text-muted-foreground">Order Management Dashboard</p>
+        <h2 className="text-2xl font-semibold">Order Management Dashboard</h2>
       </div>
-      <div className="flex items-center gap-2">
-        <Alert
-          command="Test Square"
-          message="This is a test of the square webhook listener and prisma database."
-          description="Status 200: Success! New order: new order information"
-          responseB="Ok"
-          handleAction={handleTest}
-          handleConfirm={handleClick}
-        />
+      <div className="flex items-center gap-2 w-fit">
+        {/*        <Input
+          handleChange={handleChange}
+          handleSubmit={handleSubmit} 
+          searchTerm={searchTerm}
+        /> */}
         <Button
           aria-hidden="false"
           size="sm"

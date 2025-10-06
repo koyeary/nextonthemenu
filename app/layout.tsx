@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "../components/layout/navbar";
 import { Theme } from "@radix-ui/themes";
-
+import ReactQueryProvider from "./providers/ReactQueryProvider";
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
 
@@ -20,16 +20,18 @@ export default function RootLayout({
 }>) {
   return (
     <Theme>
-      <html lang="en">
-        <body>
-          <header className="shadow-lg shadow-gray-200 ">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <Navbar />
-            </div>
-          </header>
-          {children}
-        </body>
-      </html>
+      <ReactQueryProvider>
+        <html lang="en">
+          <body>
+            <header className="shadow-lg shadow-gray-200 ">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <Navbar />
+              </div>
+            </header>
+            {children}
+          </body>
+        </html>
+      </ReactQueryProvider>
     </Theme>
   );
 }
