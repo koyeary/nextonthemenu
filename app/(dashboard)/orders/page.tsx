@@ -59,7 +59,7 @@ const Orders = () => {
   /*   const [seeComplete, setSeeComplete] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>(""); */
-  /* 
+  /*
   const fetchData = useCallback(async () => {
     const results = await fetch("/api/orders", {
       headers: { "Content-type": "application/json", method: "GET" },
@@ -107,18 +107,18 @@ const Orders = () => {
     fetchData();
   }, []); */
 
-  const pending =
-    orders &&
-    filteredOrders.filter((order: Order) => order.status === "pending");
-  const ready =
-    filteredOrders &&
-    filteredOrders.filter((order: Order) => order.status === "ready");
-  const complete =
-    orders &&
-    filteredOrders.filter((order: Order) => order.status === "completed");
-
   if (isLoading) return <p>Loading orders…</p>;
+  if (!orders) return <p>Filtering...</p>;
   if (error) return <p>Error loading orders</p>;
+
+  const isFiltered = filteredOrders ? filteredOrders : orders;
+  const pending = isFiltered.filter(
+    (order: Order) => order.status === "pending"
+  );
+  const ready = isFiltered.filter((order: Order) => order.status === "ready");
+  const complete = isFiltered.filter(
+    (order: Order) => order.status === "completed"
+  );
 
   return (
     <>
@@ -129,7 +129,6 @@ const Orders = () => {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold">Pending</h2>
-            {/*  <Badge variant="secondary">3</Badge>  */}
           </div>
           <div className="space-y-3">
             {pending.map((order: Order) => (

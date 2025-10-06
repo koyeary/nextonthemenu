@@ -22,7 +22,7 @@ const Input: FC<InputProps> = ({
         type={type}
         value={searchTerm}
         onChange={handleChange}
-        placeholder=" "
+        placeholder="Search"
         name={name}
       />
     </div>
