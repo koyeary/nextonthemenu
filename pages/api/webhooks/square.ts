@@ -1,4 +1,43 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@/lib/db/connection";
+
+export const config = { api: { bodyParser: false } };
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== "POST") return res.status(405).end("Method Not Allowed");
+
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+  }
+  const rawBody = Buffer.concat(chunks).toString("utf-8");
+
+  let body: any;
+  try {
+    body = JSON.parse(rawBody);
+    if (typeof body === "string") body = JSON.parse(body);
+  } catch (err) {
+    return res.status(400).json({ error: "Invalid JSON", raw: rawBody });
+  }
+
+  const orderId = body?.order?.id;
+  const status = body?.order?.state ?? "UNKNOWN";
+
+  if (orderId) {
+    await prisma.order.upsert({
+      where: { orderId },
+      update: { status, payload: body },
+      create: { orderId, status, payload: body },
+    });
+  }
+
+  return res.status(200).json({ ok: true });
+}
+
+/* import { NextApiRequest, NextApiResponse } from "next";
 import client from "@/lib/db/connection";
 import { Prisma } from "@prisma/client";
 import { SquareClient, SquareEnvironment } from "square";
@@ -17,16 +56,17 @@ const squareQuery = async (orderId: string) => {
   const newOrder = await prisma.order.update({
     where: { orderId: orderId },
     data: {
-      item: order?.lineItems[0].name ?? "",
-      notes: order?.lineItems[0].note ?? "",
-      due: order?.fulfillments[0].pickupDetails.pickup_at,
+      item: order?.lineItems?.[0]?.name ?? "",
+      notes: order?.lineItems?.[0]?.note ?? "",
+      due: order?.fulfillments?.[0]?.pickupDetails?.pickupAt ?? "",
       location: order?.locationId ?? "",
-      quantity: parseInt(order?.lineItems[0].quantity ?? "1"), // Provide actual quantity or a default value
-      price: new Prisma.Decimal(order?.lineItems[0].basePriceMoney?.amount),
+      quantity: parseInt(order?.lineItems?.[0]?.quantity ?? "1"),
       customerName:
-        order?.fulfillments[0].pickupDetails?.recipient?.displayName, // Provide actual customer name or a default
-      phone: order?.fulfillments[0].pickupDetails?.recipient?.phoneNumber,
-      email: order?.fulfillments[0].pickupDetails?.recipient?.emailAddress,
+        order?.fulfillments?.[0]?.pickupDetails?.recipient?.displayName ?? "",
+      phone:
+        order?.fulfillments?.[0]?.pickupDetails?.recipient?.phoneNumber ?? "",
+      email:
+        order?.fulfillments?.[0]?.pickupDetails?.recipient?.emailAddress ?? "",
     },
   });
 
@@ -95,3 +135,4 @@ export default async function handler(
     return res.status(400).json({ error: "Webhook handler failed" });
   }
 }
+ */
