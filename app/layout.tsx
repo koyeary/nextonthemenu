@@ -31,9 +31,12 @@ export default function RootLayout({
               </div>
             </header>
             {children}
-            <Script src="/StarWebPrintTrader.js" strategy="beforeInteractive" />
             <Script
-              src="/StarWebPrintBuilder.js"
+              src="/starwebprint/StarWebPrintTrader.js"
+              strategy="beforeInteractive"
+            />
+            <Script
+              src="/starwebprint/StarWebPrintBuilder.js"
               strategy="beforeInteractive"
             />
           </body>

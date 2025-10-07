@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
@@ -22,6 +23,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   status,
   formatDate,
 }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {
     data: orders,
     error,
@@ -31,6 +33,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     queryFn: fetchOrders,
     refetchInterval: 5000, // optional: auto-refresh every 5s
   });
+
+  const router = useRouter();
 
   const getColor =
     status === "pending"
@@ -45,10 +49,18 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   const updateOrder = useUpdateOrder();
 
   const handleStatusChange = (newStatus: string) => {
-    updateOrder.mutate({ id: order.orderId, status: newStatus });
+    updateOrder.mutate({
+      id: order.orderId,
+      status: newStatus,
+    });
   };
 
-  if (isLoading) return <p>Updating order status…</p>;
+  if (isLoading)
+    return (
+      <Card key={order.id} className={`p-4 border-l-4 ${getColor} h-20`}>
+        <p>Updating order status</p>
+      </Card>
+    );
   if (error) return <p>Error updating order</p>;
 
   return (
@@ -86,7 +98,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
             size="sm"
             variant="outline"
             className="mr-1 bg-violet-500 text-white"
-            onClick={() => handleStatusChange("pending")}
+            onClick={() => router.push("/printer")}
           >
             <Printer /> Reprint
           </Button>

@@ -1,6 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Script from "next/script";
 
 // --- Type Declarations for StarWebPrint SDK ---
 declare global {
@@ -17,7 +21,6 @@ interface TraderResponse {
   responseText?: string;
 }
 
-// --- Component ---
 export default function PrinterPage() {
   const [paperWidth, setPaperWidth] = useState<"2inch" | "3inch">("2inch");
   const [logoPath, setLogoPath] = useState("01-Receipt_Letter_ENG.bmp");
@@ -68,9 +71,7 @@ export default function PrinterPage() {
   // Text + Paper Logic
   // -----------------------
   const createText = () => {
-    setText(
-      "Thank you very much for your business!\nShizuoka Store: 054-347-0112\n..."
-    );
+    setText("Thank you very much!\nShizuoka Store: 054-347-0112\n...");
   };
 
   const changePaperWidth = (width: "2inch" | "3inch") => {
@@ -84,7 +85,7 @@ export default function PrinterPage() {
   const changeLogo = (width: string, path: string) => {
     try {
       const image = new Image();
-      image.src = `/img/${width}/${path}?${new Date().getTime()}`;
+      image.src = `/starwebprint/img/${width}/${path}?${new Date().getTime()}`;
 
       image.onload = function () {
         const canvasPrint = canvasPrintRef.current;
@@ -127,7 +128,7 @@ export default function PrinterPage() {
   // Print Message Handling
   // -----------------------
   const sendMessage = (request: string) => {
-    if (!window.StarWebPrintTrader) {
+    if (typeof window === "undefined" || !window.StarWebPrintTrader) {
       alert("StarWebPrintTrader SDK not loaded.");
       return;
     }
@@ -135,7 +136,15 @@ export default function PrinterPage() {
     showNowPrinting();
 
     const url = "http://localhost:8001/StarWebPRNT/SendMessage";
-    const trader = new window.StarWebPrintTrader({ url });
+    const trader = new window.StarWebPrintTrader({
+      url: "/StarWebPRNT/SendMessage",
+    });
+
+    // DEV-ONLY patch for mock server
+    trader.sendMessage = function (args) {
+      console.log("Mock sendMessage called:", args.request?.slice?.(0, 200));
+      this.onReceive({ traderSuccess: "true" });
+    };
 
     trader.onReceive = (response: TraderResponse) => {
       hideNowPrinting();
@@ -160,16 +169,37 @@ export default function PrinterPage() {
       }
     };
 
+    //monkey wrench for dev, remove for prod
+    if (process.env.NODE_ENV === "development") {
+      const origFunc = trader.onReceive;
+      trader.onReceive = (res: any) => {
+        if (res.status === 200 && !res.responseText) {
+          console.warn("Bypassing StarWebPrint validation in dev mode.");
+          hideNowPrinting(); // or your success callback
+        } else {
+          origFunc?.(res);
+        }
+      };
+    }
+
     trader.sendMessage({ request });
   };
 
   const onSend = () => {
-    if (!window.StarWebPrintBuilder) {
-      alert("StarWebPrintBuilder SDK not loaded.");
+    if (typeof window === "undefined" || !window.StarWebPrintBuilder) {
+      alert("StarWebPrintBuilder SDK not loaded yet.");
       return;
     }
 
-    const builder = new window.StarWebPrintBuilder();
+    // Adjust this depending on what console.log reveals
+    const builder = new window.StarWebPrintBuilder(); // or new window.StarWebPrintBuilder() / window.StarWebPrintBuilder.Builder
+
+    console.log(builder); // confirm createInitializationElement exists
+    if (typeof builder.createInitializationElement !== "function") {
+      alert("Builder functions not found. Check SDK version and path.");
+      return;
+    }
+
     const canvasPrint = canvasPrintRef.current;
     if (!canvasPrint) return;
 
@@ -196,90 +226,106 @@ export default function PrinterPage() {
   // JSX Layout
   // -----------------------
   return (
-    <div className="p-6 space-y-4 font-sans">
-      {/* Overlay */}
-      <div
-        id="overlay"
-        ref={overlayRef}
-        className="fixed inset-0 bg-black/40 hidden transition-opacity"
-      >
-        <div
-          id="nowPrintingWrapper"
-          ref={nowPrintingRef}
-          className="absolute inset-0 flex items-center justify-center"
-        >
-          <div className="text-white text-center">
-            <h1>Now Printing</h1>
-            <p>
-              <img src="/images/icon_loading.gif" alt="loading" />
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Header */}
-      <header className="flex justify-between items-center">
-        <h1 className="text-xl font-bold">Receipt Letter</h1>
-        <img src="/images/logo_02.png" alt="logo" className="h-4" />
-      </header>
-
-      {/* Paper Width Selector */}
-      <div>
-        <label>Paper Width Selection</label>
-        <select
-          value={paperWidth}
-          onChange={(e) =>
-            changePaperWidth(e.target.value as "2inch" | "3inch")
-          }
-          className="border rounded p-1 ml-2"
-        >
-          <option value="2inch">2 Inch (SM-S210i)</option>
-          <option value="3inch">3 Inch (TSP650II)</option>
-        </select>
-      </div>
-
-      {/* Logo Selector */}
-      <div>
-        <label>Logo Selection</label>
-        <select
-          value={logoPath}
-          onChange={(e) => {
-            setLogoPath(e.target.value);
-            changeLogo(paperWidth, e.target.value);
-          }}
-          className="border rounded p-1 ml-2"
-        >
-          <option value="01-Receipt_Letter_ENG.bmp">
-            01 Receipt Letter (English)
-          </option>
-          {/*   <option value="02-Receipt_Letter_JP.bmp">
-            02 Receipt Letter (Japanese)
-          </option>
-          <option value="03-Thanks_Letter.bmp">03 Thank You Letter</option> */}
-        </select>
-      </div>
-
-      {/* Canvases */}
-      <div>
-        <canvas ref={canvasPrintRef} hidden width={0} height={15}></canvas>
-        <canvas ref={canvasShowRef}></canvas>
-      </div>
-
-      {/* Textarea */}
-      <textarea
-        rows={15}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        className="w-full border rounded p-2 font-mono text-sm"
+    <>
+      {/* Load StarWebPrint SDK before React runs */}
+      <Script
+        src="/starwebprint/StarWebPrintBuilder.js"
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="/starwebprint/StarWebPrintTrader.js"
+        strategy="beforeInteractive"
       />
 
-      {/* Print Button */}
-      <button
-        onClick={onSend}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Print
-      </button>
-    </div>
+      <div className="p-6 space-y-4 font-sans ">
+        {/* Overlay */}
+        <div
+          id="overlay"
+          ref={overlayRef}
+          className="fixed inset-0 bg-black/40 hidden transition-opacity"
+        >
+          <div
+            id="nowPrintingWrapper"
+            ref={nowPrintingRef}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <div className="text-white text-center">
+              <h1>Now Printing</h1>
+              <p>
+                <img
+                  src="/starwebprint/images/icon_loading.gif"
+                  alt="loading"
+                />
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Header */}
+        <header className="flex justify-between items-center">
+          <h1 className="text-xl font-bold">Receipt Letter</h1>
+          {/*       <img
+            src="/startwebprint/images/logo_02.png"
+            alt="logo"
+            className="h-4"
+          /> */}
+        </header>
+
+        {/* Paper Width Selector */}
+        <div>
+          <label>Paper Width</label>
+          <select
+            value={paperWidth}
+            onChange={(e) =>
+              changePaperWidth(e.target.value as "2inch" | "3inch")
+            }
+            className="border rounded p-1 ml-2"
+          >
+            <option value="2inch">2 inch (SM-S210i)</option>
+            <option value="3inch">3 inch (TSP650II)</option>
+          </select>
+        </div>
+
+        {/* Logo Selector */}
+        <div>
+          <label>Logo Selection</label>
+          <select
+            value={logoPath}
+            onChange={(e) => {
+              setLogoPath(e.target.value);
+              changeLogo(paperWidth, e.target.value);
+            }}
+            className="border rounded p-1 ml-2"
+          >
+            <option value="02-Receipt_Letter_JP.bmp">
+              02 Receipt Letter Japanese
+            </option>
+            <option value="03-Thanks_Letter.bmp">03 Thanks Letter</option>
+          </select>
+        </div>
+
+        {/* Canvases */}
+        <div>
+          <canvas ref={canvasPrintRef} hidden width={0} height={15}></canvas>
+          <canvas ref={canvasShowRef}></canvas>
+        </div>
+
+        {/* Textarea */}
+        <textarea
+          rows={10}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="w-full border rounded p-2 font-mono text-sm mx-auto"
+        />
+
+        {/* Print Button */}
+        <button
+          onClick={onSend}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Print
+        </button>
+      </div>
+    </>
   );
 }

@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
 export function useUpdateOrder() {
   const queryClient = useQueryClient();
 
@@ -12,6 +11,7 @@ export function useUpdateOrder() {
       });
 
       if (!res.ok) throw new Error("Failed to update order");
+
       return res.json();
     },
     onSuccess: () => {
