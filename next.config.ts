@@ -14,7 +14,7 @@ const nextConfig = {
     return [
       {
         source: "/StarWebPRNT/:path*",
-        destination: "http://localhost:8001/StarWebPRNT/:path*", // goes to printer
+        destination: "http://172.16.1.1/StarWebPRNT/:path*", // goes to printer
       },
     ];
   },

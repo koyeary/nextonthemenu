@@ -135,16 +135,16 @@ export default function PrinterPage() {
 
     showNowPrinting();
 
-    const url = "http://localhost:8001/StarWebPRNT/SendMessage";
+    const url = "http://172.16.1.254/StarWebPRNT/SendMessage";
     const trader = new window.StarWebPrintTrader({
       url: "/StarWebPRNT/SendMessage",
     });
 
-    // DEV-ONLY patch for mock server
+    /*   // DEV-ONLY patch for mock server
     trader.sendMessage = function (args) {
       console.log("Mock sendMessage called:", args.request?.slice?.(0, 200));
       this.onReceive({ traderSuccess: "true" });
-    };
+    }; */
 
     trader.onReceive = (response: TraderResponse) => {
       hideNowPrinting();
@@ -170,7 +170,7 @@ export default function PrinterPage() {
     };
 
     //monkey wrench for dev, remove for prod
-    if (process.env.NODE_ENV === "development") {
+    /*     if (process.env.NODE_ENV === "development") {
       const origFunc = trader.onReceive;
       trader.onReceive = (res: any) => {
         if (res.status === 200 && !res.responseText) {
@@ -180,7 +180,7 @@ export default function PrinterPage() {
           origFunc?.(res);
         }
       };
-    }
+    } */
 
     trader.sendMessage({ request });
   };

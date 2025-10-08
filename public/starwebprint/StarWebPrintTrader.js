@@ -93,7 +93,8 @@ StarWebPrintTrader.prototype.sendMessage = function (a) {
   b = "";
   b = void 0 != a.url ? a.url : this.url;
   if (
-    /^https?:\/\/(localhost|127\.0\.0\.1):8001\//.test(b.toLowerCase()) &&
+    //172.16.1.254
+    /^https?:\/\/(172\.16\.1\.254):8001\//.test(b.toLowerCase()) &&
     -1 != navigator.userAgent.indexOf("webPRNTSupportMessageHandler")
   )
     ((this._json = JSON.stringify({ url: b, body: c })),
@@ -120,7 +121,7 @@ StarWebPrintTrader.prototype.sendMessage = function (a) {
       if (
         -1 == navigator.userAgent.indexOf("WebPRNTSupportHTTPS") &&
         (0 == b.toLowerCase().indexOf("https://localhost") ||
-          0 == b.toLowerCase().indexOf("https://127.0.0.1"))
+          0 == b.toLowerCase().indexOf("https://172.16.1.254"))
       )
         b = "http://" + b.substring(8);
     try {

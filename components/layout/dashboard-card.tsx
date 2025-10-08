@@ -92,18 +92,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         </p>
       </div>
       <div className="flex items-center justify-between mt-3">
-        {status === "pending" && (
-          <Button
-            aria-hidden="false"
-            size="sm"
-            variant="outline"
-            className="mr-1 bg-violet-500 text-white"
-            onClick={() => router.push("/printer")}
-          >
-            <Printer /> Reprint
-          </Button>
-        )}
-
         <div>
           {status === "ready" && (
             <Button
@@ -118,6 +106,18 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           )}
         </div>
         <div>
+          {status === "ready" && (
+            <Button
+              aria-hidden="false"
+              size="sm"
+              variant="outline"
+              className="mr-1 bg-violet-500 text-white"
+              onClick={() => router.push("/printer")}
+            >
+              <Printer /> Print
+            </Button>
+          )}
+
           <Button
             aria-hidden="false"
             size="sm"

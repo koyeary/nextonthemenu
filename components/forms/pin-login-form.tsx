@@ -7,6 +7,7 @@ interface PinLoginFormProps {
   onSubmit: () => void;
   handleClear: () => void;
   handleDelete: () => void;
+  handleKeyDown: () => void;
   pin: string;
   maxLength?: number;
   placeholder?: string;
@@ -18,6 +19,7 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
   onSubmit,
   handleDelete,
   handleClear,
+
   pin,
   maxLength = 4,
 }: PinLoginFormProps) => {
