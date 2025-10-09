@@ -19,7 +19,6 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
   onSubmit,
   handleDelete,
   handleClear,
-
   pin,
   maxLength = 4,
 }: PinLoginFormProps) => {

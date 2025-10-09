@@ -1,10 +1,32 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Printer } from "lucide-react";
 import Order from "@/types/Order";
 import { useUpdateOrder } from "@/hooks/useUpdateOrder";
+import Script from "next/script";
+import PrintDialog from "../ui/print-dialog";
+
+// --- Type Declarations for StarWebPrint SDK ---
+declare global {
+  interface Window {
+    StarWebPrintTrader?: any;
+    StarWebPrintBuilder?: any;
+  }
+}
+
+interface TraderResponse {
+  traderSuccess?: string;
+  traderStatus?: unknown;
+  status?: number;
+  responseText?: string;
+}
 
 interface DashboardCardProps {
   formatDate: (date: string | Date) => string;
@@ -54,6 +76,18 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       status: newStatus,
     });
   };
+
+  /* END SO MUCH PRINT STUFF */
+
+  /*   const formatReceipt = () => {
+    <>
+      <p>
+        {order.quantity} - {order.item}
+      </p>
+      <p>Modifications: {order.notes}</p>
+      <p>Order #: {orderId}</p>
+    </>;
+  }; */
 
   if (isLoading)
     return (
@@ -106,41 +140,33 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           )}
         </div>
         <div>
-          {status === "ready" && (
+          {status === "ready" && <PrintDialog order={order} />}
+
+          {status !== "ready" && (
             <Button
               aria-hidden="false"
               size="sm"
               variant="outline"
-              className="mr-1 bg-violet-500 text-white"
-              onClick={() => router.push("/printer")}
+              className={
+                status === "pending"
+                  ? "bg-green-600 text-white"
+                  : status === "ready"
+                    ? "bg-blue-500 text-white"
+                    : "bg-red-400 text-white"
+              }
+              onClick={() => {
+                handleStatusChange(
+                  status === "pending"
+                    ? "ready"
+                    : status === "ready"
+                      ? "completed"
+                      : "pending"
+                );
+              }}
             >
-              <Printer /> Print
+              {getCommand}
             </Button>
           )}
-
-          <Button
-            aria-hidden="false"
-            size="sm"
-            variant="outline"
-            className={
-              status === "pending"
-                ? "bg-green-600 text-white"
-                : status === "ready"
-                  ? "bg-blue-500 text-white"
-                  : "bg-red-400 text-white"
-            }
-            onClick={() => {
-              handleStatusChange(
-                status === "pending"
-                  ? "ready"
-                  : status === "ready"
-                    ? "completed"
-                    : "pending"
-              );
-            }}
-          >
-            {getCommand}
-          </Button>
         </div>
       </div>
     </Card>

@@ -1,12 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-
+/* eslint-disable */
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
+import { Button } from "./button";
+import { X, Printer } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Text } from "@radix-ui/themes";
 
-// --- Type Declarations for StarWebPrint SDK ---
+type PrintDialogProps = {
+  order;
+};
+
 declare global {
   interface Window {
     StarWebPrintTrader?: any;
@@ -21,18 +24,29 @@ interface TraderResponse {
   responseText?: string;
 }
 
-export default function PrinterPage() {
-  const [paperWidth, setPaperWidth] = useState<"2inch" | "3inch">("2inch");
-  const [logoPath, setLogoPath] = useState("01-Receipt_Letter_ENG.bmp");
-  const [text, setText] = useState("");
+const PrintDialog: React.FC<PrintDialogProps> = ({ order }) => {
   const canvasPrintRef = useRef<HTMLCanvasElement | null>(null);
   const canvasShowRef = useRef<HTMLCanvasElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const nowPrintingRef = useRef<HTMLDivElement | null>(null);
+  const [paperWidth, setPaperWidth] = useState<"2inch" | "3inch">("2inch");
+  const [logoPath, setLogoPath] = useState("01-Receipt_Letter_ENG.bmp");
+  const [text, setText] = useState("");
 
-  // -----------------------
-  // Lifecycle Initialization
-  // -----------------------
+  const {
+    orderId,
+    quantity,
+    item,
+    notes,
+    due,
+    price,
+    customerName,
+    email,
+    phone,
+  } = order;
+
+  const formatText = `${item.toUpperCase()}\nQuantity: ${quantity}\nNotes: ${notes}\nCustomer name: ${customerName}\nEmail: ${email}\nPhone: ${phone}`;
+
   useEffect(() => {
     nowLoading();
     createText();
@@ -71,7 +85,7 @@ export default function PrinterPage() {
   // Text + Paper Logic
   // -----------------------
   const createText = () => {
-    setText("Thank you very much!\nShizuoka Store: 054-347-0112\n...");
+    return formatText;
   };
 
   const changePaperWidth = (width: "2inch" | "3inch") => {
@@ -221,15 +235,12 @@ export default function PrinterPage() {
     request += builder.createTextElement({ data: text });
     request += builder.createCutPaperElement({ feed: true });
 
-    sendMessage(request);
+    console.log(request);
+    //sendMessage(request);
   };
 
-  // -----------------------
-  // JSX Layout
-  // -----------------------
   return (
     <>
-      {/* Load StarWebPrint SDK before React runs */}
       <Script
         src="/starwebprint/StarWebPrintBuilder.js"
         strategy="beforeInteractive"
@@ -238,97 +249,51 @@ export default function PrinterPage() {
         src="/starwebprint/StarWebPrintTrader.js"
         strategy="beforeInteractive"
       />
-
-      <div className="p-6 space-y-4 font-sans ">
-        {/* Overlay */}
-        <div
-          id="overlay"
-          ref={overlayRef}
-          className="fixed inset-0 bg-black/40 hidden transition-opacity"
+      <Dialog.Root>
+        <Dialog.Trigger
+          type="button"
+          className="bg-violet-500 font-semibold text-white rounded-lg px-6 py-2 flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
         >
-          <div
-            id="nowPrintingWrapper"
-            ref={nowPrintingRef}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <div className="text-white text-center">
-              <h1>Now Printing</h1>
-              <p>
-                <img
-                  src="/starwebprint/images/icon_loading.gif"
-                  alt="loading"
-                />
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Header */}
-        <header className="flex justify-between items-center">
-          <img
-            src="/starwebprint/images/mias-logotype-box-copy-7518-web.jpg"
-            alt="logo"
-            className="h-4"
-          />
-        </header>
-
-        {/* Paper Width Selector */}
-        <div>
-          <label>Paper Width</label>
-          <select
-            value={paperWidth}
-            onChange={(e) =>
-              changePaperWidth(e.target.value as "2inch" | "3inch")
-            }
-            className="border rounded p-1 ml-2"
-          >
-            <option value="2inch">2 inch (SM-S210i)</option>
-            <option value="3inch">3 inch (TSP650II)</option>
-          </select>
-        </div>
-
-        {/* Logo Selector */}
-        {/*         <div>
-          <label>Logo Selection</label>
-          <select
-            value={logoPath}
-            onChange={(e) => {
-              setLogoPath(e.target.value);
-              changeLogo(paperWidth, e.target.value);
-            }}
-            className="border rounded p-1 ml-2"
-          >
-            <option value="/starwebprint/images/mias-logotype-box-copy-7518-web.jpg">
-              02 Receipt Letter Japanese
-            </option>
-            <option value="/starwebprint/images/mias-logotype-box-copy-7518-web.jpg">
-              03 Thanks Letter
-            </option>
-          </select>
-        </div> */}
-
-        {/* Canvases */}
-        <div>
-          <canvas ref={canvasPrintRef} hidden width={0} height={15}></canvas>
-          <canvas ref={canvasShowRef}></canvas>
-        </div>
-
-        {/* Textarea */}
-        <textarea
-          rows={10}
-          value={text}
-          onChange={(e) => console.log(e.target.value)}
-          className="w-full border rounded p-2 font-mono text-sm mx-auto"
-        />
-
-        {/* Print Button */}
-        <button
-          onClick={onSend}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Print
-        </button>
-      </div>
+          <Printer />
+        </Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Overlay className="w-screen h-screen bg-gray-300/80 fixed inset-0">
+            <Dialog.Content className="absolute p-10 bg-gray-100 rounded-2xl w-full max-w-md top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-2xl">
+              <Dialog.Close className="absolute right-6 top-6  font-semibold text-zinc-400 gap-2 rounded-lg border flex whitespace-nowrap">
+                <X />
+              </Dialog.Close>
+              <Dialog.Title className="py-2">
+                <Text as="p" className="text-xl">
+                  {item.toUpperCase()}
+                </Text>
+              </Dialog.Title>
+              <Text as="p" className="text-lg font-semibold">
+                Quantity: {quantity}
+              </Text>
+              <Text as="p" className="text-lg font-semibold">
+                Notes: {notes}
+              </Text>
+              <Text as="p" className="text-lg">
+                Customer Name: {customerName}
+              </Text>
+              <Text as="p" className="text-lg">
+                Email: {email}
+              </Text>
+              <Text as="p" className="text-lg">
+                Phone: {phone}
+              </Text>
+              <Button
+                onClick={onSend}
+                className="bg-violet-500 font-semibold text-white  rounded-lg px-6 py-2 mx-auto mt-5 w-30 flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
+              >
+                <Printer /> PRINT
+              </Button>
+            </Dialog.Content>
+          </Dialog.Overlay>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   );
-}
+};
+
+export default PrintDialog;

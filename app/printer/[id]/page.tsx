@@ -70,8 +70,9 @@ export default function PrinterPage() {
   // -----------------------
   // Text + Paper Logic
   // -----------------------
+
   const createText = () => {
-    setText("Thank you very much!\nShizuoka Store: 054-347-0112\n...");
+    setText(`Thank you very much!\nOrder Number: number\n...`);
   };
 
   const changePaperWidth = (width: "2inch" | "3inch") => {
@@ -141,13 +142,12 @@ export default function PrinterPage() {
       url: url,
     });
 
-    // DEV-ONLY patch for mock server
-    /* trader.sendMessage = function (args) {
+    /*     // DEV-ONLY patch for mock server
+    trader.sendMessage = function (args) {
       console.log("Mock sendMessage called:", args.request?.slice?.(0, 200));
       this.onReceive({ traderSuccess: "true" });
-    }; */
-    //end dev patch
-
+    };
+ */
     trader.onReceive = (response: TraderResponse) => {
       hideNowPrinting();
       let msg = "- onReceive -\n\n";
@@ -317,7 +317,7 @@ export default function PrinterPage() {
         <textarea
           rows={10}
           value={text}
-          onChange={(e) => console.log(e.target.value)}
+          onChange={(e) => setText(e.target.value)}
           className="w-full border rounded p-2 font-mono text-sm mx-auto"
         />
 

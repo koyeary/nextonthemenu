@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -110,7 +111,7 @@ const Orders = () => {
             ))}
           </div>
         </div>
-        {/* In Progress Column */}
+
         <div>
           <div className="flex items-center justify-between mb-4 ml-5 text-xl">
             <div className="font-bold">READY</div>
