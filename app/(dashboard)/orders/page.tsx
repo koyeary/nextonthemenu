@@ -27,7 +27,7 @@ const formatDate = (due: string | number | Date) => {
   return `${month}/${day} ${formattedTime}`;
 };
 
-function getHoliday(dateInput) {
+const getHoliday = (dateInput) => {
   const date = new Date(dateInput);
   const year = date.getFullYear();
 
@@ -76,21 +76,25 @@ function getHoliday(dateInput) {
     { date: nthWeekdayOfMonth(year, 10, 4, 4), name: "Thanksgiving Day" }, // 4th Thu in Nov
   ];
 
-  // Check fixed-date holidays
-  const formatted = format(date);
-  if (fixedHolidays[formatted]) {
-    return fixedHolidays[formatted];
-  }
+  // Combine all holidays into one array with Date objects
+  const allHolidays = Object.entries(fixedHolidays)
+    .map(([md, name]) => {
+      const [month, day] = md.split("-").map(Number);
+      return { date: new Date(year, month - 1, day), name };
+    })
+    .concat(variableHolidays);
 
-  // Check variable holidays
-  for (const { date: d, name } of variableHolidays) {
-    if (format(d) === formatted) {
-      return name;
-    }
+  // Check if date is holiday or up to 2 days before
+  for (const { date: holidayDate, name } of allHolidays) {
+    const diffDays = Math.round((holidayDate - date) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return name; // exact holiday
+    if (diffDays === 1) return `${name} (in 1 day)`;
+    if (diffDays === 2) return `${name} (in 2 days)`;
   }
 
   return null;
-}
+};
 
 const Orders = () => {
   const {
@@ -178,7 +182,7 @@ const Orders = () => {
           <div className="space-y-3">
             {pending.map((order: Order) => (
               <DashboardCard
-                holiday={getHoliday(order.due)}
+                getHoliday={getHoliday}
                 key={order.id}
                 order={order}
                 formatDate={formatDate}
