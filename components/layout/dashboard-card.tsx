@@ -44,6 +44,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   order,
   status,
   formatDate,
+  holiday,
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {
@@ -77,18 +78,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     });
   };
 
-  /* END SO MUCH PRINT STUFF */
-
-  /*   const formatReceipt = () => {
-    <>
-      <p>
-        {order.quantity} - {order.item}
-      </p>
-      <p>Modifications: {order.notes}</p>
-      <p>Order #: {orderId}</p>
-    </>;
-  }; */
-
   if (isLoading)
     return (
       <Card key={order.id} className={`p-4 border-l-4 ${getColor} h-20`}>
@@ -109,6 +98,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           </p>
 
           <p className="text-muted-foreground">
+            {holiday && holiday}
             Due: <span className="font-semibold">{formatDate(order.due)}</span>
           </p>
         </div>

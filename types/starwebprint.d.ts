@@ -1,13 +1,9 @@
+/* eslint-disable*/
 // starwebprint.d.ts
 // Basic type declarations for StarWebPrintTrader and StarWebPrintBuilder.
 // These are simplified, but they’ll give you full IntelliSense and prevent TS errors.
 
 declare global {
-  /*   interface Window {
-    StarWebPrintTrader: typeof StarWebPrintTrader;
-    StarWebPrintBuilder: typeof StarWebPrintBuilder;
-  } */
-
   declare global {
     interface Window {
       StarWebPrintTrader?: any;

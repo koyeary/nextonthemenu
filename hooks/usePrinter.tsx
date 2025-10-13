@@ -1,38 +1,74 @@
-/* eslint-disable */
 "use client";
+
 import { useState, useCallback } from "react";
-import { buildPrinterXml } from "./printerUtils";
+import { TraderConfig } from "@/types/printer";
+import { PrinterService, PrintJobResult } from "@/lib/printer/printerService";
 
-export function usePrinter() {
+export interface UsePrinterReturn {
+  isPrinting: boolean;
+  progress: string;
+  error: string | null;
+  lastResult: PrintJobResult | null;
+  sendPrintJob: (
+    canvas: HTMLCanvasElement,
+    config: TraderConfig
+  ) => Promise<void>;
+  clearError: () => void;
+}
+
+export function usePrinter(): UsePrinterReturn {
   const [isPrinting, setIsPrinting] = useState(false);
+  const [progress, setProgress] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [lastResult, setLastResult] = useState<PrintJobResult | null>(null);
 
-  const printText = useCallback(async (text: string) => {
-    setIsPrinting(true);
+  const sendPrintJob = useCallback(
+    async (canvas: HTMLCanvasElement, config: TraderConfig): Promise<void> => {
+      setIsPrinting(true);
+      setError(null);
+      setProgress("Initializing...");
+
+      try {
+        const result = await PrinterService.sendPrintJob(
+          canvas,
+          config,
+          (status) => setProgress(status)
+        );
+
+        setLastResult(result);
+        setProgress("");
+
+        // Show result to user
+        alert(result.message);
+      } catch (err: any) {
+        const errorMessage = err.message || "An unexpected error occurred";
+        setError(errorMessage);
+        setProgress("");
+
+        // Ask user if they want to retry
+        const retry = confirm(`${errorMessage}\n\nDo you want to retry?`);
+
+        if (retry) {
+          // Retry the print job
+          return sendPrintJob(canvas, config);
+        }
+      } finally {
+        setIsPrinting(false);
+      }
+    },
+    []
+  );
+
+  const clearError = useCallback(() => {
     setError(null);
-    setSuccess(false);
-
-    try {
-      const xml = buildPrinterXml(text);
-      const res = await fetch("https://172.16.1.254/StarWebPRNT/SendMessage", {
-        method: "POST",
-        headers: { "Content-Type": "text/xml; charset=utf-8" },
-        body: xml,
-      });
-
-      const result = await res.text();
-      if (!res.ok) throw new Error(`Printer error: ${res.status}`);
-
-      setSuccess(true);
-      console.log("🖨️ Print success:", result);
-    } catch (err: any) {
-      console.error("❌ Printer failed:", err);
-      setError(err.message);
-    } finally {
-      setIsPrinting(false);
-    }
   }, []);
 
-  return { printText, isPrinting, error, success };
+  return {
+    isPrinting,
+    progress,
+    error,
+    lastResult,
+    sendPrintJob,
+    clearError,
+  };
 }
