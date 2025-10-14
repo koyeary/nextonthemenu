@@ -7,6 +7,7 @@ interface PinLoginFormProps {
   onSubmit: () => void;
   handleClear: () => void;
   handleDelete: () => void;
+  handleKeyDown: () => void;
   pin: string;
   maxLength?: number;
   placeholder?: string;

@@ -17,9 +17,10 @@ const Home: React.FC = () => {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full">
       <div className="text-center space-y-8 h-fit mt-30">
         <div className="space-y-4">
-          <h2 className="text-gray-900">
+          <h1 className="text-gray-900">
             Welcome to Your Kitchen Delivery System
-          </h2>
+          </h1>
+          <h2>Staff Login</h2>
           <Card>
             <CardContent className="p-6 text-center">
               <h3 className="mb-2">

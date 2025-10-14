@@ -16,7 +16,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex justify-between items-center h-16. w-full">
+    <div className="flex justify-between items-center h-16 w-full">
       <div className="flex items-center space-x-3">
         <ChefHat className="h-8 w-8 text-primary" />
 
