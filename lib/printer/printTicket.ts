@@ -115,9 +115,9 @@ export async function printTicket(
         }
       };
 
-      trader.onError = (response: any) => {
+      /*  trader.onError = (response: any) => {
         reject(new Error(response.responseText || "Print failed"));
-      };
+      }; */
 
       // Send to printer
       trader.sendMessage({ request });
