@@ -1,19 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../app/providers/authProvider";
 import { ChefHat, UserMinus } from "lucide-react";
 
 const Navbar = () => {
   const router = useRouter();
+  const { user, logout } = useAuth();
 
-  const handleLogout = async () => {
-    /*     await fetch("/api/logout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }); */
+  if (!user) {
+    setTimeout(() => {
+      console.log("loading...");
+    }, 3000);
     router.push("/login");
-  };
+  }
 
   return (
     <div className="flex justify-between items-center h-16 w-full">
@@ -24,12 +23,14 @@ const Navbar = () => {
           <h1 className="text-text">Mia&apos;s Bakery</h1>
         </div>
       </div>
-      <div className="w-fit flex-row">
-        <UserMinus
-          className="text-primary h-7 w-7 cursor-pointer"
-          onClick={handleLogout}
-        />
-      </div>
+      {user && (
+        <div className="w-fit flex-row">
+          <UserMinus
+            className="text-primary h-7 w-7 cursor-pointer hover:bg-blue-500"
+            onClick={() => logout()}
+          />
+        </div>
+      )}
     </div>
   );
 };

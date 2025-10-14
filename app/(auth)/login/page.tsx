@@ -1,14 +1,26 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../providers/authProvider";
 import PinLoginForm from "@/components/forms/pin-login-form";
 
 const Login = () => {
   const [pin, setPin] = React.useState<string>("");
-
+  const [error, setError] = React.useState("");
+  const { user, login, isLoading } = useAuth();
   const router = useRouter();
 
   const maxLength = 4;
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await login(pin);
+      router.push("/orders");
+    } catch {
+      setError("Invalid PIN");
+    }
+  };
 
   const onPinChange = (number: string) => {
     if (pin.length < maxLength) {
@@ -29,18 +41,8 @@ const Login = () => {
     setPin(newPin);
   };
 
-  const handleSubmit = async () => {
-    /*     const authenticatedUser = await fetch(`/api/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ pin: pin }),
-    });
-
-    console.log(authenticatedUser); */
-    return router.push("/orders");
-  };
+  if (isLoading) return <p>Loading user profile...</p>;
+  if (error) return <p>Error logging in</p>;
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  h-full">
@@ -54,7 +56,7 @@ const Login = () => {
           <PinLoginForm
             onPinChange={onPinChange}
             pin={pin}
-            onSubmit={handleSubmit}
+            onSubmit={handleLogin}
             handleClear={handleClear}
             handleDelete={handleDelete}
           />
