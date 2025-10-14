@@ -190,14 +190,14 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
               </Button>
             )}
           </div>
-          <div className="text-center flex-row font-bold text-red-500 text-xl">
+          <div className="text-center flex-row font-bold text-red-500 text-lg">
             {getHoliday(order.due)?.toUpperCase()}
           </div>
           <div>
             {status === "ready" && (
               <Button
                 onClick={() => handlePrint(order)}
-                className="bg-violet-500 font-semibold text-white  rounded-lg px-6 py-2 mx-auto mt-5 w-30 flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
+                className="bg-violet-500 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
               >
                 <Printer size={18} /> PRINT
               </Button>

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Order from "@/types/Order";
 
 declare global {
