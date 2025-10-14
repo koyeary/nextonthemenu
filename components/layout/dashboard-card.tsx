@@ -76,14 +76,8 @@ const getHoliday = (dateInput) => {
 
   // Variable-date holidays (U.S. federal)
   const variableHolidays = [
-    {
-      date: nthWeekdayOfMonth(year, 0, 1, 3),
-      name: "Martin Luther King Jr. Day",
-    }, // 3rd Mon in Jan
-    { date: nthWeekdayOfMonth(year, 1, 1, 3), name: "Presidents Day" }, // 3rd Mon in Feb
     { date: lastWeekdayOfMonth(year, 4, 1), name: "Memorial Day" }, // Last Mon in May
     { date: nthWeekdayOfMonth(year, 8, 1, 1), name: "Labor Day" }, // 1st Mon in Sep
-    { date: nthWeekdayOfMonth(year, 9, 1, 2), name: "Columbus Day" }, // 2nd Mon in Oct
     { date: nthWeekdayOfMonth(year, 10, 4, 4), name: "Thanksgiving" }, // 4th Thu in Nov
   ];
 
@@ -111,6 +105,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   order,
   status,
   formatDate,
+  handlePrint,
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {
@@ -199,7 +194,14 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
             {getHoliday(order.due)?.toUpperCase()}
           </div>
           <div>
-            {status === "ready" && <PrintDialog order={order} />}
+            {status === "ready" && (
+              <Button
+                onClick={() => handlePrint(order)}
+                className="bg-violet-500 font-semibold text-white  rounded-lg px-6 py-2 mx-auto mt-5 w-30 flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
+              >
+                <Printer size={18} /> PRINT
+              </Button>
+            )}
 
             {status !== "ready" && (
               <Button

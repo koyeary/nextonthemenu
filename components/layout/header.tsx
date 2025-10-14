@@ -12,6 +12,7 @@ const Header = ({
   seeComplete,
   searchTerm,
   handleChange,
+  handleHolidaySearch,
 }: HeaderProps) => {
   return (
     <div className="flex items-center justify-between border-b pb-4 ">
@@ -23,6 +24,16 @@ const Header = ({
         <Button
           aria-hidden="false"
           size="sm"
+          className="text-sm font-semibold px-3 py-1 bg-orange-700"
+          onClick={handleHolidaySearch}
+          variant="default"
+        >
+          THANKSGIVING
+        </Button>
+        <Button
+          aria-hidden="false"
+          size="sm"
+          className="text-sm font-semibold px-3 py-1"
           onClick={handleClick}
           variant="default"
         >

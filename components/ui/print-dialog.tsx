@@ -9,7 +9,7 @@ import TicketCanvas from "../ticket/TicketCanvas";
 import { DEFAULT_SETTINGS } from "@/lib/utils/constants";
 import { TicketSettings } from "@/types/Ticket";
 
-const PrintDialog: React.FC<PrintDialogProps> = ({ order }) => {
+const PrintDialog: React.FC<PrintDialogProps> = ({ order, handlePrint }) => {
   const [settings, setSettings] = useState<TicketSettings>({
     order: order,
     ...DEFAULT_SETTINGS,
@@ -34,17 +34,14 @@ const PrintDialog: React.FC<PrintDialogProps> = ({ order }) => {
     router.push("/print");
   };
 
-  const formatText = `${item.toUpperCase()}\nQuantity: ${quantity}\nNotes: ${notes}\nCustomer name: ${customerName}\nEmail: ${email}\nPhone: ${phone}`;
-  console.log(settings);
-  console.log(order);
   return (
     <>
       <Dialog.Root>
         <Dialog.Trigger
           type="button"
-          className="bg-violet-500 font-semibold text-white rounded-lg px-6 py-2 flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
+          className="bg-violet-500 font-semibold text-white rounded-lg px-6 py-2 flex whitespace-nowrap items-center gap-3 hover:bg-violet-800 "
         >
-          <Printer />
+          <Printer size={18} /> Print
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="w-screen h-screen bg-gray-300/80 fixed inset-0">
@@ -55,39 +52,25 @@ const PrintDialog: React.FC<PrintDialogProps> = ({ order }) => {
 
               <Dialog.Title className="py-2">
                 <Text as="p" className="text-xl">
-                  SUCCESS
+                  CONFIRM PRINT
                 </Text>
               </Dialog.Title>
-              <TicketCanvas
+              {/*     <TicketCanvas
                 order={settings.order}
                 paperWidth={settings.paperWidth}
                 font={settings.font}
                 italic={settings.italic}
-              />
-              {/*  <Text as="p" className="text-lg font-semibold">
-                Quantity: {quantity}
-              </Text>
-              <Text as="p" className="text-lg font-semibold">
-                Notes: {notes}
-              </Text>
-              <Text as="p" className="text-lg">
-                Customer Name: {customerName}
-              </Text>
-              <Text as="p" className="text-lg">
-                Email: {email}
-              </Text>
-              <Text as="p" className="text-lg">
-                Phone: {phone}
-              </Text> */}
+              /> */}
+
               <Button
-                onClick={() => sendPrintJob(order)}
+                onClick={() => handlePrint(order)}
                 className="bg-violet-500 font-semibold text-white  rounded-lg px-6 py-2 mx-auto mt-5 w-30 flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
               >
                 {isPrinting ? (
                   "Printing..."
                 ) : (
                   <>
-                    <Printer /> PRINT
+                    <Printer size={22} /> OK
                   </>
                 )}
               </Button>

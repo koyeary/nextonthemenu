@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import DashboardCard from "@/components/layout/dashboard-card";
 import Header from "@/components/layout/header";
 import Script from "next/script";
-//import Ticket from "../../../components/ticket/Ticket";
+import { printTicket } from "@/lib/printer/printTicket";
 import Order from "@/types/Order";
 
 const fetchOrders = async () => {
@@ -27,75 +27,6 @@ const formatDate = (due: string | number | Date) => {
   return `${month}/${day} ${formattedTime}`;
 };
 
-const getHoliday = (dateInput) => {
-  const date = new Date(dateInput);
-  const year = date.getFullYear();
-
-  // Helper: format date as "MM-DD"
-  const format = (d) => {
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${month}-${day}`;
-  };
-
-  // Fixed-date holidays
-  const fixedHolidays = {
-    "01-01": "New Year's Day",
-    "06-19": "Juneteenth National Independence Day",
-    "07-04": "Independence Day",
-    "11-11": "Veterans Day",
-    "12-25": "Christmas Day",
-  };
-
-  // Helper: nth weekday of a month (e.g. 3rd Monday in January)
-  const nthWeekdayOfMonth = (year, month, weekday, nth) => {
-    const firstDay = new Date(year, month, 1);
-    const firstWeekday = firstDay.getDay();
-    const day = 1 + ((7 + weekday - firstWeekday) % 7) + 7 * (nth - 1);
-    return new Date(year, month, day);
-  };
-
-  // Helper: last weekday of a month (e.g. last Monday in May)
-  const lastWeekdayOfMonth = (year, month, weekday) => {
-    const lastDay = new Date(year, month + 1, 0);
-    const lastWeekday = lastDay.getDay();
-    const day = lastDay.getDate() - ((7 + lastWeekday - weekday) % 7);
-    return new Date(year, month, day);
-  };
-
-  // Variable-date holidays (U.S. federal)
-  const variableHolidays = [
-    {
-      date: nthWeekdayOfMonth(year, 0, 1, 3),
-      name: "Martin Luther King Jr. Day",
-    }, // 3rd Mon in Jan
-    { date: nthWeekdayOfMonth(year, 1, 1, 3), name: "Presidents Day" }, // 3rd Mon in Feb
-    { date: lastWeekdayOfMonth(year, 4, 1), name: "Memorial Day" }, // Last Mon in May
-    { date: nthWeekdayOfMonth(year, 8, 1, 1), name: "Labor Day" }, // 1st Mon in Sep
-    { date: nthWeekdayOfMonth(year, 9, 1, 2), name: "Columbus Day" }, // 2nd Mon in Oct
-    { date: nthWeekdayOfMonth(year, 10, 4, 4), name: "Thanksgiving Day" }, // 4th Thu in Nov
-  ];
-
-  // Combine all holidays into one array with Date objects
-  const allHolidays = Object.entries(fixedHolidays)
-    .map(([md, name]) => {
-      const [month, day] = md.split("-").map(Number);
-      return { date: new Date(year, month - 1, day), name };
-    })
-    .concat(variableHolidays);
-
-  // Check if date is holiday or up to 2 days before
-  for (const { date: holidayDate, name } of allHolidays) {
-    const diffDays = Math.round((holidayDate - date) / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return name; // exact holiday
-    if (diffDays === 1) return `${name} (in 1 day)`;
-    if (diffDays === 2) return `${name} (in 2 days)`;
-  }
-
-  return null;
-};
-
 const Orders = () => {
   const {
     data: orders,
@@ -107,11 +38,54 @@ const Orders = () => {
     refetchInterval: 5000, // optional: auto-refresh every 5s
   });
   const [seeComplete, setSeeComplete] = useState<boolean>(false);
+  const [filterHoliday, setFilterHoliday] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredOrders, setFilteredOrders] = useState<Order[]>(orders);
+  const [printerUrl, setPrinterUrl] = useState(
+    "http://localhost:8001/StarWebPRNT/SendMessage"
+  );
+  const [paperType, setPaperType] = useState("");
+  const [printing, setPrinting] = useState(false);
+
+  const handlePrint = async (order) => {
+    if (!printerUrl.trim()) {
+      alert("Please enter printer URL");
+      return;
+    }
+
+    setPrinting(true);
+
+    try {
+      await printTicket(order, printerUrl, paperType);
+      alert("✓ Receipt printed successfully!");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      alert(`✗ Print failed: ${message}`);
+      console.error("Print error:", error);
+    } finally {
+      setPrinting(false);
+    }
+  };
 
   const handleClick = () => {
     setSeeComplete(!seeComplete);
+  };
+
+  const handleHolidaySearch = () => {
+    setFilterHoliday(!filterHoliday);
+    if (filterHoliday) {
+      const results = orders.filter((order) =>
+        Object.entries(order).some(([key, val]) => {
+          // If field looks like a date or timestamp
+
+          // Default string match for non-date fields
+          return String(val).toLowerCase().includes("thanksgiving");
+        })
+      );
+      return setFilteredOrders(results);
+    }
+
+    setFilteredOrders(orders);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -168,6 +142,7 @@ const Orders = () => {
         strategy="beforeInteractive"
       />
       <Header
+        handleHolidaySearch={handleHolidaySearch}
         handleClick={handleClick}
         handleChange={handleChange}
         seeComplete={seeComplete}
@@ -182,7 +157,6 @@ const Orders = () => {
           <div className="space-y-3">
             {pending.map((order: Order) => (
               <DashboardCard
-                getHoliday={getHoliday}
                 key={order.id}
                 order={order}
                 formatDate={formatDate}
@@ -203,7 +177,7 @@ const Orders = () => {
                 order={order}
                 formatDate={formatDate}
                 status="ready"
-                /*  print={<Ticket order={order} />} */
+                handlePrint={handlePrint}
               />
             ))}
           </div>
