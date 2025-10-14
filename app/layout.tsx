@@ -4,6 +4,7 @@ import Navbar from "../components/layout/navbar";
 
 import { Theme } from "@radix-ui/themes";
 import ReactQueryProvider from "./providers/ReactQueryProvider";
+import { AuthProvider } from "./providers/authProvider";
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
 
@@ -23,24 +24,26 @@ export default function RootLayout({
   return (
     <Theme>
       <ReactQueryProvider>
-        <html lang="en">
-          <body>
-            <header className="shadow-lg shadow-gray-200 ">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <Navbar />
-              </div>
-            </header>
-            {children}
-            <Script
-              src="/starwebprint/StarWebPrintTrader.js"
-              strategy="beforeInteractive"
-            />
-            <Script
-              src="/starwebprint/StarWebPrintBuilder.js"
-              strategy="beforeInteractive"
-            />
-          </body>
-        </html>
+        <AuthProvider>
+          <html lang="en">
+            <body>
+              <header className="shadow-lg shadow-gray-200 ">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <Navbar />
+                </div>
+              </header>
+              {children}
+              <Script
+                src="/starwebprint/StarWebPrintTrader.js"
+                strategy="beforeInteractive"
+              />
+              <Script
+                src="/starwebprint/StarWebPrintBuilder.js"
+                strategy="beforeInteractive"
+              />
+            </body>
+          </html>
+        </AuthProvider>
       </ReactQueryProvider>
     </Theme>
   );

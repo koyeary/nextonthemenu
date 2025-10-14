@@ -44,9 +44,17 @@ model Order {
 
 model User {
   id    Int @id @default(autoincrement())
-  pin   String @unique
   name  String
-  role String
+  pin   String 
+  role  String
+  
+  @@map("users")
+}
+
+enum Role {
+  Admin
+  Kitchen
+  FOH
 }
 
 model Item {
@@ -54,4 +62,6 @@ model Item {
   name  String
   price Decimal
   quantity Int
+
+  @@map("items")
 }
