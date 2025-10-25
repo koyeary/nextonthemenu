@@ -23,7 +23,7 @@ body {
 h1 {
   font-size: var(--text-xl);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
+  /*   color: var(--color-text); */
 }
 
 h2 {

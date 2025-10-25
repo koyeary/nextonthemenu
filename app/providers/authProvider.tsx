@@ -1,5 +1,6 @@
 "use client";
 import { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import {
   QueryClient,
   QueryClientProvider,
@@ -35,10 +36,12 @@ export function useAuth() {
     },
   });
 
+  const router = useRouter();
   const logoutMutation = useMutation({
     mutationFn: logout,
     onSuccess: () => {
       queryClient.setQueryData(["currentUser"], { user: null });
+      router.push("/login");
     },
   });
 
