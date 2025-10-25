@@ -1,18 +1,9 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useAuth } from "../../app/providers/authProvider";
 import { ChefHat, UserMinus } from "lucide-react";
 
 const Navbar = () => {
-  const router = useRouter();
   const { user, logout } = useAuth();
-
-  if (!user) {
-    setTimeout(() => {
-      console.log("loading...");
-    }, 3000);
-    router.push("/login");
-  }
 
   return (
     <div className="flex justify-between items-center h-16 w-full">

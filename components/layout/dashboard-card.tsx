@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
+
+//FOH only can mark an item picked up before or after print / print completed too
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import { Printer } from "lucide-react";
+import { CakeSlice, Printer, UndoDot, Trash } from "lucide-react";
 import Order from "@/types/Order";
 import { useUpdateOrder } from "@/hooks/useUpdateOrder";
 import Script from "next/script";
 import PrintDialog from "../ui/print-dialog";
+import Alert from "../ui/alert-dialog";
 
 // --- Type Declarations for StarWebPrint SDK ---
 declare global {
@@ -94,8 +97,8 @@ const getHoliday = (dateInput) => {
     const diffDays = Math.round((holidayDate - date) / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) return name; // exact holiday
-    if (diffDays === 1) return `${name} (in 1 day)`;
-    if (diffDays === 2) return `${name} (in 2 days)`;
+    if (diffDays === 1) return `${name}`;
+    if (diffDays === 2) return `${name}`;
   }
 
   return null;
@@ -117,15 +120,24 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     queryFn: fetchOrders,
     refetchInterval: 5000, // optional: auto-refresh every 5s
   });
+  const [show, setShow] = useState(false);
 
-  const router = useRouter();
+  const handleDelete = (orderId) => {
+    const res = fetch("/api/orders", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: { orderId: orderId },
+    });
+  };
 
   const getColor =
     status === "pending"
-      ? "border-l-yellow-400"
+      ? "border-l-blue-600"
       : status === "ready"
-        ? "border-l-green-600"
-        : "border-l-gray-400";
+        ? "border-l-cyan-600"
+        : "border-l-teal-900";
 
   const getCommand =
     status === "pending" ? "Ready" : status === "ready" ? "Pick Up" : "Undo";
@@ -148,62 +160,91 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   if (error) return <p>Error updating order</p>;
 
   return (
-    <Card key={order.id} className={`p-4 border-l-4 ${getColor}`}>
-      <div className="flex flex-col w-full">
-        {/*  <div className="flex items-start justify-between mb-2"> */}
-        <div>
-          <h1 className="font-semibold ">
-            {order.quantity} {order.item}{" "}
-          </h1>
-          <p>
-            Modifications: <span className="font-semibold">{order.notes}</span>
-          </p>
-
-          <p className="text-muted-foreground">
-            Due: <span className="font-semibold">{formatDate(order.due)}</span>
-          </p>
-          {/*    </div> */}
-        </div>
-        <div className="space-y-1 text-sm">
-          <p>Quantity: {order.quantity}</p>
-          <p className="text-sm text-muted-foreground">
-            Name: <span className="font-semibold">{order.customerName}</span>
-          </p>
-          <p>
-            Email: <span className="font-semibold">{order.email}</span>
-          </p>
-          <p>
-            Phone: <span className="font-semibold">{order.phone}</span>
-          </p>
-        </div>
-        <div className="flex items-center justify-between mt-3">
+    <>
+      <Card key={order.id} className={`border-l-4 ${getColor}`}>
+        <div className="flex flex-col w-full">
           <div>
-            {status === "ready" && (
+            <div
+              className={`flex items-center justify-between mb-2 ${status === "pending" ? "bg-blue-600 text-white" : status === "ready" ? "bg-cyan-600 text-white" : "bg-blue-400 text-white"} p-4 rounded-md`}
+            >
+              <h1 className={`font-semibold`}>{order.customerName}</h1>
+              <p className="text-xs font-semibold text-right">
+                OrderID: {123} <br />
+                Location:
+                {order.location === "L5MQCWDDVAYA6"
+                  ? " UES"
+                  : order.location === "L56CFWYF0H5JK"
+                    ? " Brooklyn"
+                    : order.location === "LF6HAV7DTAEKJ" && " Times Square"}
+              </p>
+            </div>
+            <p className="pl-4">
+              Item: <span className="font-semibold">{order.item}</span>
+            </p>
+            <p className="pl-4">
+              Quantity: <span className="font-semibold">{order.quantity}</span>
+            </p>
+            <p className="pl-4">
+              Notes: <span className="font-semibold">{order.notes}</span>
+            </p>
+
+            <p className="text-muted-foreground pl-4">
+              Due:{" "}
+              <span className="font-semibold">{formatDate(order.due)}</span>
+            </p>
+            <p className="text-muted-foreground pl-4">
+              Created:{" "}
+              <span className="font-semibold">
+                {formatDate(order.createdAt)}
+              </span>
+            </p>
+          </div>
+          <div className="space-y-1 text-sm"></div>
+          <div className="flex items-center justify-between mt-3 px-4 pb-4">
+            <div>
+              {status !== "pending" && (
+                <Button
+                  aria-hidden="false"
+                  size="sm"
+                  variant="outline"
+                  className="mr-1 bg-amber-600 text-white"
+                  onClick={() => handleStatusChange("pending")}
+                >
+                  <UndoDot />
+                </Button>
+              )}
               <Button
                 aria-hidden="false"
                 size="sm"
                 variant="outline"
-                className="mr-1 bg-yellow-500 text-white"
-                onClick={() => handleStatusChange("pending")}
+                className="mr-1 bg-rose-700 text-white"
+                onClick={handleDelete}
               >
-                Undo
+                <Trash />
               </Button>
-            )}
-          </div>
-          <div className="text-center flex-row font-bold text-red-500 text-lg">
-            {getHoliday(order.due)?.toUpperCase()}
-          </div>
-          <div>
-            {status === "ready" && (
-              <Button
-                onClick={() => handlePrint(order)}
-                className="bg-violet-500 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
-              >
-                <Printer size={18} /> PRINT
-              </Button>
-            )}
+            </div>
+            <div className="text-center flex-row font-bold text-red-500 text-md">
+              {getHoliday(order.due)?.toUpperCase()}
+            </div>
+            <div>
+              {status === "ready" && (
+                <Button
+                  onClick={() => handlePrint(order)}
+                  className="bg-violet-800 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
+                >
+                  <Printer /> PRINT
+                </Button>
+              )}
+              {status === "pending" && (
+                <Button
+                  onClick={() => handleStatusChange("ready")}
+                  className="bg-teal-600 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
+                >
+                  <CakeSlice /> READY
+                </Button>
+              )}
 
-            {status !== "ready" && (
+              {/*      {status !== "ready" && (
               <Button
                 aria-hidden="false"
                 size="sm"
@@ -227,11 +268,12 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
               >
                 {getCommand}
               </Button>
-            )}
+            )} */}
+            </div>
           </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </>
   );
 };
 
