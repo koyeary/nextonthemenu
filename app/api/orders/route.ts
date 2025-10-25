@@ -8,17 +8,17 @@ export async function GET() {
 }
 
 export async function DELETE(request: NextRequest) {
-  const orderId = request.json().orderId;
+  const { orderId } = await request.json();
 
   if (!orderId) {
     return NextResponse.json(
-      { error: "Missing orderId parameter" },
+      { error: "Missing orderId in body" },
       { status: 400 }
     );
   }
 
   await prisma.order.delete({
-    where: { orderId: orderId },
+    where: { orderId },
   });
 
   return NextResponse.json(

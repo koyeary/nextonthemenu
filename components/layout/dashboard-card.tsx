@@ -122,14 +122,21 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   });
   const [show, setShow] = useState(false);
 
-  const handleDelete = (orderId) => {
-    const res = fetch("/api/orders", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: { orderId: orderId },
-    });
+  const handleDelete = async () => {
+    try {
+      const res = await fetch("/api/orders", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderId: order.orderId }),
+      });
+
+      console.log("Delete response:", res);
+      return res.json();
+    } catch (error) {
+      console.error("Error deleting order:", error);
+    }
   };
 
   const getColor =
@@ -169,7 +176,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
             >
               <h1 className={`font-semibold`}>{order.customerName}</h1>
               <p className="text-xs font-semibold text-right">
-                OrderID: {123} <br />
+                OrderID: {order.orderId} <br />
                 Location:
                 {order.location === "L5MQCWDDVAYA6"
                   ? " UES"
@@ -243,32 +250,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                   <CakeSlice /> READY
                 </Button>
               )}
-
-              {/*      {status !== "ready" && (
-              <Button
-                aria-hidden="false"
-                size="sm"
-                variant="outline"
-                className={
-                  status === "pending"
-                    ? "bg-green-600 text-white"
-                    : status === "ready"
-                      ? "bg-blue-500 text-white"
-                      : "bg-red-400 text-white"
-                }
-                onClick={() => {
-                  handleStatusChange(
-                    status === "pending"
-                      ? "ready"
-                      : status === "ready"
-                        ? "completed"
-                        : "pending"
-                  );
-                }}
-              >
-                {getCommand}
-              </Button>
-            )} */}
             </div>
           </div>
         </div>
