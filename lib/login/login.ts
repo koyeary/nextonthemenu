@@ -1,3 +1,5 @@
+import { useRouter } from "next/navigation";
+
 export async function login(pin: string) {
   const res = await fetch("/api/login", {
     method: "POST",

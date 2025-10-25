@@ -1,7 +1,11 @@
+import React from "react";
 import { Button } from "../ui/button";
 import { Minus, Plus } from "lucide-react";
 import Input from "../ui/input";
+import { SegmentedControl } from "@radix-ui/themes";
+import { DatePickerInput } from "@mantine/dates";
 
+import "@mantine/core/styles.css";
 type HeaderProps = {
   handleClick: () => void;
   seeComplete: boolean;
@@ -13,23 +17,55 @@ const Header = ({
   searchTerm,
   handleChange,
   handleHolidaySearch,
+  nearestHoliday,
+  setSelectedLocation,
+  selectedLocation,
+  range,
+  setRange,
 }: HeaderProps) => {
+  const locations = [
+    { name: "All", code: "all" },
+    { name: "UES", code: "L5MQCWDDVAYA6" },
+    { name: "Times Square", code: "LF6HAV7DTAEKJ" },
+    { name: "Brooklyn", code: "L56CFWYF0H5JK" },
+  ];
+
   return (
     <div className="flex items-center justify-between border-b pb-4 ">
-      <div>
-        <h2 className="text-1xl font-semibold">Order Management Dashboard</h2>
-      </div>
       <div className="flex items-center gap-2 w-3lg">
-        <Input handleChange={handleChange} searchTerm={searchTerm} />
+        <SegmentedControl.Root
+          defaultValue="all"
+          size="2"
+          onValueChange={setSelectedLocation}
+        >
+          {locations.map((l) => (
+            <SegmentedControl.Item key={l.code} value={l.code}>
+              {l.name}
+            </SegmentedControl.Item>
+          ))}
+        </SegmentedControl.Root>
+
+        <DatePickerInput
+          styles={{ input: { width: 225 } }}
+          clearable
+          type="range"
+          placeholder="Pick dates range"
+          value={range}
+          onChange={setRange}
+          valueFormat="MM/DD/YYYY"
+        />
         <Button
           aria-hidden="false"
           size="sm"
-          className="text-sm font-semibold px-3 py-1 bg-orange-700"
+          className="text-sm font-semibold px-3 py-1 bg-purple-600"
           onClick={handleHolidaySearch}
           variant="default"
         >
-          THANKSGIVING
+          {nearestHoliday.name.toUpperCase()}
         </Button>
+        <Input handleChange={handleChange} searchTerm={searchTerm} />
+      </div>
+      <div className="flex items-center gap-2 w-3lg">
         <Button
           aria-hidden="false"
           size="sm"
@@ -42,7 +78,7 @@ const Header = ({
           ) : (
             <Plus className="w-4 h-4" />
           )}
-          See Completed Orders
+          See Completed
         </Button>
       </div>
     </div>
