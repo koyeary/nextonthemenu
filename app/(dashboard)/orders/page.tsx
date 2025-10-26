@@ -41,6 +41,8 @@ const Orders = () => {
 
   const [seeComplete, setSeeComplete] = useState<boolean>(false);
   const [filterHoliday, setFilterHoliday] = useState<boolean>(false);
+  const [filterTodayOrTomorrow, setFilterTodayOrTomorrow] =
+    useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [printerUrl, setPrinterUrl] = useState(
     "http://localhost:8001/StarWebPRNT/SendMessage"
@@ -48,7 +50,7 @@ const Orders = () => {
   const [paperType, setPaperType] = useState("");
   const [printing, setPrinting] = useState(false);
   const [range, setRange] = useState<[string | null, string | null]>([
-    Date.now(),
+    null,
     null,
   ]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>(orders);
@@ -160,18 +162,17 @@ const Orders = () => {
 
     // Fixed-date holidays
     const holidays = [
-      { name: "New Year's Day", date: new Date(`${year}-01-01`) },
+      { name: "New Year's", date: new Date(`${year}-01-01`) },
       { name: "Memorial Day", date: lastWeekdayOfMonth(1, 4, year) }, // Last Monday of May
-      { name: "Juneteenth", date: new Date(`${year}-06-19`) },
-      { name: "Independence Day", date: new Date(`${year}-07-04`) },
+      { name: "July 4", date: new Date(`${year}-07-04`) },
       { name: "Labor Day", date: nthWeekdayOfMonth(1, 1, 8, year) }, // 1st Monday of Sep
       { name: "Thanksgiving", date: nthWeekdayOfMonth(4, 4, 10, year) }, // 4th Thursday of Nov
-      { name: "Christmas Day", date: new Date(`${year}-12-25`) },
+      { name: "Christmas", date: new Date(`${year}-12-25`) },
     ];
 
     // If all holidays for the year have passed, check next year's New Year
     const next = holidays.find((h) => h.date > date) || {
-      name: "New Year's Day",
+      name: "New Year's",
       date: new Date(`${year + 1}-01-01`),
     };
 
@@ -244,6 +245,56 @@ const Orders = () => {
     setFilteredOrders(results);
   };
 
+  const todayOrTomorrow = (dateInput) => {
+    const date = new Date(dateInput);
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    if (
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate()
+    ) {
+      return "Today";
+    }
+
+    if (
+      date.getFullYear() === tomorrow.getFullYear() &&
+      date.getMonth() === tomorrow.getMonth() &&
+      date.getDate() === tomorrow.getDate()
+    ) {
+      return "Tomorrow";
+    }
+  };
+
+  const handleTomorrow = () => {
+    const newFilterState = !filterTodayOrTomorrow;
+    setFilterTodayOrTomorrow(newFilterState);
+
+    if (newFilterState) {
+      const results = orders.filter(
+        (order) => todayOrTomorrow(order.due) === "Tomorrow"
+      );
+      setFilteredOrders(results);
+    } else {
+      setFilteredOrders(orders);
+    }
+  };
+  const handleToday = () => {
+    const newFilterState = !filterTodayOrTomorrow;
+    setFilterTodayOrTomorrow(newFilterState);
+
+    if (newFilterState) {
+      const results = orders.filter(
+        (order) => todayOrTomorrow(order.due) === "Today"
+      );
+      setFilteredOrders(results);
+    } else {
+      setFilteredOrders(orders);
+    }
+  };
+
   const ordersByLocation = (locationCode: string) => {
     console.log("Filtering by location:", locationCode);
     if (locationCode === "all") {
@@ -283,6 +334,8 @@ const Orders = () => {
         strategy="beforeInteractive"
       />
       <Header
+        handleToday={handleToday}
+        handleTomorrow={handleTomorrow}
         handleHolidaySearch={handleHolidaySearch}
         handleClick={handleClick}
         handleChange={handleChange}
@@ -322,6 +375,7 @@ const Orders = () => {
           <div className="space-y-3">
             {ready.map((order: Order) => (
               <DashboardCard
+                todayOrTomorrow={todayOrTomorrow}
                 key={order.id}
                 order={order}
                 formatDate={formatDate}
@@ -341,6 +395,7 @@ const Orders = () => {
             <div className="space-y-3">
               {complete.map((order: Order) => (
                 <DashboardCard
+                  todayOrTomorrow={todayOrTomorrow}
                   key={order.id}
                   order={order}
                   formatDate={formatDate}
