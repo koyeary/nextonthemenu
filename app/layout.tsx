@@ -34,6 +34,7 @@ export default function RootLayout({
         <AuthProvider>
           <MantineProvider>
             <html lang="en" {...mantineHtmlProps}>
+              <meta name="apple-mobile-web-app-title" content="KDS" />
               <body>
                 <header className="shadow-lg shadow-gray-200 ">
                   <ColorSchemeScript defaultColorScheme="auto" />
