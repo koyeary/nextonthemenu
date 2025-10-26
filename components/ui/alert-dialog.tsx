@@ -3,6 +3,7 @@ import { AlertDialog } from "radix-ui";
 import { Button } from "./button";
 
 type AlertProps = {
+  action: object;
   command: string;
   message: string;
   description: string;
@@ -12,20 +13,15 @@ type AlertProps = {
   handleConfirm: () => void;
 };
 const Alert: React.FC<AlertProps> = ({
-  command,
+  action,
   message,
   description,
   responseA,
   responseB,
-  handleAction,
   handleConfirm,
 }) => (
   <AlertDialog.Root>
-    <AlertDialog.Trigger asChild>
-      <Button size="sm" variant="default" onClick={handleAction}>
-        {command}
-      </Button>
-    </AlertDialog.Trigger>
+    <AlertDialog.Trigger asChild>{action}</AlertDialog.Trigger>
     <AlertDialog.Portal>
       <AlertDialog.Overlay className="AlertDialogOverlay" />
       <AlertDialog.Content className="AlertDialogContent">
