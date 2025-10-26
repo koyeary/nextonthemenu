@@ -201,16 +201,17 @@ const Orders = () => {
   };
 
   const handleHolidaySearch = () => {
-    setFilterHoliday(!filterHoliday);
-    if (filterHoliday) {
+    const newFilterState = !filterHoliday; // compute next value first
+    setFilterHoliday(newFilterState);
+
+    if (newFilterState) {
       const results = orders.filter(
         (order) => getHoliday(order.due) === getNextHoliday(Date.now()).name
       );
-
-      return setFilteredOrders(results);
+      setFilteredOrders(results);
+    } else {
+      setFilteredOrders(orders);
     }
-
-    setFilteredOrders(orders);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -305,6 +306,8 @@ const Orders = () => {
                 order={order}
                 formatDate={formatDate}
                 status="pending"
+                seeComplete={seeComplete}
+                handlePrint={handlePrint}
               />
             ))}
           </div>
@@ -322,6 +325,7 @@ const Orders = () => {
                 formatDate={formatDate}
                 status="ready"
                 handlePrint={handlePrint}
+                seeComplete={seeComplete}
               />
             ))}
           </div>
@@ -339,6 +343,8 @@ const Orders = () => {
                   order={order}
                   formatDate={formatDate}
                   status="completed"
+                  seeComplete={seeComplete}
+                  handlePrint={handlePrint}
                 />
               ))}
             </div>

@@ -6,10 +6,10 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
-
+import { Badge } from "@radix-ui/themes";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import { CakeSlice, Printer, UndoDot, Trash } from "lucide-react";
+import { ShoppingBag, CakeSlice, Printer, UndoDot, Trash } from "lucide-react";
 import Order from "@/types/Order";
 import { useUpdateOrder } from "@/hooks/useUpdateOrder";
 import Script from "next/script";
@@ -109,6 +109,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   status,
   formatDate,
   handlePrint,
+  seeComplete,
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {
@@ -121,6 +122,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     refetchInterval: 5000, // optional: auto-refresh every 5s
   });
   const [show, setShow] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
   const handleDelete = async () => {
     try {
@@ -133,6 +135,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       });
 
       console.log("Delete response:", res);
+
       return res.json();
     } catch (error) {
       console.error("Error deleting order:", error);
@@ -141,13 +144,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 
   const getColor =
     status === "pending"
-      ? "border-l-blue-600"
+      ? "border-l-sky-700"
       : status === "ready"
-        ? "border-l-cyan-600"
+        ? "border-l-cyan-700"
         : "border-l-teal-900";
-
-  const getCommand =
-    status === "pending" ? "Ready" : status === "ready" ? "Pick Up" : "Undo";
 
   const updateOrder = useUpdateOrder();
 
@@ -170,84 +170,124 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     <>
       <Card key={order.id} className={`border-l-4 ${getColor}`}>
         <div className="flex flex-col w-full">
-          <div>
-            <div
-              className={`flex items-center justify-between mb-2 ${status === "pending" ? "bg-blue-600 text-white" : status === "ready" ? "bg-cyan-600 text-white" : "bg-blue-400 text-white"} p-4 rounded-md`}
-            >
-              <h1 className={`font-semibold`}>{order.customerName}</h1>
-              <p className="text-xs font-semibold text-right">
-                OrderID: {order.orderId} <br />
-                Location:
-                {order.location === "L5MQCWDDVAYA6"
-                  ? " UES"
-                  : order.location === "L56CFWYF0H5JK"
-                    ? " Brooklyn"
-                    : order.location === "LF6HAV7DTAEKJ" && " Times Square"}
-              </p>
-            </div>
-            <p className="pl-4">
-              Item: <span className="font-semibold">{order.item}</span>
-            </p>
-            <p className="pl-4">
-              Quantity: <span className="font-semibold">{order.quantity}</span>
-            </p>
-            <p className="pl-4">
-              Notes: <span className="font-semibold">{order.notes}</span>
-            </p>
+          <div
+            className={`flex items-center justify-between mb-2 ${status === "pending" ? "bg-sky-700 text-white" : status === "ready" ? "bg-cyan-600 text-white" : "bg-cyan-700 text-white"} p-4 rounded-md`}
+          >
+            <h1 className={`font-semibold`}>{order.customerName}</h1>
 
-            <p className="text-muted-foreground pl-4">
-              Due:{" "}
-              <span className="font-semibold">{formatDate(order.due)}</span>
-            </p>
-            <p className="text-muted-foreground pl-4">
-              Created:{" "}
-              <span className="font-semibold">
-                {formatDate(order.createdAt)}
-              </span>
+            <p className="text-xs font-semibold text-right">
+              OrderID: {order.id} <br />
+              Location:
+              {order.location === "L5MQCWDDVAYA6"
+                ? " UES"
+                : order.location === "L56CFWYF0H5JK"
+                  ? " Brooklyn"
+                  : order.location === "LF6HAV7DTAEKJ" && " Times Square"}
             </p>
           </div>
+          <p className="pl-4">
+            Item: <span className="font-semibold">{order.item}</span>
+          </p>
+          <p className="pl-4">
+            Quantity: <span className="font-semibold">{order.quantity}</span>
+          </p>
+          <p className="pl-4">
+            Notes: <span className="font-semibold">{order.notes}</span>
+          </p>
+
+          <p className="text-muted-foreground pl-4">
+            Due: <span className="font-semibold">{formatDate(order.due)}</span>
+          </p>
+          <p className="text-muted-foreground pl-4">
+            Created:{" "}
+            <span className="font-semibold">{formatDate(order.createdAt)}</span>
+          </p>
+
           <div className="space-y-1 text-sm"></div>
+
           <div className="flex items-center justify-between mt-3 px-4 pb-4">
-            <div>
+            <div className="flex items-center gap-1">
+              <Alert
+                open={showDelete}
+                setOpen={setShowDelete}
+                message={"Are you sure you want to delete this order?"}
+                description="This action cannot be undone."
+                responseA={"Cancel"}
+                responseB={"Delete Order"}
+                handleConfirm={handleDelete}
+                action={
+                  <Button
+                    aria-hidden="false"
+                    size="sm"
+                    variant="outline"
+                    className="mr-1 bg-rose-700  hover:bg-rose-600  text-white gap-2"
+                  >
+                    <Trash /> {seeComplete ? "" : " DELETE"}
+                  </Button>
+                }
+              />
               {status !== "pending" && (
                 <Button
                   aria-hidden="false"
                   size="sm"
                   variant="outline"
-                  className="mr-1 bg-amber-600 text-white"
+                  className="mr-1 bg-amber-600  hover:bg-amber-400  text-white"
                   onClick={() => handleStatusChange("pending")}
                 >
-                  <UndoDot />
+                  <UndoDot /> {seeComplete ? "" : " PENDING"}
                 </Button>
               )}
-              <Button
-                aria-hidden="false"
-                size="sm"
-                variant="outline"
-                className="mr-1 bg-rose-700 text-white"
-                onClick={handleDelete}
-              >
-                <Trash />
-              </Button>
             </div>
-            <div className="text-center flex-row font-bold text-red-500 text-md">
-              {getHoliday(order.due)?.toUpperCase()}
-            </div>
+            {getHoliday(order.due) && (
+              <div className="w-full justify-center mx-auto flex mt-2 mb-2">
+                {" "}
+                <Badge variant="solid" radius="large" color="lime" size="3">
+                  {getHoliday(order.due)?.toUpperCase()}
+                </Badge>
+              </div>
+            )}
             <div>
-              {status === "ready" && (
-                <Button
-                  onClick={() => handlePrint(order)}
-                  className="bg-violet-800 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
-                >
-                  <Printer /> PRINT
-                </Button>
-              )}
+              <div className="flex gap-2">
+                {status !== "pending" && (
+                  <>
+                    <Alert
+                      open={show}
+                      setOpen={setShow}
+                      message={"Are you sure you want to print the receipt?"}
+                      description={
+                        "This will send the order receipt to the connected printer."
+                      }
+                      responseA={"Cancel"}
+                      responseB={"Print Receipt"}
+                      handleConfirm={() => {
+                        handlePrint(order);
+                      }}
+                      action={
+                        <Button className="bg-violet-800 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-2 hover:bg-violet-500">
+                          <Printer />
+                          {seeComplete ? "" : " PRINT"}
+                        </Button>
+                      }
+                    />
+                  </>
+                )}
+                {status === "ready" && (
+                  <Button
+                    onClick={() => handleStatusChange("completed")}
+                    className="bg-teal-500 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-2 hover:bg-teal-400"
+                  >
+                    <ShoppingBag />
+                    {seeComplete ? "" : " PICK UP"}
+                  </Button>
+                )}
+              </div>
+
               {status === "pending" && (
                 <Button
                   onClick={() => handleStatusChange("ready")}
-                  className="bg-teal-600 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
+                  className="bg-sky-500  hover:bg-sky-400  font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-2"
                 >
-                  <CakeSlice /> READY
+                  <CakeSlice /> {seeComplete ? "" : " READY"}
                 </Button>
               )}
             </div>
