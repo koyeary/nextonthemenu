@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
-import { Minus, Plus } from "lucide-react";
+import { CalendarClock, CalendarArrowDown, Minus, Plus } from "lucide-react";
 import Input from "../ui/input";
 import { SegmentedControl } from "@radix-ui/themes";
 import { DatePickerInput } from "@mantine/dates";
@@ -12,6 +12,8 @@ type HeaderProps = {
 };
 
 const Header = ({
+  handleToday,
+  handleTomorrow,
   handleClick,
   seeComplete,
   searchTerm,
@@ -19,7 +21,6 @@ const Header = ({
   handleHolidaySearch,
   nearestHoliday,
   setSelectedLocation,
-  selectedLocation,
   range,
   setRange,
 }: HeaderProps) => {
@@ -44,7 +45,25 @@ const Header = ({
             </SegmentedControl.Item>
           ))}
         </SegmentedControl.Root>
+        <Button
+          aria-hidden="false"
+          size="sm"
+          className="text-sm font-semibold px-3 py-1 bg-sky-600"
+          onClick={handleToday}
+          variant="default"
+        >
+          <CalendarArrowDown className="w-4 h-4 " /> Today
+        </Button>
 
+        <Button
+          aria-hidden="false"
+          size="sm"
+          className="text-sm font-semibold px-3 py-1 bg-blue-600"
+          onClick={handleTomorrow}
+          variant="default"
+        >
+          <CalendarClock className="w-4 h-4 " /> Tomorrow
+        </Button>
         <DatePickerInput
           styles={{ input: { width: 225 } }}
           clearable
@@ -57,7 +76,7 @@ const Header = ({
         <Button
           aria-hidden="false"
           size="sm"
-          className="text-sm font-semibold px-3 py-1 bg-purple-600"
+          className="text-sm font-semibold px-3 py-1 bg-indigo-600"
           onClick={handleHolidaySearch}
           variant="default"
         >
