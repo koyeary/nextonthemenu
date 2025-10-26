@@ -260,15 +260,17 @@ const Orders = () => {
   if (error) return <p>Error loading orders</p>;
 
   const isFiltered = filteredOrders ? filteredOrders : orders;
-  const pending = isFiltered.filter(
-    (order: Order) => order.status === "pending"
-  ); // Filter pending orders due within 1 year
+  const pending = isFiltered
+    .filter((order: Order) => order.status === "pending")
+    .sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime());
 
-  const ready = isFiltered.filter((order: Order) => order.status === "ready");
+  const ready = isFiltered
+    .filter((order: Order) => order.status === "ready")
+    .sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime());
 
-  const complete = isFiltered.filter(
-    (order: Order) => order.status === "completed"
-  );
+  const complete = isFiltered
+    .filter((order: Order) => order.status === "completed")
+    .sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime());
 
   return (
     <>
