@@ -14,6 +14,33 @@
   }
 }
 
+css/* Hide scrollbar for Chrome, Safari and Opera */
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+@layer components {
+  .scrollbar-thin {
+    scrollbar-width: thin; /* For Firefox */
+  }
+  .scrollbar-none {
+    scrollbar-width: none; /* For Firefox */
+  }
+  /* Custom styling for WebKit browsers */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px; /* Example for thin scrollbar in Chrome/Safari */
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in Chrome/Safari */
+  }
+}
+
 body {
   background: var(--color-secondary);
   color: var(--color-text);

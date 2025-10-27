@@ -5,6 +5,7 @@ import "@radix-ui/themes/styles.css";
 import type { Metadata } from "next";
 import Script from "next/script";
 import Navbar from "../components/layout/navbar";
+import "./globals.css";
 
 import { Theme } from "@radix-ui/themes";
 import {
@@ -35,7 +36,7 @@ export default function RootLayout({
           <MantineProvider>
             <html lang="en" {...mantineHtmlProps}>
               <meta name="apple-mobile-web-app-title" content="KDS" />
-              <body>
+              <body className="bg-gray-50 min-h-screen overflow-hidden scrollbar-none">
                 <header className="shadow-lg shadow-gray-200 ">
                   <ColorSchemeScript defaultColorScheme="auto" />
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

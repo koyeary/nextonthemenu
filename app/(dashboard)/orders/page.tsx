@@ -36,7 +36,7 @@ const Orders = () => {
   } = useQuery({
     queryKey: ["orders"],
     queryFn: fetchOrders,
-    refetchInterval: 3000,
+    refetchInterval: 2000,
   });
 
   const [seeComplete, setSeeComplete] = useState<boolean>(false);
@@ -348,13 +348,13 @@ const Orders = () => {
         setSelectedLocation={ordersByLocation}
       />
       <div
-        className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6 max-w-11/12 mx-auto flex-wrap`}
+        className={`grid ${!seeComplete ? "grid-cols-2" : "grid-cols-3"} gap-6 max-w-11/12 mx-auto flex-wrap pb-10 h-screen flex scrollbar-none`}
       >
-        <div>
+        <div className="h-screen overflow-auto">
           <div className="flex items-center justify-between mb-4 ml-5 text-2xl">
             <div className="font-bold">PENDING</div>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-3  pb-100">
             {pending.map((order: Order) => (
               <DashboardCard
                 key={order.id}
@@ -368,11 +368,11 @@ const Orders = () => {
           </div>
         </div>
 
-        <div>
+        <div className="h-screen overflow-auto">
           <div className="flex items-center justify-between mb-4 ml-5 text-2xl">
             <div className="font-bold">READY</div>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-3 pb-100">
             {ready.map((order: Order) => (
               <DashboardCard
                 todayOrTomorrow={todayOrTomorrow}
@@ -388,11 +388,11 @@ const Orders = () => {
         </div>
 
         {seeComplete && (
-          <div>
+          <div className="h-screen overflow-auto pb-100">
             <div className="flex items-center justify-between mb-4 ml-5 text-xl">
               <div className="font-bold">COMPLETED</div>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 ">
               {complete.map((order: Order) => (
                 <DashboardCard
                   todayOrTomorrow={todayOrTomorrow}

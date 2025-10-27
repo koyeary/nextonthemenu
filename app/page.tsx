@@ -14,7 +14,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-screen">
       <div className="text-center space-y-8 h-fit mt-30">
         <div className="space-y-4">
           <h1 className="text-gray-900">
