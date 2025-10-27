@@ -13,6 +13,7 @@ type AlertProps = {
   handleConfirm: () => void;
 };
 const Alert: React.FC<AlertProps> = ({
+  icon,
   action,
   message,
   description,
@@ -25,7 +26,7 @@ const Alert: React.FC<AlertProps> = ({
     <AlertDialog.Portal>
       <AlertDialog.Overlay className="AlertDialogOverlay" />
       <AlertDialog.Content className="AlertDialogContent">
-        <AlertDialog.Title className="AlertDialogTitle">
+        <AlertDialog.Title className="text-center font-semibold text-2xl mb-5">
           {message}
         </AlertDialog.Title>
         <AlertDialog.Description className="AlertDialogDescription">
@@ -34,12 +35,19 @@ const Alert: React.FC<AlertProps> = ({
         <div style={{ display: "flex", gap: 25, justifyContent: "flex-end" }}>
           {responseA && (
             <AlertDialog.Cancel asChild>
-              <Button className="Button mauve">{responseA}</Button>
+              <Button className="bg-gray-400 rounded-sm">{responseA}</Button>
             </AlertDialog.Cancel>
           )}
           <AlertDialog.Action asChild>
-            <Button onClick={handleConfirm} className="Button red">
-              {responseB}
+            <Button
+              onClick={handleConfirm}
+              className={
+                responseB === "PRINT"
+                  ? "bg-violet-600 rounded-sm"
+                  : "bg-blue-500 rounded-sm"
+              }
+            >
+              {icon} {responseB}
             </Button>
           </AlertDialog.Action>
         </div>

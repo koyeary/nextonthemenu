@@ -16,21 +16,30 @@ export default function TicketCanvas({
   paperWidth,
   font,
   italic,
-  // order,
+  order,
 }: TicketCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const {
+    orderId,
+    name,
+    notes,
+    due,
+    quantity,
+    customerName,
+    email,
+    phoneNumber,
+  } = order;
   useEffect(() => {
     const order = {
-      orderId: "DFufZ6bWQ6OOFxr1uZaRkLJUBQKZY",
-      item: "Dozen Cinnamon Roles",
-      notes: "Leave me alone, I want 50",
-      due: "2025-10-06T01:42:28.484+00:00",
-      quantity: 50,
-      price: 33,
-      customerName: "Bunker Yeary-Rantala",
-      email: "bunker@inabunker.com",
-      phone: "555-555-5555",
+      orderId: orderId,
+      item: name,
+      notes: notes,
+      due: due,
+      quantity: quantity,
+      customerName: customerName,
+      email: email,
+      phone: phoneNumber,
     };
 
     if (!canvasRef.current) return;
@@ -44,7 +53,33 @@ export default function TicketCanvas({
 
     const drawer = new CanvasTicketDrawer(canvas);
     drawer.drawTicket(config, font, italic, order);
-  }, [paperWidth, font, italic]);
+  }, [
+    customerName,
+    due,
+    email,
+    font,
+    italic,
+    name,
+    notes,
+    order,
+    orderId,
+    phoneNumber,
+    quantity,
+  ]);
+
+  /* const drawLeftText = (text) => {
+  var canvas = document.getElementById("canvasPaper");
+
+  if (canvas.getContext) {
+    var context = canvas.getContext("2d");
+
+    context.textAlign = "left";
+
+    context.fillText(text, leftPosition, cursor);
+
+    context.textAlign = "start";
+  }
+} */
 
   return (
     <div className="canvasBlock">

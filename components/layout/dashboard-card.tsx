@@ -15,7 +15,7 @@ import { useUpdateOrder } from "@/hooks/useUpdateOrder";
 import Script from "next/script";
 import PrintDialog from "../ui/print-dialog";
 import Alert from "../ui/alert-dialog";
-
+import Ticket from "../ticket/Ticket";
 // --- Type Declarations for StarWebPrint SDK ---
 declare global {
   interface Window {
@@ -253,12 +253,11 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                     <Alert
                       open={show}
                       setOpen={setShow}
-                      message={"Are you sure you want to print the receipt?"}
-                      description={
-                        "This will send the order receipt to the connected printer."
-                      }
+                      message={"CONFIRM OR EDIT DETAILS"}
+                      description={<Ticket order={order} />}
                       responseA={"Cancel"}
-                      responseB={"Print Receipt"}
+                      responseB="PRINT"
+                      icon={<Printer />}
                       handleConfirm={() => {
                         handlePrint(order);
                       }}
