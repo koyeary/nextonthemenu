@@ -7,7 +7,7 @@ const Dashboard = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div className="space-y-4 p-6 mx-5">
+    <div className="space-y-4 p-6 mx-5 overflow-hidden">
       {" "}
       <Script
         src="/starwebprint/StarWebPrintBuilder.js"
