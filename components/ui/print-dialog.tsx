@@ -5,18 +5,18 @@ import { X, Printer } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Text } from "@radix-ui/themes";
 import { usePrinter } from "../../hooks/usePrinter";
-import TicketCanvas from "../ticket/TicketCanvas";
+//import TicketCanvas from "../ticket/TicketCanvas";
 import { DEFAULT_SETTINGS } from "@/lib/utils/constants";
 import { TicketSettings } from "@/types/Ticket";
 
 const PrintDialog: React.FC<PrintDialogProps> = ({ order, handlePrint }) => {
-  const [settings, setSettings] = useState<TicketSettings>({
+  /*   const [settings, setSettings] = useState<TicketSettings>({
     order: order,
     ...DEFAULT_SETTINGS,
-  });
-  const { sendPrintJob, isPrinting, success } = usePrinter();
+  }); */
+  const { /* sendPrintJob,  */ isPrinting /* , success */ } = usePrinter();
 
-  const {
+  /*   const {
     //orderId,
     quantity,
     item,
@@ -26,13 +26,13 @@ const PrintDialog: React.FC<PrintDialogProps> = ({ order, handlePrint }) => {
     customerName,
     email,
     phone,
-  } = order;
+  } = order; */
 
-  const router = useRouter();
+  /*   const router = useRouter(); */
 
-  const push = () => {
+  /*   const push = () => {
     router.push("/print");
-  };
+  }; */
 
   return (
     <>
