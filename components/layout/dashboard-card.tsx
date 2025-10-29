@@ -13,7 +13,7 @@ import { ShoppingBag, CakeSlice, Printer, UndoDot, Trash } from "lucide-react";
 import Order from "@/types/Order";
 import { useUpdateOrder } from "@/hooks/useUpdateOrder";
 import Script from "next/script";
-import PrintDialog from "../ui/print-dialog";
+//import PrintDialog from "../ui/print-dialog";
 import Alert from "../ui/alert-dialog";
 import Ticket from "../ticket/Ticket";
 // --- Type Declarations for StarWebPrint SDK ---
@@ -123,6 +123,17 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   });
   const [show, setShow] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [paperWidth, setPaperWidth] = useState<"2inch" | "3inch">("2inch");
+  const [logoPath, setLogoPath] = useState("01-Receipt_Letter_ENG.bmp");
+  const [text, setText] = useState("");
+  // const canvasPrintRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasShowRef = useRef<HTMLCanvasElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const nowPrintingRef = useRef<HTMLDivElement | null>(null);
+
+  // -----------------------
+  // Lifecycle Initialization
+  // -----------------------
 
   const handleDelete = async () => {
     try {
@@ -165,6 +176,45 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       </Card>
     );
   if (error) return <p>Error updating order</p>;
+
+  // -----------------------
+  // UI Display Helpers
+  // -----------------------
+  /*   const nowLoading = () => {
+    if (overlayRef.current) overlayRef.current.style.display = "none";
+  };
+
+  const showNowPrinting = () => {
+    if (overlayRef.current && nowPrintingRef.current) {
+      overlayRef.current.style.display = "block";
+      nowPrintingRef.current.style.display = "table";
+    }
+  };
+
+  const hideNowPrinting = () => {
+    if (!overlayRef.current || !nowPrintingRef.current) return;
+    overlayRef.current.style.opacity = "0.0";
+    overlayRef.current.style.transition = "all 0.3s";
+    setTimeout(() => {
+      if (overlayRef.current) {
+        overlayRef.current.style.display = "none";
+        overlayRef.current.style.opacity = "1";
+      }
+    }, 300);
+    nowPrintingRef.current.style.display = "none";
+  }; */
+
+  // -----------------------
+  // Text + Paper Logic
+  // -----------------------
+
+  // -----------------------
+  // Logo / Image Rendering
+  // -----------------------
+
+  // -----------------------
+  // Print Message Handling
+  // -----------------------
 
   return (
     <>
@@ -258,9 +308,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                       responseA={"Cancel"}
                       responseB="PRINT"
                       icon={<Printer />}
-                      handleConfirm={() => {
-                        handlePrint(order);
-                      }}
+                      handleConfirm={() => console.log("nevermind")}
                       action={
                         <Button className="bg-violet-800 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-2 hover:bg-violet-500">
                           <Printer />

@@ -256,7 +256,7 @@ const PrintDialog: React.FC<PrintDialogProps> = ({ order }) => {
         >
           <Printer />
         </Dialog.Trigger>
-        <Dialog.Portal>
+        <Dialog.Portal ref={canvasPrintRef}>
           <Dialog.Overlay className="w-screen h-screen bg-gray-300/80 fixed inset-0">
             <Dialog.Content className="absolute p-10 bg-gray-100 rounded-2xl w-full max-w-md top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-2xl">
               <Dialog.Close className="absolute right-6 top-6  font-semibold text-zinc-400 gap-2 rounded-lg border flex whitespace-nowrap">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DashboardCard from "@/components/layout/dashboard-card";
 import Header from "@/components/layout/header";
