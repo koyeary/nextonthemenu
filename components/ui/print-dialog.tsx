@@ -9,12 +9,12 @@ import { usePrinter } from "../../hooks/usePrinter";
 import { DEFAULT_SETTINGS } from "@/lib/utils/constants";
 import { TicketSettings } from "@/types/Ticket";
 
-const PrintDialog: React.FC<PrintDialogProps> = ({ order, handlePrint }) => {
+const PrintDialog: React.FC<PrintDialogProps> = ({ order }) => {
   /*   const [settings, setSettings] = useState<TicketSettings>({
     order: order,
     ...DEFAULT_SETTINGS,
   }); */
-  const { /* sendPrintJob,  */ isPrinting /* , success */ } = usePrinter();
+  const { sendPrintJob, isPrinting } = usePrinter();
 
   /*   const {
     //orderId,
@@ -27,12 +27,6 @@ const PrintDialog: React.FC<PrintDialogProps> = ({ order, handlePrint }) => {
     email,
     phone,
   } = order; */
-
-  /*   const router = useRouter(); */
-
-  /*   const push = () => {
-    router.push("/print");
-  }; */
 
   return (
     <>
@@ -63,7 +57,7 @@ const PrintDialog: React.FC<PrintDialogProps> = ({ order, handlePrint }) => {
               /> */}
 
               <Button
-                onClick={() => handlePrint(order)}
+                onClick={sendPrintJob(order)}
                 className="bg-violet-500 font-semibold text-white  rounded-lg px-6 py-2 mx-auto mt-5 w-30 flex whitespace-nowrap items-center gap-3 hover:bg-violet-800"
               >
                 {isPrinting ? (

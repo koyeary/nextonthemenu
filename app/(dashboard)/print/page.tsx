@@ -13,11 +13,9 @@ const Print = ({ order }) => {
   const { isPrinting, progress, error, lastResult, sendPrintJob, clearError } =
     usePrinter();
 
-  const handleSend = () => {
+  const handlePrint = () => {
     setIsPrinting(true);
 
-    // TODO: Implement actual printing logic using StarWebPrintBuilder and StarWebPrintTrader
-    // This will be addressed in the next phase
     sendPrintJob();
 
     setTimeout(() => {

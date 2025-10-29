@@ -364,7 +364,6 @@ const Orders = () => {
                 formatDate={formatDate}
                 status="pending"
                 seeComplete={seeComplete}
-                handlePrint={handlePrint}
               />
             ))}
           </div>
