@@ -153,7 +153,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 
   const handleStatusChange = (newStatus: string) => {
     updateOrder.mutate({
-      id: order.orderId,
+      id: order.uid,
       status: newStatus,
     });
   };

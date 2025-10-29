@@ -11,12 +11,13 @@ export async function PATCH(
     const { status } = body;
 
     const updated = await prisma.order.update({
-      where: { orderId: params.id },
+      where: { uid: params.id },
       data: { status },
     });
 
     return NextResponse.json(updated);
   } catch (error) {
+    console.log(id);
     console.error("Update failed:", error);
     return NextResponse.json(
       { error: "Failed to update order" },
