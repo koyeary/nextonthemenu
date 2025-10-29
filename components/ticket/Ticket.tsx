@@ -27,7 +27,7 @@ const Ticket: React.FC = ({ order }) => {
       // You can import StarWebPrintBuilder from /public/js if needed
       const builder = new (window as any).StarWebPrintBuilder();
       const request = builder.createTextElement({ data: text });
-      await fetch("http://localhost:8001/StarWebPRNT/SendMessage", {
+      await fetch("http://172.16.1.1/StarWebPRNT/SendMessage", {
         method: "POST",
         body: request,
       });

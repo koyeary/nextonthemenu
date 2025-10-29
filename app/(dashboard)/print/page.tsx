@@ -13,17 +13,6 @@ const Print = ({ order }) => {
   const { isPrinting, progress, error, lastResult, sendPrintJob, clearError } =
     usePrinter();
 
-  const handlePrint = () => {
-    setIsPrinting(true);
-
-    sendPrintJob();
-
-    setTimeout(() => {
-      setIsPrinting(false);
-      alert("Print functionality will be implemented in the next phase");
-    }, 1000);
-  };
-
   return (
     <>
       <Ticket order={order} />

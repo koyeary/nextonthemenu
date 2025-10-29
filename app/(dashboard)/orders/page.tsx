@@ -46,7 +46,7 @@ const Orders = () => {
     useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [printerUrl, setPrinterUrl] = useState(
-    "http://localhost:8001/StarWebPRNT/SendMessage"
+    "https://172.16.1.1/StarWebPRNT/SendMessage"
   );
   const [paperType, setPaperType] = useState("");
   const [printing, setPrinting] = useState(false);
@@ -73,16 +73,16 @@ const Orders = () => {
     setFilteredOrders(results);
   };
 
-  const handlePrint = async (order) => {
-    if (!printerUrl.trim()) {
-      alert("Please enter printer URL");
-      return;
-    }
-
-    setPrinting(true);
+  const handlePrint = async () => {
+    const xml = "test print";
+    const printTicket = await fetch("/api/print", {
+      method: "POST",
+      headers: { "Content-Type": "text/xml; charset=utf-8" },
+      body: xml,
+    });
 
     try {
-      await printTicket(order, printerUrl, paperType);
+      console.log(printTicket);
       alert("✓ Receipt printed successfully!");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";

@@ -10,14 +10,14 @@ const nextConfig = {
     // !! WARN !!
     ignoreBuildErrors: true,
   },
-  async rewrites() {
+  /*   async rewrites() {
     return [
       {
         source: "/StarWebPRNT/:path*",
         destination: "http://172.16.1.1/StarWebPRNT/:path*", // goes to printer
       },
     ];
-  },
+  }, */
 };
 
 export default nextConfig;
