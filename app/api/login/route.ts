@@ -1,4 +1,3 @@
-// app/api/login/route.ts
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { PrismaClient } from "@prisma/client";
@@ -7,18 +6,18 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   const { pin } = await req.json();
+  console.log(pin);
 
   if (!pin || typeof pin !== "string") {
     return NextResponse.json({ error: "PIN required" }, { status: 400 });
   }
 
   const user = await prisma.user.findFirst({ where: { pin } });
-
+  console.log(user);
   if (!user) {
     return NextResponse.json({ error: "Invalid PIN" }, { status: 401 });
   }
 
-  // Store user info in cookie (for demo, use a simple serialized JSON)
   const cookieData = JSON.stringify({
     id: user.id,
     name: user.name,

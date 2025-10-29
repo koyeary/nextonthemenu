@@ -42,45 +42,61 @@ export default async function handler(req: NextRequest, res: NextResponse) {
 
     const order = await retrieveOrder(orderId);
     console.log("Retrieved order from Square:");
-    console.log(order);
+    console.log(order.lineItems);
+    const lineItems = order.lineItems;
 
-    const provider = req.headers["x-provider"] || "unknown";
+    /*     const provider = req.headers["x-provider"] || "unknown";
     const eventType = body?.type ?? "unknown";
 
-    await prisma.webhookEvent.create({
+    /*    await prisma.webhookEvent.create({
       data: {
         provider: String(provider),
         eventType,
         payload: body,
       },
-    });
+    }); */
 
     if (order) {
-      const orderData = {
-        orderId: order.id,
-        status: "pending",
-        location: order.locationId,
-        item: order.lineItems[0]?.name || "",
-        notes: order.lineItems[0]?.note || "",
-        quantity: parseInt(order.lineItems[0]?.quantity) || 1,
-        customerName:
-          order.fulfillments[0]?.pickupDetails.recipient?.displayName || "",
-        due: order.fulfillments[0]?.pickupDetails.pickupAt || null,
-        email: order.fulfillments[0]?.pickupDetails.emailAddress || "",
-        phone: order.fulfillments[0]?.pickupDetails.phoneNumber || "",
-        price: 0.0,
-        createdAt: order.createdAt,
+      console.log(order.id);
+      const processOrder = async () => {
+        const orderDataArray = lineItems.map((item) => ({
+          orderId: orderId,
+          uid: item.uid,
+          status: "pending",
+          location: order.locationId,
+          item: item.name || "",
+          notes: item.note || "",
+          quantity: parseInt(item.quantity) || 1,
+          customerName:
+            order.fulfillments?.[0]?.pickupDetails?.recipient?.displayName ||
+            "",
+          due: order.fulfillments?.[0]?.pickupDetails?.pickupAt || null,
+          email: order.fulfillments?.[0]?.pickupDetails?.emailAddress || "",
+          phone: order.fulfillments?.[0]?.pickupDetails?.phoneNumber || "",
+          price: 0.0,
+          createdAt: order.createdAt,
+        }));
+
+        // Upsert each line item in the database
+        const res = await Promise.all(
+          orderDataArray.map((orderData) =>
+            prisma.order.upsert({
+              where: { uid: orderData.uid },
+              update: orderData,
+              create: orderData,
+            })
+          )
+        );
+
+        console.log(
+          `Processed ${orderDataArray.length} items for order ${order.id}`
+        );
+
+        res.status(200).json({ ok: true });
       };
 
-      console.log("Upserting order into database:");
-      console.log(orderData);
-      await prisma.order.upsert({
-        where: { orderId: order.id },
-        update: orderData,
-        create: orderData,
-      });
-
-      res.status(200).json({ ok: true });
+      const result = await processOrder();
+      return result;
     }
   } catch (err) {
     console.error(err);

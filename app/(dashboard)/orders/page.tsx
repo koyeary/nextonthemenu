@@ -7,6 +7,7 @@ import Header from "@/components/layout/header";
 import Script from "next/script";
 import { printTicket } from "@/lib/printer/printTicket";
 import Order from "@/types/Order";
+import { retrieveAllOrders } from "../../api/square/route";
 
 const fetchOrders = async () => {
   const res = await fetch("/api/orders");
@@ -202,6 +203,7 @@ const Orders = () => {
   };
 
   const handleHolidaySearch = () => {
+    retrieveAllOrders();
     const newFilterState = !filterHoliday; // compute next value first
     setFilterHoliday(newFilterState);
 
