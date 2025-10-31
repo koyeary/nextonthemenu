@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { CANVAS_DIMENSIONS, CANVAS_CONFIGS } from "@/lib/utils/constants";
+import { CANVAS_CONFIGS } from "@/lib/utils/constants";
 import { CanvasTicketDrawer } from "@/lib/ticket/canvasDrawer";
 import { PaperWidth } from "@/types/ticket";
 import Order from "@/types/Order";
@@ -13,7 +13,6 @@ interface TicketCanvasProps {
 }
 
 export default function TicketCanvas({
-  paperWidth,
   font,
   italic,
   order,

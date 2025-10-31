@@ -2,12 +2,14 @@
 /*eslint-disable*/
 import React, { useState } from "react";
 import { useTicketCanvas } from "@/hooks/useTicketCanvas";
+import { AlertDialog } from "radix-ui";
+import dayjs from "dayjs";
 import { Button } from "../ui/button";
 import { Printer } from "lucide-react";
 
 const Ticket: React.FC<{ order: any }> = ({ order }) => {
   const [text, setText] = useState(
-    `Items ${order.orderCount}\nName: ${order.customerName.toUpperCase()}\nItem: ${order.item.toUpperCase()}\n***************\n Notes: ${order.notes}\n Due: ${order.due}`
+    `${order.customerName.toUpperCase()} ${order.orderCount === "1" ? "1/1" : order.orderCount}\n${order.item.toUpperCase()}\n*********************\nNotes: ${order.notes.length > 0 ? order.notes : "N/A"}\n Pick Up ${dayjs(order.due).format("MM-DD h:m A ")}`
   );
   const { canvasRef } = useTicketCanvas(order, text);
 
@@ -15,7 +17,7 @@ const Ticket: React.FC<{ order: any }> = ({ order }) => {
     console.log("sending print job…");
 
     if (typeof window === "undefined" || !window.StarWebPrintBuilder) {
-      alert("StarWebPrintBuilder SDK not loaded yet.");
+      alert("StarWebPrintBuilder not loaded yet.");
       return;
     }
 
@@ -49,17 +51,12 @@ const Ticket: React.FC<{ order: any }> = ({ order }) => {
       <canvas
         ref={canvasRef}
         className="w-full border rounded-md p-2 mt-5"
-        width={300}
-        height={300}
+        width={288}
+        height={375}
       />
-      {/*       <textarea
-        rows={10}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        className="w-full border rounded-md p-2 mt-5"
-      /> */}
+
       <Button
-        className="bg-violet-800 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-2 hover:bg-violet-500"
+        className="bg-violet-800 font-semibold text-white rounded-lg px-3 py-1  flex mt-4 whitespace-nowrap items-center gap-2 hover:bg-violet-500"
         onClick={onSend}
       >
         <Printer />

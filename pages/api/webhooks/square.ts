@@ -71,7 +71,7 @@ export default async function handler(req: NextRequest, res: NextResponse) {
         }));
 
         // Upsert each line item in the database
-        const res = await Promise.all(
+        await Promise.all(
           orderDataArray.map((orderData) =>
             prisma.order.upsert({
               where: { uid: orderData.uid },

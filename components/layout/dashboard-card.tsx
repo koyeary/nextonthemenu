@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 
+//when adding get user
 //FOH only can mark an item picked up before or after print / print completed too
 import { useEffect, useRef, useState } from "react";
 
@@ -13,9 +14,9 @@ import { ShoppingBag, CakeSlice, Printer, UndoDot, Trash } from "lucide-react";
 import Order from "@/types/Order";
 import { useUpdateOrder } from "@/hooks/useUpdateOrder";
 import Script from "next/script";
-//import PrintDialog from "../ui/print-dialog";
 import Alert from "../ui/alert-dialog";
 import Ticket from "../ticket/Ticket";
+
 // --- Type Declarations for StarWebPrint SDK ---
 declare global {
   interface Window {
@@ -166,6 +167,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       id: order.uid,
       status: newStatus,
     });
+    fetchOrders();
   };
 
   if (isLoading)
@@ -175,45 +177,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       </Card>
     );
   if (error) return <p>Error updating order</p>;
-
-  // -----------------------
-  // UI Display Helpers
-  // -----------------------
-  /*   const nowLoading = () => {
-    if (overlayRef.current) overlayRef.current.style.display = "none";
-  };
-
-  const showNowPrinting = () => {
-    if (overlayRef.current && nowPrintingRef.current) {
-      overlayRef.current.style.display = "block";
-      nowPrintingRef.current.style.display = "table";
-    }
-  };
-
-  const hideNowPrinting = () => {
-    if (!overlayRef.current || !nowPrintingRef.current) return;
-    overlayRef.current.style.opacity = "0.0";
-    overlayRef.current.style.transition = "all 0.3s";
-    setTimeout(() => {
-      if (overlayRef.current) {
-        overlayRef.current.style.display = "none";
-        overlayRef.current.style.opacity = "1";
-      }
-    }, 300);
-    nowPrintingRef.current.style.display = "none";
-  }; */
-
-  // -----------------------
-  // Text + Paper Logic
-  // -----------------------
-
-  // -----------------------
-  // Logo / Image Rendering
-  // -----------------------
-
-  // -----------------------
-  // Print Message Handling
-  // -----------------------
 
   return (
     <>
@@ -304,12 +267,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                     <Alert
                       open={show}
                       setOpen={setShow}
-                      message={"CONFIRM OR EDIT DETAILS"}
+                      message={"PRINT PREVIEW"}
                       description={<Ticket order={order} />}
-                      responseA={"Cancel"}
-                      responseB="PRINT"
-                      icon={<Printer />}
-                      handleConfirm={() => console.log("nevermind")}
                       action={
                         <Button className="bg-violet-800 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-2 hover:bg-violet-500">
                           <Printer />

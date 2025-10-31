@@ -47,7 +47,6 @@ const Orders = () => {
   const [printerUrl, setPrinterUrl] = useState(
     "https://172.16.1.1/StarWebPRNT/SendMessage"
   );
-  const [paperType, setPaperType] = useState("");
   const [printing, setPrinting] = useState(false);
   const [range, setRange] = useState<[string | null, string | null]>([
     null,
