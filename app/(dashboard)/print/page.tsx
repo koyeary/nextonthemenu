@@ -1,6 +1,6 @@
 "use client";
 
-const Print = ({ order }) => {
+const Print = () => {
   return <></>;
 };
 

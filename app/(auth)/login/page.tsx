@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "../../providers/authProvider";
 import PinLoginForm from "@/components/forms/pin-login-form";
 
@@ -8,7 +7,6 @@ const Login = () => {
   const [pin, setPin] = React.useState<string>("");
   const [error, setError] = React.useState("");
   const { login, isLoading } = useAuth();
-  const router = useRouter();
 
   const maxLength = 4;
 
