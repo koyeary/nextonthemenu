@@ -1,7 +1,5 @@
 import React from "react";
 
-//const { data, isLoading, isError } = useUsers();
-
 const LoginRoot = ({
   children,
 }: Readonly<{

@@ -5,8 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import DashboardCard from "@/components/layout/dashboard-card";
 import Header from "@/components/layout/header";
 import Script from "next/script";
-import { printTicket } from "@/lib/printer/printTicket";
 import Order from "@/types/Order";
+//import { retrieveAllOrders } from "../../api/square/route";
 
 const fetchOrders = async () => {
   const res = await fetch("/api/orders");
@@ -45,9 +45,8 @@ const Orders = () => {
     useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [printerUrl, setPrinterUrl] = useState(
-    "http://localhost:8001/StarWebPRNT/SendMessage"
+    "https://172.16.1.1/StarWebPRNT/SendMessage"
   );
-  const [paperType, setPaperType] = useState("");
   const [printing, setPrinting] = useState(false);
   const [range, setRange] = useState<[string | null, string | null]>([
     null,
@@ -72,16 +71,16 @@ const Orders = () => {
     setFilteredOrders(results);
   };
 
-  const handlePrint = async (order) => {
-    if (!printerUrl.trim()) {
-      alert("Please enter printer URL");
-      return;
-    }
-
-    setPrinting(true);
+  const handlePrint = async (token) => {
+    const xml = "test print";
+    const printTicket = await fetch("/api/print", {
+      method: "POST",
+      headers: { "Content-Type": "text/xml; charset=utf-8" },
+      body: { xml, token },
+    });
 
     try {
-      await printTicket(order, printerUrl, paperType);
+      console.log(printTicket);
       alert("✓ Receipt printed successfully!");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
@@ -202,6 +201,7 @@ const Orders = () => {
   };
 
   const handleHolidaySearch = () => {
+    //  retrieveAllOrders();
     const newFilterState = !filterHoliday; // compute next value first
     setFilterHoliday(newFilterState);
 
@@ -362,7 +362,6 @@ const Orders = () => {
                 formatDate={formatDate}
                 status="pending"
                 seeComplete={seeComplete}
-                handlePrint={handlePrint}
               />
             ))}
           </div>

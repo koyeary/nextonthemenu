@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 
+//when adding get user
 //FOH only can mark an item picked up before or after print / print completed too
 import { useEffect, useRef, useState } from "react";
 
@@ -13,9 +14,9 @@ import { ShoppingBag, CakeSlice, Printer, UndoDot, Trash } from "lucide-react";
 import Order from "@/types/Order";
 import { useUpdateOrder } from "@/hooks/useUpdateOrder";
 import Script from "next/script";
-import PrintDialog from "../ui/print-dialog";
 import Alert from "../ui/alert-dialog";
 import Ticket from "../ticket/Ticket";
+
 // --- Type Declarations for StarWebPrint SDK ---
 declare global {
   interface Window {
@@ -123,6 +124,16 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   });
   const [show, setShow] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [paperWidth, setPaperWidth] = useState<"2inch" | "3inch">("2inch");
+  const [logoPath, setLogoPath] = useState("01-Receipt_Letter_ENG.bmp");
+  const [text, setText] = useState("");
+  const canvasShowRef = useRef<HTMLCanvasElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const nowPrintingRef = useRef<HTMLDivElement | null>(null);
+
+  // -----------------------
+  // Lifecycle Initialization
+  // -----------------------
 
   const handleDelete = async () => {
     try {
@@ -131,7 +142,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ orderId: order.orderId }),
+        body: JSON.stringify({ uid: order.uid }),
       });
 
       console.log("Delete response:", res);
@@ -153,9 +164,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 
   const handleStatusChange = (newStatus: string) => {
     updateOrder.mutate({
-      id: order.orderId,
+      id: order.uid,
       status: newStatus,
     });
+    fetchOrders();
   };
 
   if (isLoading)
@@ -173,10 +185,12 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           <div
             className={`flex items-center justify-between mb-2 ${status === "pending" ? "bg-sky-700 text-white" : status === "ready" ? "bg-cyan-600 text-white" : "bg-cyan-700 text-white"} p-4 rounded-md`}
           >
-            <h1 className={`font-semibold`}>{order.customerName}</h1>
-
+            <h1 className={`font-semibold`}>
+              {order.customerName}
+              {order.orderCount !== "1" ? ` - Item ${order.orderCount}` : ""}
+            </h1>
             <p className="text-xs font-semibold text-right">
-              OrderID: {order.id} <br />
+              <br /> OrderID: {order.id} <br />
               Location:
               {order.location === "L5MQCWDDVAYA6"
                 ? " UES"
@@ -253,14 +267,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                     <Alert
                       open={show}
                       setOpen={setShow}
-                      message={"CONFIRM OR EDIT DETAILS"}
+                      message={"PRINT PREVIEW"}
                       description={<Ticket order={order} />}
-                      responseA={"Cancel"}
-                      responseB="PRINT"
-                      icon={<Printer />}
-                      handleConfirm={() => {
-                        handlePrint(order);
-                      }}
                       action={
                         <Button className="bg-violet-800 font-semibold text-white  rounded-lg px-3 py-1 mx-auto flex whitespace-nowrap items-center gap-2 hover:bg-violet-500">
                           <Printer />

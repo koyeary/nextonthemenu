@@ -7,7 +7,7 @@ import PinLoginForm from "@/components/forms/pin-login-form";
 const Login = () => {
   const [pin, setPin] = React.useState<string>("");
   const [error, setError] = React.useState("");
-  const { user, login, isLoading } = useAuth();
+  const { login, isLoading } = useAuth();
   const router = useRouter();
 
   const maxLength = 4;
@@ -16,7 +16,6 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(pin);
-      router.push("/orders");
     } catch {
       setError("Invalid PIN");
     }

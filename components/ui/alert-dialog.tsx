@@ -26,6 +26,11 @@ const Alert: React.FC<AlertProps> = ({
     <AlertDialog.Portal>
       <AlertDialog.Overlay className="AlertDialogOverlay" />
       <AlertDialog.Content className="AlertDialogContent">
+        {!responseA && (
+          <AlertDialog.Cancel asChild className="flex-end">
+            <button className="outline px-2">X</button>
+          </AlertDialog.Cancel>
+        )}
         <AlertDialog.Title className="text-center font-semibold text-2xl mb-5">
           {message}
         </AlertDialog.Title>
@@ -38,18 +43,20 @@ const Alert: React.FC<AlertProps> = ({
               <Button className="bg-gray-400 rounded-sm">{responseA}</Button>
             </AlertDialog.Cancel>
           )}
-          <AlertDialog.Action asChild>
-            <Button
-              onClick={handleConfirm}
-              className={
-                responseB === "PRINT"
-                  ? "bg-violet-600 rounded-sm"
-                  : "bg-blue-500 rounded-sm"
-              }
-            >
-              {icon} {responseB}
-            </Button>
-          </AlertDialog.Action>
+          {responseB && (
+            <AlertDialog.Action asChild>
+              <Button
+                onClick={handleConfirm}
+                className={
+                  responseB === "PRINT"
+                    ? "bg-violet-600 rounded-sm"
+                    : "bg-blue-500 rounded-sm"
+                }
+              >
+                {icon} {responseB}
+              </Button>
+            </AlertDialog.Action>
+          )}
         </div>
       </AlertDialog.Content>
     </AlertDialog.Portal>

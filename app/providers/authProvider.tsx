@@ -33,6 +33,7 @@ export function useAuth() {
     mutationFn: (pin: string) => login(pin),
     onSuccess: (data) => {
       queryClient.setQueryData(["currentUser"], data);
+      router.push("/orders");
     },
   });
 
