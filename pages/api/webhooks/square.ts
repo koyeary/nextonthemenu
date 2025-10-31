@@ -33,8 +33,6 @@ export default async function handler(req: NextRequest, res: NextResponse) {
   }
   const rawBody = Buffer.concat(chunks).toString("utf-8");
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-
   try {
     const body = JSON.parse(rawBody);
 

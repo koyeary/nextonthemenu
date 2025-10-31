@@ -14,6 +14,7 @@ export async function POST() {
       const batch = results.data.slice(i, i + batchSize);
 
       await Promise.all(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         batch.map((item: any) => {
           // Only map the fields you want
           const itemData = {
