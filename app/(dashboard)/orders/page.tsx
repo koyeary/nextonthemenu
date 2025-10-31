@@ -72,12 +72,12 @@ const Orders = () => {
     setFilteredOrders(results);
   };
 
-  const handlePrint = async () => {
+  const handlePrint = async (token) => {
     const xml = "test print";
     const printTicket = await fetch("/api/print", {
       method: "POST",
       headers: { "Content-Type": "text/xml; charset=utf-8" },
-      body: xml,
+      body: { xml, token },
     });
 
     try {
