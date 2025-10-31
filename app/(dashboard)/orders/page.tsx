@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DashboardCard from "@/components/layout/dashboard-card";
 import Header from "@/components/layout/header";
 import Script from "next/script";
-import { printTicket } from "@/lib/printer/printTicket";
 import Order from "@/types/Order";
-import { retrieveAllOrders } from "../../api/square/route";
+//import { retrieveAllOrders } from "../../api/square/route";
 
 const fetchOrders = async () => {
   const res = await fetch("/api/orders");
@@ -203,7 +202,7 @@ const Orders = () => {
   };
 
   const handleHolidaySearch = () => {
-    retrieveAllOrders();
+    //  retrieveAllOrders();
     const newFilterState = !filterHoliday; // compute next value first
     setFilterHoliday(newFilterState);
 

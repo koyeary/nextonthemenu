@@ -17,7 +17,7 @@ const Navbar = () => {
       {user && (
         <div className="w-fit flex-row">
           <UserMinus
-            className="text-primary h-7 w-7 cursor-pointer hover:bg-blue-500"
+            className="text-primary h-7 w-7 cursor-pointer"
             onClick={() => logout()}
           />
         </div>

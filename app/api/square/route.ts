@@ -1,4 +1,4 @@
-import { SquareEnvironment, SquareClient } from "square";
+/* import { SquareEnvironment, SquareClient } from "square";
 import prisma from "@/lib/db/connection";
 
 export async function GET() {
@@ -56,7 +56,7 @@ export const retrieveAllOrders = async () => {
     console.error("Error fetching orders:", error);
   }
 };
-
+ */
 /*   try {
     const client = new SquareClient({
       environment: SquareEnvironment.Production,

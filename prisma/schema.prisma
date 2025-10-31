@@ -30,6 +30,8 @@ model Order {
   due          DateTime?
   location     String
   item         String
+  itemToken    String?
+  orderCount   String?
   notes        String?
   quantity     Int
   price        Decimal  @db.Decimal(8, 2)
@@ -59,10 +61,15 @@ enum Role {
 }
 
 model Item {
-  id    Int @id @default(autoincrement())
-  name  String
-  price Decimal
-  quantity Int
+  id            Int @id @default(autoincrement())
+  token         String
+  itemName      String
+  category       String
+  variationName String
+  unitPrecision String
+  sku           String
+  reference    String
+  quantity      Int
 
   @@map("items")
 }

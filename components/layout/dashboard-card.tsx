@@ -126,7 +126,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   const [paperWidth, setPaperWidth] = useState<"2inch" | "3inch">("2inch");
   const [logoPath, setLogoPath] = useState("01-Receipt_Letter_ENG.bmp");
   const [text, setText] = useState("");
-  // const canvasPrintRef = useRef<HTMLCanvasElement | null>(null);
   const canvasShowRef = useRef<HTMLCanvasElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const nowPrintingRef = useRef<HTMLDivElement | null>(null);
@@ -142,7 +141,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ orderId: order.orderId }),
+        body: JSON.stringify({ uid: order.uid }),
       });
 
       console.log("Delete response:", res);
@@ -223,10 +222,12 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           <div
             className={`flex items-center justify-between mb-2 ${status === "pending" ? "bg-sky-700 text-white" : status === "ready" ? "bg-cyan-600 text-white" : "bg-cyan-700 text-white"} p-4 rounded-md`}
           >
-            <h1 className={`font-semibold`}>{order.customerName}</h1>
-
+            <h1 className={`font-semibold`}>
+              {order.customerName}
+              {order.orderCount !== "1" ? ` - Item ${order.orderCount}` : ""}
+            </h1>
             <p className="text-xs font-semibold text-right">
-              OrderID: {order.id} <br />
+              <br /> OrderID: {order.id} <br />
               Location:
               {order.location === "L5MQCWDDVAYA6"
                 ? " UES"

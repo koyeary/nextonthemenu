@@ -45,26 +45,17 @@ export default async function handler(req: NextRequest, res: NextResponse) {
     console.log(order.lineItems);
     const lineItems = order.lineItems;
 
-    /*     const provider = req.headers["x-provider"] || "unknown";
-    const eventType = body?.type ?? "unknown";
-
-    /*    await prisma.webhookEvent.create({
-      data: {
-        provider: String(provider),
-        eventType,
-        payload: body,
-      },
-    }); */
-
     if (order) {
-      console.log(order.id);
       const processOrder = async () => {
-        const orderDataArray = lineItems.map((item) => ({
+        const orderDataArray = lineItems.map((item, index) => ({
           orderId: orderId,
           uid: item.uid,
           status: "pending",
           location: order.locationId,
           item: item.name || "",
+          itemToken: item.catalogObjectId || "",
+          orderCount:
+            lineItems.length > 1 ? `${index + 1}/${lineItems.length}` : 1,
           notes: item.note || "",
           quantity: parseInt(item.quantity) || 1,
           customerName:
