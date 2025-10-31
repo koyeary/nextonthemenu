@@ -7,7 +7,7 @@ import { Printer } from "lucide-react";
 
 const Ticket: React.FC<{ order: any }> = ({ order }) => {
   const [text, setText] = useState(
-    `Name: ${order.customerName.toUpperCase()}\nItem: ${order.item.toUpperCase()}\n***************\n Notes: ${order.notes}\n Due: ${order.due}`
+    `Items ${order.orderCount}\nName: ${order.customerName.toUpperCase()}\nItem: ${order.item.toUpperCase()}\n***************\n Notes: ${order.notes}\n Due: ${order.due}`
   );
   const { canvasRef } = useTicketCanvas(order, text);
 

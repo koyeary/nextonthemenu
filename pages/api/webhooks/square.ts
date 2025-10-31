@@ -52,10 +52,12 @@ export default async function handler(req: NextRequest, res: NextResponse) {
           uid: item.uid,
           status: "pending",
           location: order.locationId,
-          item: item.name || "",
+          item: `${item.name} ${item.variationName}` || "",
           itemToken: item.catalogObjectId || "",
           orderCount:
-            lineItems.length > 1 ? `${index + 1}/${lineItems.length}` : 1,
+            lineItems.length > 1
+              ? `${index + 1}/${lineItems.length}`
+              : "1" || "1",
           notes: item.note || "",
           quantity: parseInt(item.quantity) || 1,
           customerName:
@@ -82,12 +84,10 @@ export default async function handler(req: NextRequest, res: NextResponse) {
         console.log(
           `Processed ${orderDataArray.length} items for order ${order.id}`
         );
-
-        res.status(200).json({ ok: true });
       };
 
       const result = await processOrder();
-      return result;
+      res.status(200).json({ ok: true, data: result });
     }
   } catch (err) {
     console.error(err);
