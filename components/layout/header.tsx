@@ -1,24 +1,47 @@
+"use client";
+
 import React from "react";
 import { Button } from "../ui/button";
-import { CalendarClock, CalendarArrowDown, Minus, Plus } from "lucide-react";
-import Input from "../ui/input";
-import { SegmentedControl } from "@radix-ui/themes";
-import { DatePickerInput } from "@mantine/dates";
-
+import DateRangeFilter from "./date-range-filter";
+import {
+  CalendarClock,
+  CalendarArrowDown,
+  Funnel,
+  Minus,
+  Plus,
+  Search,
+  X,
+} from "lucide-react";
+import { IconButton, SegmentedControl, TextField } from "@radix-ui/themes";
 import "@mantine/core/styles.css";
+import StationSelector from "../selectors/station-selector";
+
 type HeaderProps = {
+  activeFilter: string;
+  handleToday: () => void;
+  handleTomorrow: () => void;
   handleClick: () => void;
+  openFilter: (filter: string) => void;
   seeComplete: boolean;
+  searchTerm: string;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleHoliday: (dateInput?: string | Date) => void;
+  nearestHoliday: { name: string };
+  setSelectedLocation: (code: string) => void;
+  range: [Date | null, Date | null];
+  setRange: (range: [Date | null, Date | null]) => void;
 };
 
 const Header = ({
+  activeFilter,
   handleToday,
   handleTomorrow,
   handleClick,
+  openFilter,
   seeComplete,
   searchTerm,
   handleChange,
-  handleHolidaySearch,
+  handleHoliday,
   nearestHoliday,
   setSelectedLocation,
   range,
@@ -32,8 +55,52 @@ const Header = ({
   ];
 
   return (
-    <div className="flex items-center justify-between border-b pb-4 ">
-      <div className="flex items-center gap-2 w-3lg">
+    <div className="flex items-center justify-between border-b pb-4 pr-20 w-screen overflow-auto">
+      {/*  <Funnel strokeWidth={2} size={28} className="mx-5" /> */}
+      <div className="flex justify-between items-center gap-2 mx-auto">
+        {/*         <div className="text-2xl mr-5 font-semibold">Filters</div> */}
+        <Button
+          size="sm"
+          className={`text-sm font-semibold  px-1 py-1 bg-indigo-800 transition-all duration-300 ${
+            activeFilter === "searchbar"
+              ? "opacity-0 w-0 p-0"
+              : "opacity-100 w-auto px-3 "
+          }`}
+          onClick={() => openFilter("searchbar")}
+        >
+          <Search className="w-4 h-4 mr-1 " /> Search
+        </Button>
+        <div
+          className={`transition-all duration-300 overflow-hidden  ${
+            activeFilter === "searchbar"
+              ? "w-[250px] opacity-100"
+              : "w-0 opacity-0"
+          }`}
+        >
+          {activeFilter === "searchbar" && (
+            <TextField.Root
+              radius="rounded"
+              placeholder="Name, date, item, etc..."
+              size="2"
+              onChange={handleChange}
+              value={searchTerm}
+            >
+              <TextField.Slot>
+                <Search height="16" width="16" />
+              </TextField.Slot>
+              <TextField.Slot pr="3">
+                <IconButton
+                  size="2"
+                  variant="ghost"
+                  onClick={() => openFilter("none")}
+                >
+                  <X height="16" width="16" />
+                </IconButton>
+              </TextField.Slot>
+            </TextField.Root>
+          )}
+        </div>
+        <StationSelector />
         <SegmentedControl.Root
           defaultValue="all"
           size="2"
@@ -46,58 +113,96 @@ const Header = ({
           ))}
         </SegmentedControl.Root>
         <Button
-          aria-hidden="false"
           size="sm"
-          className="text-sm font-semibold px-3 py-1 bg-sky-600"
+          className={`text-sm font-semibold px-3 py-1 transition-all duration-300 ${
+            activeFilter === "Today"
+              ? "bg-sky-600 focus:border-purple-500"
+              : "bg-sky-500"
+          }`}
           onClick={handleToday}
-          variant="default"
         >
-          <CalendarArrowDown className="w-4 h-4 " /> Today
+          <CalendarArrowDown className="w-4 h-4 mr-1" /> Today
         </Button>
-
         <Button
-          aria-hidden="false"
           size="sm"
-          className="text-sm font-semibold px-3 py-1 bg-blue-600"
+          className={`text-sm font-semibold px-3 py-1 transition-all duration-300 ${
+            activeFilter === "Tomorrow"
+              ? "bg-blue-800 focus:border-purple-500"
+              : "bg-blue-600"
+          }`}
           onClick={handleTomorrow}
-          variant="default"
         >
-          <CalendarClock className="w-4 h-4 " /> Tomorrow
+          <CalendarClock className="w-4 h-4 mr-1" /> Tomorrow
+        </Button>{" "}
+        <Button
+          size="sm"
+          className={`text-sm font-semibold px-3 py-1 transition-all duration-300  ${
+            activeFilter === "holiday"
+              ? "bg-indigo-800  focus:border-purple-500"
+              : "bg-indigo-600"
+          }`}
+          onClick={handleHoliday}
+        >
+          {nearestHoliday.name}
         </Button>
-        <DatePickerInput
-          styles={{ input: { width: 225 } }}
-          clearable
-          type="range"
-          placeholder="Pick dates range"
-          value={range}
-          onChange={setRange}
-          valueFormat="MM/DD/YYYY"
+        <DateRangeFilter
+          activeFilter={activeFilter}
+          openFilter={openFilter}
+          range={range}
+          setRange={setRange}
         />
-        <Button
-          aria-hidden="false"
+        {/* <Button
           size="sm"
-          className="text-sm font-semibold px-3 py-1 bg-indigo-600"
-          onClick={handleHolidaySearch}
-          variant="default"
+          className={`text-sm font-semibold  px-1 py-1 bg-indigo-800 transition-all duration-300 ${
+            activeFilter === "searchbar"
+              ? "opacity-0 w-0 p-0"
+              : "opacity-100 w-auto px-3 "
+          }`}
+          onClick={() => openFilter("searchbar")}
         >
-          {nearestHoliday.name.toUpperCase()}
+          <Search className="w-4 h-4 mr-1 " /> Search
         </Button>
-        <Input handleChange={handleChange} searchTerm={searchTerm} />
-      </div>
-      <div className="flex items-center gap-2 w-3lg">
+        <div
+          className={`transition-all duration-300 overflow-hidden  ${
+            activeFilter === "searchbar"
+              ? "w-[250px] opacity-100"
+              : "w-0 opacity-0"
+          }`}
+        >
+          {activeFilter === "searchbar" && (
+            <TextField.Root
+              radius="rounded"
+              placeholder="Name, date, item, etc..."
+              size="2"
+              onChange={handleChange}
+              value={searchTerm}
+            >
+              <TextField.Slot>
+                <Search height="16" width="16" />
+              </TextField.Slot>
+              <TextField.Slot pr="3">
+                <IconButton
+                  size="2"
+                  variant="ghost"
+                  onClick={() => openFilter("none")}
+                >
+                  <X height="16" width="16" />
+                </IconButton>
+              </TextField.Slot>
+            </TextField.Root>
+          )}
+        </div> */}
         <Button
-          aria-hidden="false"
           size="sm"
-          className="text-sm font-semibold px-3 py-1"
+          className="text-sm font-semibold py-1"
           onClick={handleClick}
-          variant="default"
         >
           {seeComplete ? (
             <Minus className="w-4 h-4" />
           ) : (
             <Plus className="w-4 h-4" />
           )}
-          See Completed
+          Picked Up
         </Button>
       </div>
     </div>

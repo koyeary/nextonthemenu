@@ -1,7 +1,6 @@
 import * as React from "react";
 import { AlertDialog } from "radix-ui";
 import { Button } from "./button";
-
 type AlertProps = {
   action: object;
   command: string;

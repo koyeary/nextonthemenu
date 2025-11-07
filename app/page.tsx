@@ -5,7 +5,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-
+import IPAddressDialog from "../components/layout/ip-address-dialog";
 const Home: React.FC = () => {
   const router = useRouter();
 
@@ -39,6 +39,7 @@ const Home: React.FC = () => {
           </Card>
         </div>
       </div>
+      <IPAddressDialog />
     </main>
   );
 };

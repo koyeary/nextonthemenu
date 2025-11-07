@@ -21,9 +21,7 @@ const retrieveOrder = async (orderId) => {
     console.error(err);
   }
 };
-// ----------------------------
-// Webhook Handler
-// ----------------------------
+
 export default async function handler(req: NextRequest, res: NextResponse) {
   if (req.method !== "POST") return res.status(405).end("Method Not Allowed");
 
@@ -40,7 +38,7 @@ export default async function handler(req: NextRequest, res: NextResponse) {
 
     const order = await retrieveOrder(orderId);
     console.log("Retrieved order from Square:");
-    console.log(order.lineItems);
+
     const lineItems = order.lineItems;
 
     if (order) {
@@ -66,6 +64,7 @@ export default async function handler(req: NextRequest, res: NextResponse) {
           phone: order.fulfillments?.[0]?.pickupDetails?.phoneNumber || "",
           price: 0.0,
           createdAt: order.createdAt,
+          printedAt: null,
         }));
 
         // Upsert each line item in the database
