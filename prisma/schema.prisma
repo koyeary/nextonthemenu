@@ -39,6 +39,7 @@ model Order {
   email        String
   phone        String
   createdAt    DateTime @default(now()) @map("created_at")
+  printedAt    DateTime?
 
   @@index([status])
   @@index([due])

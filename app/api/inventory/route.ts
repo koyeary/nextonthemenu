@@ -1,9 +1,11 @@
+import { NextResponse } from "next/server";
 import fs from "fs";
 import Papa from "papaparse";
 import prisma from "@/lib/db/connection";
 
-export async function POST() {
+export async function GET() {
   try {
+    let categories = [];
     const csvFile = fs.readFileSync("public/square.csv", "utf8");
     const results = Papa.parse(csvFile, { header: true, skipEmptyLines: true });
 
@@ -27,8 +29,8 @@ export async function POST() {
             reference: item["Reference Handle"] || "",
             quantity: parseInt(item["Quantity"]) || 0,
           };
-
-          return prisma.item.create({
+          categories.push(itemData.category);
+          /* return prisma.item.create({
             data: {
               token: itemData.token,
               itemName: itemData.itemName,
@@ -39,18 +41,20 @@ export async function POST() {
               reference: itemData.reference,
               quantity: itemData.quantity,
             },
-          });
+          }); */
+          // NextResponse.json({ ok: true });
         })
       );
 
       processed += batch.length;
+
       console.log(`Processed ${processed}/${results.data.length}`);
     }
-
-    return Response.json({ success: true, count: results.data.length });
+    console.log([...new Set(categories)]);
+    return NextResponse.json({ success: true, categories: categories });
   } catch (error) {
     console.error("Import error:", error);
-    return Response.json(
+    return NextResponse.json(
       {
         success: false,
         error: error instanceof Error ? error.message : String(error),

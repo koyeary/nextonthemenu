@@ -15,7 +15,6 @@ export function useUpdateOrder() {
       return res.json();
     },
     onSuccess: () => {
-      // ✅ refetch orders so UI is in sync
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
   });
