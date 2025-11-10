@@ -2,46 +2,115 @@
 
 import * as React from "react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
-import { Plus, Network } from "lucide-react";
+import { Plus, Printer, Network } from "lucide-react";
+
+interface IPEntry {
+  fieldId: number;
+  address: string;
+  station: string;
+}
 
 const IPAddressDialog = () => {
   const [open, setOpen] = React.useState(false);
-  const [ipFields, setIpFields] = React.useState([{ id: 1, value: "" }]);
+  const [ipFields, setIpFields] = React.useState<IPEntry[]>([
+    { fieldId: 1, address: "", station: "" },
+  ]);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [message, setMessage] = React.useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
+  // Fetch existing IPs when dialog opens
+  React.useEffect(() => {
+    if (!open) return;
+
+    const getIp = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch("/api/ips");
+
+        if (!res.ok) throw new Error("Failed to load IPs");
+
+        const data: IPEntry[] = await res.json();
+
+        const normalized =
+          Array.isArray(data) && data.length
+            ? data.map((item, index) => ({
+                fieldId: index + 1,
+                address: item.address ?? "",
+                station: item.station ?? "",
+              }))
+            : [{ fieldId: 1, address: "", station: "" }];
+
+        setIpFields(normalized);
+        setIsLoading(false);
+        setMessage({ type: "success", text: "Order updated successfully!" });
+      } catch (err) {
+        setIsLoading(false);
+
+        setMessage({
+          type: "error",
+          text: "Failed to configure printers. Please try again.",
+        });
+        setIpFields([{ fieldId: 1, address: "", station: "" }]);
+      }
+    };
+    getIp();
+  }, [open]);
+
+  // Add a new empty row
   const addIPField = () => {
-    const newId =
-      ipFields.length > 0 ? Math.max(...ipFields.map((f) => f.id)) + 1 : 1;
-    setIpFields([...ipFields, { id: newId, value: "" }]);
+    const newId = ipFields.length
+      ? Math.max(...ipFields.map((f) => f.fieldId)) + 1
+      : 1;
+    setIpFields([...ipFields, { fieldId: newId, address: "", station: "" }]);
   };
 
-  const removeIPField = (id: number) => {
+  // Remove an entry
+  const removeIPField = (fieldId: number) => {
     if (ipFields.length > 1) {
-      setIpFields(ipFields.filter((field) => field.id !== id));
+      setIpFields(ipFields.filter((f) => f.fieldId !== fieldId));
     }
   };
 
+  // Handle field change
+  const handleChange = (fieldId: number, key: keyof IPEntry, value: string) => {
+    setIpFields((prev) =>
+      prev.map((f) => (f.fieldId === fieldId ? { ...f, [key]: value } : f))
+    );
+  };
+
+  // Submit form data to API
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+    try {
+      const payload = ipFields.map(({ address, station }) => ({
+        address: address.trim().toLowerCase(),
+        station: station.trim().toLowerCase(),
+      }));
 
-    const formData = new FormData(e.currentTarget);
-    const ipAddresses = ipFields.map((field) => formData.get(`ip-${field.id}`));
+      const res = await fetch("/api/ips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    console.log("Submitting IP Addresses:", ipAddresses);
-
-    // Simulate API call
-    setTimeout(() => {
+      if (!res.ok) throw new Error("Failed to save IPs");
+    } catch (err) {
+      console.error("Submit error:", err);
+    } finally {
       setIsSubmitting(false);
       setOpen(false);
-      // Reset form
-      setIpFields([{ id: 1, value: "" }]);
-    }, 1000);
+    }
   };
 
+  // Reset on cancel
   const handleCancel = () => {
     setOpen(false);
-    setIpFields([{ id: 1, value: "" }]);
+    setIpFields([{ fieldId: 1, address: "", station: "" }]);
   };
 
   return (
@@ -49,78 +118,89 @@ const IPAddressDialog = () => {
       {/* Floating Action Button */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-8 right-8 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-50 group"
+        style={{ fontSize: 20 }}
+        className="fixed bottom-8 right-8 w-fit p-6 gap-4 h-14 bg-blue-700 hover:bg-blue-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-50 group"
         aria-label="Add IP Address"
       >
-        <Network className="w-6 h-6 group-hover:scale-110 transition-transform" />
+        Settings
+        <Printer className="w-6 h-6 group-hover:scale-110 transition-transform" />
       </button>
 
       {/* Alert Dialog */}
       <AlertDialog.Root open={open} onOpenChange={setOpen}>
         <AlertDialog.Portal>
-          <AlertDialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-50" />
-          <AlertDialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-lg shadow-xl z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 max-h-[85vh] flex flex-col">
-            <div className="p-6 border-b flex-shrink-0">
+          <AlertDialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
+          <AlertDialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-lg shadow-xl z-50 overflow-hidden">
+            <div className="p-6 border-b">
               <AlertDialog.Title className="text-xl font-semibold text-gray-900">
-                Add IP Addresses
+                Configure IP Addresses
               </AlertDialog.Title>
               <AlertDialog.Description className="text-sm text-gray-500 mt-1">
-                Enter one or more IP addresses to whitelist
+                Add or edit StarWebPRNT IPs and their station names.
               </AlertDialog.Description>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
-              <div className="p-6 space-y-4">
+            {isLoading ? (
+              <div className="flex justify-center text-2xl h-[30vh] gap-4">
+                <div className="m-auto w-fit flex items-center">
+                  <div className="w-10 h-10 border-4 mx-auto border-indigo-900 border-t-transparent rounded-full animate-spin" />
+                </div>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                className="p-6 overflow-y-auto max-h-[65vh] space-y-4"
+              >
                 {ipFields.map((field, index) => (
-                  <div key={field.id} className="relative">
-                    <label
-                      htmlFor={`ip-${field.id}`}
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      IP Address {index + 1}
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        id={`ip-${field.id}`}
-                        name={`ip-${field.id}`}
-                        placeholder="192.168.1.1"
-                        pattern="^(\d{1,3}\.){3}\d{1,3}$"
-                        required
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                      />
-                      {index === ipFields.length - 1 && (
-                        <button
-                          type="button"
-                          onClick={addIPField}
-                          className="w-10 h-10 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                          aria-label="Add another IP field"
-                        >
-                          <Plus className="w-5 h-5" />
-                        </button>
-                      )}
-                      {ipFields.length > 1 && index !== ipFields.length - 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeIPField(field.id)}
-                          className="w-10 h-10 flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
-                          aria-label="Remove IP field"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </div>
+                  <div key={field.fieldId} className="flex gap-2 items-center">
+                    <input
+                      key={`address-${field.fieldId}`}
+                      type="text"
+                      value={field.address}
+                      onChange={(e) =>
+                        handleChange(field.fieldId, "address", e.target.value)
+                      }
+                      placeholder="192.168.1.1"
+                      required
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      key={`station-${field.fieldId}`}
+                      type="text"
+                      value={field.station}
+                      onChange={(e) =>
+                        handleChange(field.fieldId, "station", e.target.value)
+                      }
+                      placeholder="Office"
+                      required
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                    {index === ipFields.length - 1 ? (
+                      <button
+                        type="button"
+                        onClick={addIPField}
+                        className="w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => removeIPField(field.fieldId)}
+                        className="w-10 h-10 flex items-center justify-center bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
                 ))}
-              </div>
 
-              <div className="border-t p-6 bg-gray-50 flex-shrink-0">
-                <div className="flex gap-3">
+                <div className="border-t pt-4 flex gap-3">
                   <AlertDialog.Cancel asChild>
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
                       disabled={isSubmitting}
                     >
                       Cancel
@@ -129,16 +209,27 @@ const IPAddressDialog = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {isSubmitting ? "Saving..." : "Save IP Addresses"}
+                    {isSubmitting ? "Saving..." : "Save"}
                   </button>
                 </div>
-              </div>
-            </form>
+              </form>
+            )}
           </AlertDialog.Content>
         </AlertDialog.Portal>
       </AlertDialog.Root>
+      {message && (
+        <div
+          className={`p-4 rounded-lg mt-4 mx-8 ${
+            message.type === "success"
+              ? "bg-green-50 text-green-800 border border-green-200"
+              : "bg-red-50 text-red-800 border border-red-200"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
     </>
   );
 };

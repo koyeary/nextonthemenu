@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertDialog } from "radix-ui";
@@ -16,12 +14,20 @@ import {
   TextField,
 } from "@radix-ui/themes";
 import { Card } from "../ui/card";
-import { ShoppingBag, CakeSlice, Printer, UndoDot, Trash } from "lucide-react";
+import {
+  ShoppingBag,
+  CakeSlice,
+  Printer,
+  UndoDot,
+  Trash,
+  FilePenLine,
+} from "lucide-react";
 import Order from "@/types/Order";
 import { useUpdateOrder } from "@/hooks/useUpdateOrder";
 import Alert from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import Ticket from "../ticket/Ticket";
+import { safeValue, getHoliday } from "../../lib/utils/helpers";
 
 declare global {
   interface Window {
@@ -34,66 +40,15 @@ interface DashboardCardProps {
   formatDate: (date: string | Date) => string;
   status: string;
   order: Order;
+  seeComplete?: boolean;
+  openDrawer?: boolean;
+  setOpenDrawer?: (open: boolean) => void;
 }
 
 const fetchOrders = async () => {
   const res = await fetch("/api/orders");
   if (!res.ok) throw new Error("Failed to fetch orders");
   return res.json();
-};
-
-const getHoliday = (dateInput) => {
-  const date = new Date(dateInput);
-  const year = date.getFullYear();
-
-  // Fixed-date holidays
-  const fixedHolidays = {
-    "01-01": "New Year's",
-    "07-04": "July 4",
-    "12-25": "Christmas",
-  };
-
-  // Helper: nth weekday of a month (e.g. 3rd Monday in January)
-  const nthWeekdayOfMonth = (year, month, weekday, nth) => {
-    const firstDay = new Date(year, month, 1);
-    const firstWeekday = firstDay.getDay();
-    const day = 1 + ((7 + weekday - firstWeekday) % 7) + 7 * (nth - 1);
-    return new Date(year, month, day);
-  };
-
-  // Helper: last weekday of a month (e.g. last Monday in May)
-  const lastWeekdayOfMonth = (year, month, weekday) => {
-    const lastDay = new Date(year, month + 1, 0);
-    const lastWeekday = lastDay.getDay();
-    const day = lastDay.getDate() - ((7 + lastWeekday - weekday) % 7);
-    return new Date(year, month, day);
-  };
-
-  // Variable-date holidays (U.S. federal)
-  const variableHolidays = [
-    { date: lastWeekdayOfMonth(year, 4, 1), name: "Memorial Day" }, // Last Mon in May
-    { date: nthWeekdayOfMonth(year, 8, 1, 1), name: "Labor Day" }, // 1st Mon in Sep
-    { date: nthWeekdayOfMonth(year, 10, 4, 4), name: "Thanksgiving" }, // 4th Thu in Nov
-  ];
-
-  // Combine all holidays into one array with Date objects
-  const allHolidays = Object.entries(fixedHolidays)
-    .map(([md, name]) => {
-      const [month, day] = md.split("-").map(Number);
-      return { date: new Date(year, month - 1, day), name };
-    })
-    .concat(variableHolidays);
-
-  // Check if date is holiday or up to 2 days before
-  for (const { date: holidayDate, name } of allHolidays) {
-    const diffDays = Math.round((holidayDate - date) / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return name; // exact holiday
-    if (diffDays === 1) return `${name}`;
-    if (diffDays === 2) return `${name}`;
-  }
-
-  return null;
 };
 
 const DashboardCard: React.FC<DashboardCardProps> = ({
@@ -112,6 +67,38 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   const [show, setShow] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [formData, setFormData] = useState<Record<string, any>>({});
+
+  const items = [
+    "status",
+    "item",
+    "notes",
+    "due",
+    "location",
+    "quantity",
+    "customerName",
+    "email",
+    "phone",
+  ];
+
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const camelToTitleCase = (str: string): string => {
+    return str
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (match) => match.toUpperCase())
+      .trim();
+  };
 
   const handleDelete = async () => {
     try {
@@ -173,33 +160,11 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         console.log(`Printed at: ${data.printedAt}`);
         fetchOrders();
       }
+      alert("print successful");
+      setShow(false);
     } catch (err) {
       console.error("Update error:", err);
     }
-  };
-
-  const items = [
-    "status",
-    "item",
-    "notes",
-    "due",
-    "location",
-    "quantity",
-    "customerName",
-    "email",
-    "phone",
-  ];
-
-  const camelToTitleCase = (str: string): string => {
-    return (
-      str
-        // Insert a space before all uppercase letters
-        .replace(/([A-Z])/g, " $1")
-        // Trim any leading space and capitalize the first letter
-        .replace(/^./, (match) => match.toUpperCase())
-        // Trim any extra whitespace
-        .trim()
-    );
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -207,36 +172,35 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     setIsSubmitting(true);
     setMessage(null);
 
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      orderNumber,
-      status: formData.get("status"),
-      notes: formData.get("notes"),
-      fulfillmentDate: formData.get("fulfillmentDate"),
+    const updateData: Record<string, any> = {
+      uid: order.uid,
+      ...formData,
     };
 
     try {
-      const response = await fetch("/api/webhooks/square", {
-        method: "POST",
+      const response = await fetch("/api/orders/update", {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(updateData),
       });
 
       if (!response.ok) {
         throw new Error("Failed to update order");
       }
 
-      const result = await response.json();
+      await response.json();
       setMessage({ type: "success", text: "Order updated successfully!" });
 
-      // Close drawer after success
       setTimeout(() => {
-        onOpenChange(false);
+        fetchOrders();
+        setShowUpdate(false);
         setMessage(null);
+        setFormData({});
       }, 1500);
     } catch (error) {
+      console.error("Update error:", error);
       setMessage({
         type: "error",
         text: "Failed to update order. Please try again.",
@@ -265,7 +229,9 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
               {order.customerName}
               {order.orderCount !== "1" ? ` - Item ${order.orderCount}` : ""}
             </h1>
-            <div className="flex items-center justify-between mt-3 px-4 pb-4">
+            <div>
+              {" "}
+              {/*<div className="flex items-center justify-between mt-3 px-4 pb-4">
               <AlertDialog.Root>
                 <AlertDialog.Trigger asChild>
                   <Button
@@ -274,7 +240,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                     variant="outline"
                     className="mr-1 bg-rose-700  hover:bg-rose-600  text-white gap-2 px-3 py-1"
                   >
-                    <ShoppingBag /> {seeComplete ? "" : " update"}
+                    <FilePenLine /> {seeComplete ? "" : " update"}
                   </Button>
                 </AlertDialog.Trigger>
                 <AlertDialog.Portal>
@@ -288,103 +254,216 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                       <span className="font-semibold">{order.orderId}</span>
                     </AlertDialog.Description>
 
-                    {/*            <div className="space-y-6 w-full mx-auto p-6 "> */}
+                    <form onSubmit={handleSubmit}>
+                      <Flex
+                        direction="column"
+                        gap="3"
+                        className="px-5 py-3 mb-5 overflow-auto"
+                      >
+                        {items.map((item) => (
+                          <Grid
+                            gap="3"
+                            className="mt-3"
+                            key={`${item}-${order.id}`}
+                          >
+                            <Text as="div" weight="bold" size="2" mb="1">
+                              {camelToTitleCase(item)}
+                            </Text>
+                            <TextField.Root
+                              type="text"
+                              id={item}
+                              name={item}
+                              value={
+                                formData[item] !== undefined
+                                  ? formData[item]
+                                  : item === "status"
+                                    ? order[item]
+                                    : item === "due"
+                                      ? order.due
+                                      : item === "location"
+                                        ? order.location === "L5MQCWDDVAYA6"
+                                          ? "UES"
+                                          : order.location === "L56CFWYF0H5JK"
+                                            ? "Brooklyn"
+                                            : order.location === "LF6HAV7DTAEKJ"
+                                              ? "Times Square"
+                                              : order.location
+                                        : order[item] || ""
+                              }
+                              onChange={(e) =>
+                                handleFieldChange(item, e.target.value)
+                              }
+                              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                            >
+                              <TextField.Slot>
+                                <ShoppingBag
+                                  height="16"
+                                  width="16"
+                                  className="ml-2 mr-4"
+                                />
+                              </TextField.Slot>
+                            </TextField.Root>
+                          </Grid>
+                        ))}
 
-                    <Flex
-                      direction="column"
-                      gap="3"
-                      className="px-5 py-3 mb-5 overflow-auto"
-                      value="form"
-                    >
-                      {items.map((item) => (
-                        <Grid gap="3" className="mt-3">
-                          <Text
-                            key={order.item + order.id}
-                            as="div"
-                            weight="bold"
-                            size="2"
-                            mb="1"
+                        {message && (
+                          <div
+                            className={`p-4 rounded-lg mt-4 ${
+                              message.type === "success"
+                                ? "bg-green-50 text-green-800 border border-green-200"
+                                : "bg-red-50 text-red-800 border border-red-200"
+                            }`}
                           >
-                            {camelToTitleCase(item)}
-                          </Text>
-                          <TextField.Root
-                            type="text"
-                            id={item}
-                            name={item}
-                            placeholder={
-                              item === "status"
-                                ? camelToTitleCase(order[item])
-                                : item === "due"
-                                  ? formatDate(order.due)
-                                  : item === "location"
-                                    ? order.location === "L5MQCWDDVAYA6"
-                                      ? " UES"
-                                      : order.location === "L56CFWYF0H5JK"
-                                        ? " Brooklyn"
-                                        : order.location === "LF6HAV7DTAEKJ" &&
-                                          " Times Square"
-                                    : order[item]
-                            }
-                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                            {message.text}
+                          </div>
+                        )}
+
+                        <Grid columns="2" gap="2" className="mt-5">
+                          <AlertDialog.Cancel asChild>
+                            <Button
+                              type="button"
+                              aria-hidden="false"
+                              size="sm"
+                              variant="outline"
+                              className="mr-1 bg-gray-300 hover:bg-gray-200 text-black gap-2 px-3 py-1"
+                              disabled={isSubmitting}
+                            >
+                              Back
+                            </Button>
+                          </AlertDialog.Cancel>
+                          <Button
+                            type="submit"
+                            aria-hidden="false"
+                            size="sm"
+                            variant="outline"
+                            className="mr-1 bg-blue-600 hover:bg-blue-500 text-white gap-2 px-3 py-1"
+                            disabled={isSubmitting}
                           >
-                            <TextField.Slot>
-                              <ShoppingBag
-                                height="16"
-                                width="16"
-                                className="ml-2 mr-4"
-                              />
-                            </TextField.Slot>
-                          </TextField.Root>
+                            {isSubmitting ? "Updating..." : "Send"}
+                          </Button>
                         </Grid>
-                      ))}
-
-                      <Grid columns="2" gap="2" className="mt-5 ">
-                        <Button
-                          aria-hidden="false"
-                          size="sm"
-                          variant="outline"
-                          className="mr-1 bg-gray-300  hover:bg-gray-200  text-black gap-2 px-3 py-1"
-                        >
-                          Back
-                        </Button>
-                        <Button
-                          type="submit"
-                          aria-hidden="false"
-                          size="sm"
-                          variant="outline"
-                          className="mr-1 bg-blue-600  hover:bg-blue-500  text-white gap-2 px-3 py-1"
-                          onClick={(e) => {
-                            const form = e.currentTarget
-                              .closest(".flex.flex-col")
-                              ?.querySelector("form");
-                            if (form) {
-                              form.dispatchEvent(
-                                new Event("submit", {
-                                  cancelable: true,
-                                  bubbles: true,
-                                })
-                              );
-                            }
-                          }}
-                        >
-                          Send
-                        </Button>
-                      </Grid>
-                    </Flex>
+                      </Flex>
+                    </form>
                   </AlertDialog.Content>
                 </AlertDialog.Portal>
               </AlertDialog.Root>
-            </div>
+            </div> */}
+              {/* <div className="flex items-center justify-between  px-4 pb-4"> */}
+              <div className="flex items-center gap-3">
+                <AlertDialog.Root>
+                  <AlertDialog.Trigger asChild>
+                    <Button
+                      aria-hidden="false"
+                      size="sm"
+                      variant="outline"
+                      className="bg-rose-700 hover:bg-rose-600 text-white px-3 py-1 relative top-0 right-0 ml-50 rounded align-top"
+                    >
+                      <FilePenLine />
+                    </Button>
+                  </AlertDialog.Trigger>
+                  <AlertDialog.Portal>
+                    <AlertDialog.Overlay className="AlertDialogOverlay" />
+                    <AlertDialog.Content className="AlertDialogContent">
+                      <AlertDialog.Title className="text-center font-semibold text-2xl mb-5">
+                        Update
+                      </AlertDialog.Title>
+                      <AlertDialog.Description className="text-lg mx-auto w-fit">
+                        Order #
+                        <span className="font-semibold">{order.orderId}</span>
+                      </AlertDialog.Description>
 
-            <p className="text-xs font-semibold text-right">
-              <br /> OrderID: {order.id} <br />
-              Location:
-              {order.location === "L5MQCWDDVAYA6"
-                ? " UES"
-                : order.location === "L56CFWYF0H5JK"
-                  ? " Brooklyn"
-                  : order.location === "LF6HAV7DTAEKJ" && " Times Square"}
-            </p>
+                      <form onSubmit={handleSubmit}>
+                        <div className="grid grid-cols-2 gap-4 py-6">
+                          {items.map((item) => (
+                            <Grid
+                              gap="2"
+                              className="mt-3"
+                              key={`${item}-${order.id}`}
+                            >
+                              <Text as="div" weight="bold" size="2" mb="1">
+                                {camelToTitleCase(item)}
+                              </Text>
+                              <input
+                                id={item}
+                                name={item}
+                                placeholder={camelToTitleCase(item)}
+                                value={safeValue(
+                                  formData[item] !== undefined
+                                    ? formData[item]
+                                    : item === "status"
+                                      ? order[item]
+                                      : item === "due"
+                                        ? order.due
+                                        : item === "location"
+                                          ? order.location === "L5MQCWDDVAYA6"
+                                            ? "UES"
+                                            : order.location === "L56CFWYF0H5JK"
+                                              ? "Brooklyn"
+                                              : order.location ===
+                                                  "LF6HAV7DTAEKJ"
+                                                ? "Times Square"
+                                                : order.location
+                                          : order[item]
+                                )}
+                                onChange={(e) =>
+                                  handleFieldChange(item, e.target.value)
+                                }
+                                className="px-3 py-2 w-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                              />
+                            </Grid>
+                          ))}
+                        </div>
+                        {message && (
+                          <div
+                            className={`p-4 rounded-lg mt-4 z-70 ${
+                              message.type === "success"
+                                ? "bg-green-50 text-green-800 border border-green-200"
+                                : "bg-red-50 text-red-800 border border-red-200"
+                            }`}
+                          >
+                            {message.text}
+                          </div>
+                        )}
+                        <div className="flex justify-center gap-4 mt-6 mb-4">
+                          <AlertDialog.Cancel asChild>
+                            <Button
+                              type="button"
+                              aria-hidden="false"
+                              size="sm"
+                              variant="outline"
+                              className=" w-50 bg-gray-300 h-10 hover:bg-gray-200 text-black gap-2 px-3 py-1"
+                              disabled={isSubmitting}
+                            >
+                              Back
+                            </Button>
+                          </AlertDialog.Cancel>
+
+                          <Button
+                            type="submit"
+                            aria-hidden="false"
+                            size="sm"
+                            variant="outline"
+                            className="w-50 h-10 bg-blue-600 hover:bg-blue-500 text-white gap-2 px-3 py-1"
+                            disabled={isSubmitting}
+                          >
+                            {isSubmitting ? "Updating..." : "Send"}
+                          </Button>
+                        </div>
+                      </form>
+                    </AlertDialog.Content>
+                  </AlertDialog.Portal>
+                </AlertDialog.Root>
+              </div>
+              <p className="text-xs font-semibold text-right">
+                <br /> OrderID: {order.id} <br />
+                Location:
+                {order.location === "L5MQCWDDVAYA6"
+                  ? " UES"
+                  : order.location === "L56CFWYF0H5JK"
+                    ? " Brooklyn"
+                    : order.location === "LF6HAV7DTAEKJ" && " Times Square"}
+              </p>
+            </div>
           </div>
           <p className="pl-4">
             Item: <span className="font-semibold">{order.item}</span>

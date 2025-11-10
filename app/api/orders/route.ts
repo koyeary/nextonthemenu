@@ -7,7 +7,7 @@ export async function GET() {
   /* const tokens = orders.map((order) => order.itemToken);
 
   await prisma.item.findMany({ tokens }) */
-  console.log(orders);
+  //console.log(orders);
   return NextResponse.json(orders);
 }
 

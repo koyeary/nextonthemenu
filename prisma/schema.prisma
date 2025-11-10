@@ -40,9 +40,11 @@ model Order {
   phone        String
   createdAt    DateTime @default(now()) @map("created_at")
   printedAt    DateTime?
+  station      String   @default("office")
 
   @@index([status])
   @@index([due])
+  @@index([station])
   @@map("orders")
 }
 
@@ -73,4 +75,12 @@ model Item {
   quantity      Int
 
   @@map("items")
+}
+
+model Ip {
+  id      Int @id @default(autoincrement())
+  address String @unique
+  station String
+
+  @@map("ips")
 }

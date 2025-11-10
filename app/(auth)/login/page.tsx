@@ -38,7 +38,10 @@ const Login = () => {
     setPin(newPin);
   };
 
-  if (isLoading) return <p>Loading user profile...</p>;
+  if (isLoading)
+    return (
+      <div className="w-10 h-10 border-4 ml-5 border-indigo-900 border-t-transparent rounded-full animate-spin" />
+    );
   if (error) return <p>Error logging in</p>;
 
   return (
