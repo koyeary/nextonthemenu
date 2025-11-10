@@ -1,4 +1,3 @@
-/* eslint-disable */
 export interface BitImageParams {
   context: CanvasRenderingContext2D;
   x: number;

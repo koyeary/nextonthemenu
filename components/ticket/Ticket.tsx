@@ -1,5 +1,5 @@
 "use client";
-/*eslint-disable*/
+
 import React, { useState } from "react";
 import { NextResponse, NextRequest } from "next/server";
 import { useTicketCanvas } from "@/hooks/useTicketCanvas";

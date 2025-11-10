@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { PrinterResponse, TraderConfig } from "@/types/printer";
 
 export interface SendMessageParams {
