@@ -1,19 +1,16 @@
-// app/api/square/update-item/route.ts
-
+import Square from "square";
 import { NextRequest, NextResponse } from "next/server";
-import { Client, Environment } from "square";
 import prisma from "@/lib/db/connection";
 
-// Initialize Square client
-const client = new Client({
-  accessToken: process.env.SQUARE_ACCESS_TOKEN,
-  environment:
-    process.env.SQUARE_ENVIRONMENT === "production"
-      ? Environment.Production
-      : Environment.Sandbox,
-});
-
 export async function PATCH(req: NextRequest) {
+  const { Client, Environment } = Square;
+
+  const client = new Client({
+    accessToken: process.env.PROD_SQ_ACCESS_TOKEN,
+    environment:
+      process.env.NODE_ENV === "production" ? "production" : "sandbox",
+  });
+
   try {
     const body = await req.json();
     const {
@@ -132,45 +129,6 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-// ==========================================
-// USAGE EXAMPLE IN YOUR COMPONENT
-// ==========================================
-
-/*
-const updateSquareItem = async () => {
-  try {
-    const response = await fetch("/api/square/update-item", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        itemId: "YOUR_SQUARE_ITEM_ID",
-        variationId: "YOUR_VARIATION_ID", // Optional, for specific variation
-        name: "Updated Item Name",
-        description: "Updated description",
-        price: 1599, // $15.99 in cents
-        sku: "SKU-123",
-        available: true,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to update item");
-    }
-
-    const data = await response.json();
-    console.log("Updated item:", data);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
-*/
-
-// ==========================================
-// ALTERNATIVE: Batch Update Multiple Items
-// ==========================================
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -240,14 +198,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-// ==========================================
-// ENV VARIABLES NEEDED
-// ==========================================
-
-/*
-Add to your .env.local:
-
-SQUARE_ACCESS_TOKEN=your_square_access_token
-SQUARE_ENVIRONMENT=sandbox  # or "production"
-*/
