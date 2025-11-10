@@ -9,6 +9,7 @@ import Header from "@/components/layout/header";
 import Script from "next/script";
 import Order from "@/types/Order";
 import OrderDrawer from "../../../components/ui/order-drawer";
+import IPAddressDialog from "../../../components/layout/ip-address-dialog";
 
 type FilterType =
   | "none"
@@ -288,7 +289,13 @@ const Orders = () => {
     }
   }, [orders]);
 
-  if (isLoading) return <p>Loading orders…</p>;
+  if (isLoading)
+    return (
+      <div>
+        {" "}
+        <div className="w-10 h-10 border-4 mx-auto border-indigo-900 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   if (error) return <p>Error loading orders</p>;
 
   // --- Render ---
@@ -392,6 +399,7 @@ const OrderColumn = ({
         />
       ))}
     </div>
+    <IPAddressDialog />
   </div>
 );
 
