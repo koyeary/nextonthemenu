@@ -65,7 +65,7 @@ enum Role {
 
 model Item {
   id            Int @id @default(autoincrement())
-  token         String
+  token         String @unique
   itemName      String
   category       String
   variationName String
@@ -73,6 +73,7 @@ model Item {
   sku           String
   reference    String
   quantity      Int
+  location      String?
 
   @@map("items")
 }

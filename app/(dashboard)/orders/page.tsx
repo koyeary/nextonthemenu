@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-//import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-//import { useAuth } from "../../providers/authProvider";
 import DashboardCard from "@/components/layout/dashboard-card";
 import Header from "@/components/layout/header";
 import Script from "next/script";

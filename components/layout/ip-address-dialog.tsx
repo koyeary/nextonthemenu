@@ -1,8 +1,12 @@
 "use client";
 
 import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { Plus, Printer, Network } from "lucide-react";
+import { Button, Callout, Select } from "@radix-ui/themes";
+import { removeToStayOrGo } from "../../lib/utils/helpers";
+import StationSelector from "../selectors/station-selector";
 
 interface IPEntry {
   fieldId: number;
@@ -10,17 +14,41 @@ interface IPEntry {
   station: string;
 }
 
+interface InventoryItem {
+  item: string;
+  station: string;
+  address: string;
+}
+
+// --- API ---
+const fetchCategories = async (): Promise<Order[]> => {
+  const res = await fetch("/api/inventory");
+  if (!res.ok) throw new Error("Failed to fetch inventory");
+  console.log("Fetched inventory categories from API");
+
+  const results = await res.json();
+
+  return results.data;
+};
+
 const IPAddressDialog = () => {
+  const { data: categories = [], error } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
+
   const [open, setOpen] = React.useState(false);
   const [ipFields, setIpFields] = React.useState<IPEntry[]>([
     { fieldId: 1, address: "", station: "" },
   ]);
+
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [message, setMessage] = React.useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [stations, setStations] = React.useState<string[]>([]);
 
   // Fetch existing IPs when dialog opens
   React.useEffect(() => {
@@ -46,7 +74,7 @@ const IPAddressDialog = () => {
 
         setIpFields(normalized);
         setIsLoading(false);
-        setMessage({ type: "success", text: "Order updated successfully!" });
+        setMessage({ type: "success", text: "IP Addresses Configured" });
       } catch (err) {
         setIsLoading(false);
 
@@ -59,6 +87,22 @@ const IPAddressDialog = () => {
     };
     getIp();
   }, [open]);
+
+  const uniqueStations = [
+    ...new Set(categories.map((cat) => removeToStayOrGo(cat.category))),
+  ].sort((a, b) => a.localeCompare(b));
+
+  React.useEffect(() => {
+    console.log();
+    console.log(uniqueStations);
+  }, [categories]);
+
+  const camelToTitleCase = (str: string): string => {
+    return str
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (match) => match.toUpperCase())
+      .trim();
+  };
 
   // Add a new empty row
   const addIPField = () => {
@@ -75,16 +119,23 @@ const IPAddressDialog = () => {
     }
   };
 
-  // Handle field change
-  const handleChange = (fieldId: number, key: keyof IPEntry, value: string) => {
+  const handleChange = (
+    fieldId: number,
+    field: "address" | "station",
+    value: string
+  ) => {
     setIpFields((prev) =>
-      prev.map((f) => (f.fieldId === fieldId ? { ...f, [key]: value } : f))
+      prev.map((f) => (f.fieldId === fieldId ? { ...f, [field]: value } : f))
     );
+
+    console.log(ipFields);
   };
 
   // Submit form data to API
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(ipFields);
+
     setIsSubmitting(true);
     try {
       const payload = ipFields.map(({ address, station }) => ({
@@ -92,6 +143,7 @@ const IPAddressDialog = () => {
         station: station.trim().toLowerCase(),
       }));
 
+      console.log(payload);
       const res = await fetch("/api/ips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -164,17 +216,15 @@ const IPAddressDialog = () => {
                       required
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
-                    <input
-                      key={`station-${field.fieldId}`}
-                      type="text"
-                      value={field.station}
-                      onChange={(e) =>
-                        handleChange(field.fieldId, "station", e.target.value)
-                      }
-                      placeholder="Office"
-                      required
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+
+                    <StationSelector
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg h-10 cursor-pointer focus:ring-2 focus:ring-blue-500"
+                      id={field.fieldId}
+                      value={camelToTitleCase(field.station)}
+                      stations={uniqueStations}
+                      onChange={handleChange}
                     />
+
                     {index === ipFields.length - 1 ? (
                       <button
                         type="button"
@@ -219,17 +269,6 @@ const IPAddressDialog = () => {
           </AlertDialog.Content>
         </AlertDialog.Portal>
       </AlertDialog.Root>
-      {message && (
-        <div
-          className={`p-4 rounded-lg mt-4 mx-8 ${
-            message.type === "success"
-              ? "bg-green-50 text-green-800 border border-green-200"
-              : "bg-red-50 text-red-800 border border-red-200"
-          }`}
-        >
-          {message.text}
-        </div>
-      )}
     </>
   );
 };

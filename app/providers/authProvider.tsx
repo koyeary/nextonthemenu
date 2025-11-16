@@ -1,4 +1,4 @@
-"use client";
+/* "use client";
 import { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -8,7 +8,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { getCurrentUser, login, logout } from "lib/login/login.ts";
+import { getCurrentUser, login, logout } from "lib/auth/auth.ts";
 
 const queryClient = new QueryClient();
 
@@ -53,3 +53,4 @@ export function useAuth() {
     isLoading: loginMutation.isPending,
   };
 }
+ */

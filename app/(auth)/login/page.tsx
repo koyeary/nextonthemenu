@@ -1,21 +1,27 @@
 "use client";
-import React from "react";
-import { useAuth } from "../../providers/authProvider";
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import PinLoginForm from "@/components/forms/pin-login-form";
 
 const Login = () => {
+  const router = useRouter();
   const [pin, setPin] = React.useState<string>("");
   const [error, setError] = React.useState("");
-  const { login, isLoading } = useAuth();
 
   const maxLength = 4;
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      await login(pin);
-    } catch {
-      setError("Invalid PIN");
+    // console.log(JSON.stringify({ pin }));
+
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ pin }),
+    });
+    console.log("login status", res.status);
+    if (res.status === 200) {
+      router.push("/orders");
     }
   };
 
@@ -25,6 +31,7 @@ const Login = () => {
       setPin(newPin);
       //add listener for keyboard events here
     }
+    console.log(pin);
   };
 
   const handleDelete = () => {
@@ -37,12 +44,6 @@ const Login = () => {
 
     setPin(newPin);
   };
-
-  if (isLoading)
-    return (
-      <div className="w-10 h-10 border-4 ml-5 border-indigo-900 border-t-transparent rounded-full animate-spin" />
-    );
-  if (error) return <p>Error logging in</p>;
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  h-full">

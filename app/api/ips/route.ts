@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   console.log(req);
   try {
     const data = await req.json();
-
+    console.log(data);
     if (!Array.isArray(data))
       return NextResponse.json({ error: "Invalid data" }, { status: 400 });
 

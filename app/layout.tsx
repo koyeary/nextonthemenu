@@ -14,8 +14,8 @@ import {
   MantineProvider,
 } from "@mantine/core";
 import ReactQueryProvider from "./providers/ReactQueryProvider";
-import { AuthProvider } from "./providers/authProvider";
-
+/* import { AuthProvider } from "./providers/authProvider";
+ */
 export const metadata: Metadata = {
   title: "Order Up",
   description: "Kitchen Delivery System",
@@ -32,30 +32,30 @@ export default function RootLayout({
   return (
     <Theme>
       <ReactQueryProvider>
-        <AuthProvider>
-          <MantineProvider>
-            <html lang="en" {...mantineHtmlProps}>
-              <meta name="apple-mobile-web-app-title" content="KDS" />
-              <body className="bg-gray-50 min-h-screen overflow-hidden scrollbar-none">
-                <header className="shadow-lg shadow-gray-200 ">
-                  <ColorSchemeScript defaultColorScheme="auto" />
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <Navbar />
-                  </div>
-                </header>
-                {children}
-                <Script
-                  src="/starwebprint/StarWebPrintTrader.js"
-                  strategy="beforeInteractive"
-                />
-                <Script
-                  src="/starwebprint/StarWebPrintBuilder.js"
-                  strategy="beforeInteractive"
-                />
-              </body>
-            </html>
-          </MantineProvider>
-        </AuthProvider>
+        {/*   <AuthProvider> */}
+        <MantineProvider>
+          <html lang="en" {...mantineHtmlProps}>
+            <meta name="apple-mobile-web-app-title" content="KDS" />
+            <body className="bg-gray-50 min-h-screen overflow-hidden scrollbar-none">
+              <header className="shadow-lg shadow-gray-200 ">
+                <ColorSchemeScript defaultColorScheme="auto" />
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <Navbar />
+                </div>
+              </header>
+              {children}
+              <Script
+                src="/starwebprint/StarWebPrintTrader.js"
+                strategy="beforeInteractive"
+              />
+              <Script
+                src="/starwebprint/StarWebPrintBuilder.js"
+                strategy="beforeInteractive"
+              />
+            </body>
+          </html>
+        </MantineProvider>
+        {/*     </AuthProvider> */}
       </ReactQueryProvider>
     </Theme>
   );

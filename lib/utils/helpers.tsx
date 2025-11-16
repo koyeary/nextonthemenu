@@ -56,3 +56,11 @@ export const getHoliday = (dateInput) => {
 
   return null;
 };
+
+export const removeToStayOrGo = (str) => {
+  return str
+    .replace(/to\s+stay/gi, "") // remove "to stay"
+    .replace(/to\s+go/gi, "") // remove "to go"
+    .replace(/\s+/g, " ") // collapse extra spaces
+    .trim(); // trim ends
+};
