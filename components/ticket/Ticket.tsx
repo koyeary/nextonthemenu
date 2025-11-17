@@ -25,7 +25,29 @@ const Ticket: React.FC<{ order: any }> = ({ order, finishPrint }) => {
     fetchAndPrint();
   }, [order.station]);
 
-  const getIp = async (stationName: string): Promise<string | null> => {
+  const getItemDetails = async () => {
+    try {
+      const res = await fetch(`/api/inventory/${order.itemToken}`);
+
+      if (!res.ok) throw new Error("Failed to load item details");
+
+      const data = await res.json();
+      console.log("Item details:", data);
+      return data.data;
+    } catch (err) {
+      console.error("Error fetching item details:", err);
+      return null;
+    }
+  };
+
+  const getIp = async (): Promise<string | null> => {
+    console.log("CALLING:", `/api/inventory/${order.itemToken}`);
+    console.log("order:", order);
+    console.log("itemToken:", order.itemToken);
+    console.log("typeof itemToken:", typeof order.itemToken);
+    console.log("encoded:", encodeURIComponent(order.itemToken));
+    const category = await getItemDetails();
+
     try {
       const res = await fetch("/api/ips");
 
@@ -34,16 +56,13 @@ const Ticket: React.FC<{ order: any }> = ({ order, finishPrint }) => {
       const data: IPEntry[] = await res.json();
 
       // Find the IP entry that matches the station
-      const matchingEntry = data.find((item) => item.station === stationName);
+      const matchingEntry = data.find((item) => item.station === category);
 
       if (matchingEntry) {
-        console.log(
-          `Found IP for station ${stationName}:`,
-          matchingEntry.address
-        );
+        console.log(`Found IP for station ${category}:`, matchingEntry.address);
         return matchingEntry.address;
       } else {
-        console.warn(`No IP found for station: ${stationName}`);
+        console.warn(`No IP found for station: ${category}`);
         return null;
       }
     } catch (err) {
@@ -105,7 +124,6 @@ const Ticket: React.FC<{ order: any }> = ({ order, finishPrint }) => {
       />
       <Button
         className="bg-violet-800 font-semibold text-white rounded-lg px-3 py-1  flex mt-4 whitespace-nowrap items-center gap-2 hover:bg-violet-500 mx-auto "
-        //onClick={onSend}
         onClick={onSend}
       >
         <Printer />

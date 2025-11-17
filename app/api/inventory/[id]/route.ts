@@ -10,7 +10,8 @@ export async function GET(
 
   try {
     const item = await prisma.item.findUnique({ where: { token: id } });
-
+    const item2 = await prisma.item.findFirst({ where: { token: id } });
+    console.log("Fetched item:", item, item2);
     return NextResponse.json({ success: true, data: item });
   } catch (error) {
     console.error("Import error:", error);
