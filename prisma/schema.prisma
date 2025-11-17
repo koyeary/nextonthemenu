@@ -73,6 +73,7 @@ model Item {
   sku           String
   reference    String
   quantity      Int 
+  baseQuantity  Int @default(1)
   activeOrders  Int @default(0)
 
   @@map("items")

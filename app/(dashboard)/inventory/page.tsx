@@ -8,14 +8,7 @@ import {
   Table,
   TextField,
 } from "@radix-ui/themes";
-import {
-  /*  ArrowUpAZ,
-  ArrowDownAZ,
-  ArrowUp01,
-  ArrowDown01, */
-  Search,
-  X,
-} from "lucide-react";
+import { Search, X } from "lucide-react";
 import { removeToStayOrGo } from "../../../lib/utils/helpers";
 
 type Item = {
@@ -25,34 +18,24 @@ type Item = {
   variationName: string;
   category: string;
   quantity: number;
+  activeOrders: number;
 };
 
-const locations = [
-  { name: "All", code: "all" },
-  { name: "UES", code: "L5MQCWDDVAYA6" },
-  { name: "Times Square", code: "LF6HAV7DTAEKJ" },
-  { name: "Brooklyn", code: "L56CFWYF0H5JK" },
-];
-
-const fetchInventory = async (): Promise<Item[]> => {
+const fetchInventory = async (location: string): Promise<Item[]> => {
   const res = await fetch("/api/inventory", {
     method: "POST",
     cache: "no-store",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ location: "L5MQCWDDVAYA6" }),
+    body: JSON.stringify({ location }),
   });
-  if (!res.ok) throw new Error("Failed to fetch inventory");
-  console.log("Fetched inventory categories from API");
-  const results = await res.json();
 
+  if (!res.ok) throw new Error("Failed to fetch inventory");
+
+  const results = await res.json();
   return results.data;
 };
 
 const Inventory = () => {
-  const { data, error } = useQuery({
-    queryKey: ["inventory"],
-    queryFn: fetchInventory,
-  });
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -61,57 +44,41 @@ const Inventory = () => {
 
   const queryClient = useQueryClient();
 
-  const findByLocation = (locationCode: string) => {
-    setSelectedLocation(locationCode);
-
-    console.log(data);
-    /*   if (locationCode === "all") return setFilteredItems(data || []);
-    setFilteredItems(data.filter((o) => o.location === locationCode)); */
-  };
+  const { data, error } = useQuery({
+    queryKey: ["inventory", selectedLocation],
+    queryFn: () => fetchInventory(selectedLocation),
+  });
 
   useEffect(() => {
     if (data) setFilteredItems(data);
   }, [data]);
 
-  if (!data) return <div>Loading inventory...</div>;
-
-  if (error) return <div>Error loading inventory: {error.message}</div>;
+  const findByLocation = (locationCode: string) => {
+    setSelectedLocation(locationCode);
+  };
 
   const handleUpdate = async (token: string, quantity: number) => {
     try {
       const res = await fetch("/api/inventory", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token,
-          quantity,
-          location: selectedLocation.code,
-        }),
+        body: JSON.stringify({ token, quantity }),
       });
 
       if (!res.ok) throw new Error("Failed to update item");
-      console.log(`Updated item ${token} to quantity ${quantity}`);
-      queryClient.invalidateQueries(["inventory"]);
+
+      queryClient.invalidateQueries(["inventory", selectedLocation]);
     } catch (err) {
       console.error("Error updating item:", err);
     }
   };
 
-  const locations = [
-    { name: "All", code: "all" },
-    { name: "UES", code: "L5MQCWDDVAYA6" },
-    { name: "Times Square", code: "LF6HAV7DTAEKJ" },
-    { name: "Brooklyn", code: "L56CFWYF0H5JK" },
-  ];
-
   const startEditing = (token: string, currentQty: number) => {
     setEditingId(token);
     setTempQty(String(currentQty));
   };
-
   const saveQty = (token: string) => {
     handleUpdate(token, parseInt(tempQty, 10));
-
     setEditingId(null);
     setTempQty("");
   };
@@ -119,17 +86,14 @@ const Inventory = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-
     const results = data.filter((item) =>
       Object.entries(item).some(([key, val]) => {
         if (typeof val !== "string" && typeof val !== "number") return false;
-
         const strVal =
           key.toLowerCase().includes("date") ||
           key.toLowerCase().includes("due")
             ? formatDate(val as string).toLowerCase()
             : String(val).toLowerCase();
-
         return strVal.includes(term);
       })
     );
@@ -142,7 +106,7 @@ const Inventory = () => {
         <h1 className="mt-5 mb-3 text-center">
           Inventory - Select item quantity to edit
         </h1>
-        <SegmentedControl.Root
+        {/*         <SegmentedControl.Root
           defaultValue="all"
           size="2"
           onValueChange={findByLocation}
@@ -152,7 +116,7 @@ const Inventory = () => {
               {l.name}
             </SegmentedControl.Item>
           ))}
-        </SegmentedControl.Root>
+        </SegmentedControl.Root> */}
         <TextField.Root
           radius="rounded"
           placeholder="Search inventory..."
@@ -182,7 +146,7 @@ const Inventory = () => {
             <Table.ColumnHeaderCell key="quantity">
               Quantity
             </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell key="quantity">
+            <Table.ColumnHeaderCell key="active-orders">
               Active Orders
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell key="category">

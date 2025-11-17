@@ -46,41 +46,42 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const { location } = await req.json();
-    console.log(location);
 
-    const locationFilter = location && location !== "all" ? { location } : {}; // <-- ignore filter when "all"
+    const locationFilter = location && location !== "all" ? { location } : {};
 
-    const inventory = await prisma.item.findMany({});
+    const inventory = await prisma.item.findMany({
+      select: {
+        token: true,
+        baseQuantity: true,
+      },
+    });
 
-    await Promise.all(
+    const updatedItems = await Promise.all(
       inventory.map(async (item) => {
         const count = await prisma.order.count({
           where: {
             itemToken: item.token,
             status: { not: "completed" },
-            ...locationFilter, // <-- FIXED
+            ...locationFilter,
           },
         });
 
-        await prisma.item.updateMany({
-          where: {
-            token: item.token,
-          },
+        return prisma.item.update({
+          where: { token: item.token },
           data: {
-            quantity: item.quantity - count,
             activeOrders: count,
+            quantity: item.baseQuantity - count,
           },
         });
       })
     );
 
-    // 🔥 Now retrieve updated inventory
-    const updatedInventory = await prisma.item.findMany({});
-
-    console.log(locationFilter, updatedInventory.length);
-    return NextResponse.json({ success: true, data: updatedInventory });
+    return NextResponse.json({
+      success: true,
+      data: updatedItems,
+    });
   } catch (error) {
-    console.error("Import error:", error);
+    console.error("Inventory update error:", error);
     return NextResponse.json(
       {
         success: false,
