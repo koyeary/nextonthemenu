@@ -6,7 +6,6 @@ import "@radix-ui/themes/styles.css";
 
 import Script from "next/script";
 import Navbar from "../components/layout/navbar";
-import "./globals.css";
 import { usePathname } from "next/navigation";
 
 import { Theme } from "@radix-ui/themes";
@@ -16,8 +15,6 @@ import {
   MantineProvider,
 } from "@mantine/core";
 import ReactQueryProvider from "./providers/ReactQueryProvider";
-/* import { AuthProvider } from "./providers/authProvider";
- */
 
 export default function RootLayout({
   children,
@@ -29,7 +26,6 @@ export default function RootLayout({
   return (
     <Theme>
       <ReactQueryProvider>
-        {/*   <AuthProvider> */}
         <MantineProvider>
           <html lang="en" {...mantineHtmlProps}>
             <meta name="apple-mobile-web-app-title" content="KDS" />
@@ -52,7 +48,6 @@ export default function RootLayout({
             </body>
           </html>
         </MantineProvider>
-        {/*     </AuthProvider> */}
       </ReactQueryProvider>
     </Theme>
   );

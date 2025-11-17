@@ -1,10 +1,12 @@
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ChefHat, UserMinus } from "lucide-react";
-
+import { Button } from "../ui/button";
 const Navbar = () => {
   const router = useRouter();
+  const pathname = usePathname();
+
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
   const getAuth = async () => {
     console.log("Checking auth status...");
@@ -49,14 +51,23 @@ const Navbar = () => {
           onClick={handleClick}
         />
         <div>
-          <h1 className="text-text">Mia&apos;s Bakery</h1>
+          <h1 className="text-text">
+            Mia&apos;s Bakery{" "}
+            {pathname === "/orders" ? (
+              <span>- Orders</span>
+            ) : pathname === "/inventory" ? (
+              <span>- Inventory</span>
+            ) : null}
+          </h1>{" "}
         </div>
       </div>
 
-      <div className="flex flex-row gap-7 w-fit">
+      <div className="flex flex-row gap-3 w-fit">
         <div className="flex flex-row gap-3"></div>
+        <Button onClick={() => router.push("/orders")}>ORDERS</Button>
+        <Button onClick={() => router.push("/inventory")}>INVENTORY</Button>
         <UserMinus
-          className="text-primary h-7 w-7 mt-1.25 cursor-pointer"
+          className="text-primary h-7 w-7 mt-1.25 ml-4 cursor-pointer"
           onClick={() => logout()}
         />
       </div>

@@ -65,20 +65,19 @@ export async function POST(req: Request) {
         await prisma.item.updateMany({
           where: {
             token: item.token,
-            ...locationFilter, // <-- FIXED
           },
           data: {
             quantity: item.quantity - count,
+            activeOrders: count,
           },
         });
       })
     );
 
     // 🔥 Now retrieve updated inventory
-    const updatedInventory = await prisma.item.findMany({
-      where: locationFilter,
-    });
+    const updatedInventory = await prisma.item.findMany({});
 
+    console.log(locationFilter, updatedInventory.length);
     return NextResponse.json({ success: true, data: updatedInventory });
   } catch (error) {
     console.error("Import error:", error);

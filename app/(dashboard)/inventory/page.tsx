@@ -36,8 +36,10 @@ const locations = [
 
 const fetchInventory = async (): Promise<Item[]> => {
   const res = await fetch("/api/inventory", {
-    method: "GET",
+    method: "POST",
     cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ location: "L5MQCWDDVAYA6" }),
   });
   if (!res.ok) throw new Error("Failed to fetch inventory");
   console.log("Fetched inventory categories from API");
@@ -62,8 +64,9 @@ const Inventory = () => {
   const findByLocation = (locationCode: string) => {
     setSelectedLocation(locationCode);
 
-    if (locationCode === "all") return setFilteredItems(data || []);
-    setFilteredItems(data.filter((o) => o.location === locationCode));
+    console.log(data);
+    /*   if (locationCode === "all") return setFilteredItems(data || []);
+    setFilteredItems(data.filter((o) => o.location === locationCode)); */
   };
 
   useEffect(() => {
@@ -79,7 +82,11 @@ const Inventory = () => {
       const res = await fetch("/api/inventory", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, quantity, location: selectedLocation }),
+        body: JSON.stringify({
+          token,
+          quantity,
+          location: selectedLocation.code,
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to update item");
@@ -175,6 +182,9 @@ const Inventory = () => {
             <Table.ColumnHeaderCell key="quantity">
               Quantity
             </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell key="quantity">
+              Active Orders
+            </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell key="category">
               Category
             </Table.ColumnHeaderCell>
@@ -211,7 +221,12 @@ const Inventory = () => {
                   </span>
                 )}
               </Table.Cell>
-
+              <Table.Cell
+                key={`${row.itemName}-activeOrders`}
+                className="cursor-pointer"
+              >
+                {row.activeOrders}
+              </Table.Cell>
               <Table.Cell key={`${row.itemName}-category`}>
                 {removeToStayOrGo(row.category)}
               </Table.Cell>

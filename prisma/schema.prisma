@@ -72,8 +72,8 @@ model Item {
   unitPrecision String
   sku           String
   reference    String
-  quantity      Int
-  locations      String[]
+  quantity      Int 
+  activeOrders  Int @default(0)
 
   @@map("items")
 }
