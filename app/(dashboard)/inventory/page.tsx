@@ -10,6 +10,7 @@ import {
 } from "@radix-ui/themes";
 import { Search, X } from "lucide-react";
 import { removeToStayOrGo } from "../../../lib/utils/helpers";
+import IPAddressDialog from "../../../components/layout/ip-address-dialog";
 
 type Item = {
   id: number;
@@ -132,7 +133,10 @@ const Inventory = () => {
             <IconButton
               size="2"
               variant="ghost"
-              onClick={() => setSearchTerm("")}
+              onClick={() => {
+                setSearchTerm("");
+                setFilteredItems(data || []);
+              }}
             >
               <X height="16" width="16" />
             </IconButton>
@@ -199,6 +203,7 @@ const Inventory = () => {
           ))}
         </Table.Body>
       </Table.Root>
+      <IPAddressDialog />
     </div>
   );
 };

@@ -198,6 +198,7 @@ const Orders = () => {
       { name: "Thanksgiving", date: new Date(`${year}-11-28`) },
       { name: "Christmas", date: new Date(`${year}-12-25`) },
     ];
+    console.log(holidays.find((h) => h.date > now) || holidays[0]);
     return holidays.find((h) => h.date > now) || holidays[0];
   };
 
@@ -247,10 +248,14 @@ const Orders = () => {
   const handleHoliday = () => {
     const newState = !filterHoliday;
     setFilterHoliday(newState);
-
+    const nextHoliday = getNextHoliday().name;
     if (newState) {
       // Filter for orders that fall on or near a holiday
-      const results = orders.filter((order) => getHoliday(order.due));
+      const holidays = orders.filter((order) => getHoliday(order.due));
+      const results = holidays.filter(
+        (order) => getHoliday(order.due) === nextHoliday
+      );
+
       setFilteredOrders(results);
     } else {
       // Reset to all orders
@@ -277,12 +282,13 @@ const Orders = () => {
     if (activeFilter === "holiday") handleHoliday();
     else if (activeFilter === "Today") handleToday();
     else if (activeFilter === "Tomorrow") handleTomorrow();
-    // etc.
   }, [orders]);
 
   useEffect(() => {
     if (filterHoliday) {
-      const results = orders.filter((order) => getHoliday(order.due));
+      const results = orders.filter(
+        (order) => getHoliday(order.due) === getNextHoliday().name
+      );
       setFilteredOrders(results);
     }
   }, [orders]);
@@ -296,7 +302,6 @@ const Orders = () => {
     );
   if (error) return <p>Error loading orders</p>;
 
-  // --- Render ---
   return (
     <>
       <Script
@@ -363,7 +368,6 @@ const Orders = () => {
   );
 };
 
-// --- Reusable column ---
 const OrderColumn = ({
   title,
   orders,
