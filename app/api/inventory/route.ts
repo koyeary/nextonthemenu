@@ -6,23 +6,80 @@ import { removeToStayOrGo } from "@/lib/utils/helpers";
 
 export async function GET() {
   try {
-    const inventory = await prisma.item.findMany();
+    const inventory = await prisma.item.findMany({});
 
-    const inOrderCounts = await Promise.all(
+    await Promise.all(
       inventory.map(async (item) => {
         const count = await prisma.order.count({
-          where: { itemToken: item.token, status: { not: "completed" } },
+          where: {
+            itemToken: item.token,
+            status: { not: "completed" },
+            //...locationFilter, // <-- FIXED
+          },
         });
-        const update = await prisma.item.update({
-          where: { token: item.token },
-          data: { quantity: item.quantity - count },
+
+        await prisma.item.updateMany({
+          where: {
+            token: item.token,
+            // ...locationFilter, // <-- FIXED
+          },
+          data: {
+            quantity: item.quantity - count,
+          },
         });
-        return { itemToken: item.token, inOrderCount: update.quantity };
       })
     );
-    console.log(inOrderCounts);
 
     return NextResponse.json({ success: true, data: inventory });
+  } catch (error) {
+    console.error("Import error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const { location } = await req.json();
+    console.log(location);
+
+    const locationFilter = location && location !== "all" ? { location } : {}; // <-- ignore filter when "all"
+
+    const inventory = await prisma.item.findMany({});
+
+    await Promise.all(
+      inventory.map(async (item) => {
+        const count = await prisma.order.count({
+          where: {
+            itemToken: item.token,
+            status: { not: "completed" },
+            ...locationFilter, // <-- FIXED
+          },
+        });
+
+        await prisma.item.updateMany({
+          where: {
+            token: item.token,
+            ...locationFilter, // <-- FIXED
+          },
+          data: {
+            quantity: item.quantity - count,
+          },
+        });
+      })
+    );
+
+    // 🔥 Now retrieve updated inventory
+    const updatedInventory = await prisma.item.findMany({
+      where: locationFilter,
+    });
+
+    return NextResponse.json({ success: true, data: updatedInventory });
   } catch (error) {
     console.error("Import error:", error);
     return NextResponse.json(
@@ -56,7 +113,7 @@ export async function PUT(req: Request) {
     );
   }
 }
-
+/* 
 export async function POST() {
   try {
     let categories = [];
@@ -81,6 +138,7 @@ export async function POST() {
             category: item["Reporting Category"] || "",
             reference: item["Reference Handle"] || "",
             quantity: parseInt(item["Quantity"]) || 0,
+            locations: item["Locations"] ? item["Locations"].split(",") : [],
           };
           categories.push(itemData.category);
           return prisma.item.create({
@@ -141,3 +199,4 @@ export async function DELETE() {
     );
   }
 }
+ */

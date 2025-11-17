@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   IconButton,
-  //SegmentedControl,
+  SegmentedControl,
   Table,
   TextField,
 } from "@radix-ui/themes";
@@ -26,8 +26,19 @@ type Item = {
   category: string;
   quantity: number;
 };
+
+const locations = [
+  { name: "All", code: "all" },
+  { name: "UES", code: "L5MQCWDDVAYA6" },
+  { name: "Times Square", code: "LF6HAV7DTAEKJ" },
+  { name: "Brooklyn", code: "L56CFWYF0H5JK" },
+];
+
 const fetchInventory = async (): Promise<Item[]> => {
-  const res = await fetch("/api/inventory", { cache: "no-store" });
+  const res = await fetch("/api/inventory", {
+    method: "GET",
+    cache: "no-store",
+  });
   if (!res.ok) throw new Error("Failed to fetch inventory");
   console.log("Fetched inventory categories from API");
   const results = await res.json();
@@ -48,13 +59,12 @@ const Inventory = () => {
 
   const queryClient = useQueryClient();
 
-  /*     const findByLocation = (locationCode: string) => {
+  const findByLocation = (locationCode: string) => {
+    setSelectedLocation(locationCode);
 
-      setSelectedLocation(locationCode);
-
-      if (locationCode === "all") return setFilteredOrders(inventory);
-      setFilteredOrders(inventory.filter((o) => o.location === locationCode));
-    }; */
+    if (locationCode === "all") return setFilteredItems(data || []);
+    setFilteredItems(data.filter((o) => o.location === locationCode));
+  };
 
   useEffect(() => {
     if (data) setFilteredItems(data);
@@ -69,7 +79,7 @@ const Inventory = () => {
       const res = await fetch("/api/inventory", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, quantity }),
+        body: JSON.stringify({ token, quantity, location: selectedLocation }),
       });
 
       if (!res.ok) throw new Error("Failed to update item");
@@ -125,7 +135,7 @@ const Inventory = () => {
         <h1 className="mt-5 mb-3 text-center">
           Inventory - Select item quantity to edit
         </h1>
-        {/*         <SegmentedControl.Root
+        <SegmentedControl.Root
           defaultValue="all"
           size="2"
           onValueChange={findByLocation}
@@ -135,7 +145,7 @@ const Inventory = () => {
               {l.name}
             </SegmentedControl.Item>
           ))}
-        </SegmentedControl.Root> */}
+        </SegmentedControl.Root>
         <TextField.Root
           radius="rounded"
           placeholder="Search inventory..."

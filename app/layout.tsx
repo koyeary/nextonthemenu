@@ -1,11 +1,13 @@
+"use client";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
-import type { Metadata } from "next";
+
 import Script from "next/script";
 import Navbar from "../components/layout/navbar";
 import "./globals.css";
+import { usePathname } from "next/navigation";
 
 import { Theme } from "@radix-ui/themes";
 import {
@@ -16,19 +18,14 @@ import {
 import ReactQueryProvider from "./providers/ReactQueryProvider";
 /* import { AuthProvider } from "./providers/authProvider";
  */
-export const metadata: Metadata = {
-  title: "Order Up",
-  description: "Kitchen Delivery System",
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+
   return (
     <Theme>
       <ReactQueryProvider>
@@ -40,7 +37,7 @@ export default function RootLayout({
               <header className="shadow-lg shadow-gray-200 ">
                 <ColorSchemeScript defaultColorScheme="auto" />
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <Navbar />
+                  {pathname !== "/login" && <Navbar />}
                 </div>
               </header>
               {children}

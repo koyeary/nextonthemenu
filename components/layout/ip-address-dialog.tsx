@@ -21,11 +21,13 @@ interface InventoryItem {
 }
 
 // --- API ---
-const fetchCategories = async (): Promise<Order[]> => {
-  const res = await fetch("/api/inventory");
+const fetchCategories = async (): Promise<Item[]> => {
+  const res = await fetch("/api/inventory", {
+    method: "GET",
+    cache: "no-store",
+  });
   if (!res.ok) throw new Error("Failed to fetch inventory");
   console.log("Fetched inventory categories from API");
-
   const results = await res.json();
 
   return results.data;
@@ -93,8 +95,7 @@ const IPAddressDialog = () => {
   ].sort((a, b) => a.localeCompare(b));
 
   React.useEffect(() => {
-    console.log();
-    console.log(uniqueStations);
+    console.log(categories);
   }, [categories]);
 
   const camelToTitleCase = (str: string): string => {

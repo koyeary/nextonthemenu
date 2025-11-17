@@ -1,37 +1,31 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PinLoginForm from "@/components/forms/pin-login-form";
 
 const Login = () => {
-  const router = useRouter();
   const [pin, setPin] = React.useState<string>("");
   const [error, setError] = React.useState("");
+  const router = useRouter();
 
   const maxLength = 4;
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    // console.log(JSON.stringify({ pin }));
-
+  const handleLogin = async (submittedPin: string) => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
-      body: JSON.stringify({ pin }),
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ pin: submittedPin }),
     });
-    console.log("login status", res.status);
-    if (res.status === 200) {
-      router.push("/orders");
-    }
+    if (res.ok) router.push("/orders");
   };
 
   const onPinChange = (number: string) => {
     if (pin.length < maxLength) {
       const newPin = pin + number;
       setPin(newPin);
-      //add listener for keyboard events here
     }
-    console.log(pin);
   };
 
   const handleDelete = () => {
@@ -45,9 +39,34 @@ const Login = () => {
     setPin(newPin);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Digits
+      if (/^\d$/.test(e.key)) {
+        onPinChange(e.key);
+        return;
+      }
+
+      // Backspace
+      if (e.key === "Backspace") {
+        handleDelete();
+        return;
+      }
+
+      // Enter
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleLogin(pin); // pass latest pin
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [pin]);
+
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  h-full">
-      <div className="text-center space-y-8 h-fit mt-30">
+    <main className="max-w-7xl m-auto px-4 sm:px-6 lg:px-8 justify-center h-full">
+      <div className="text-center space-y-8 h-fit mt-40">
         <div className="space-y-4">
           <div className="text-gray-900 text-3xl ">
             Welcome to Your Kitchen Display System{" "}

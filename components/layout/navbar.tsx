@@ -1,18 +1,45 @@
 "use client";
+import React from "react";
 import { useRouter } from "next/navigation";
-//import { useAuth } from "../../app/providers/authProvider";
-
 import { ChefHat, UserMinus } from "lucide-react";
-const logout = async () => {
-  const req = await fetch("/api/logout", { Method: "POST" });
-};
 
 const Navbar = () => {
   const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
+  const getAuth = async () => {
+    console.log("Checking auth status...");
+    const res = await fetch("/api/me", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      console.log("User not authenticated");
+      return setIsAuthenticated(false);
+    }
+    const data = await res.json();
+    console.log("Auth status:", data);
+    return setIsAuthenticated(data.user !== null);
+  };
+
+  const logout = async () => {
+    const res = await fetch("/api/auth/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (res.ok) {
+      router.push("/");
+    }
+  };
 
   const handleClick = () => {
     router.push("/");
   };
+
+  React.useEffect(() => {
+    getAuth();
+  }, []);
 
   return (
     <div className="flex justify-between items-center h-16 w-full">
@@ -26,7 +53,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/*      {auth && ( */}
       <div className="flex flex-row gap-7 w-fit">
         <div className="flex flex-row gap-3"></div>
         <UserMinus
@@ -34,7 +60,6 @@ const Navbar = () => {
           onClick={() => logout()}
         />
       </div>
-      {/*     )} */}
     </div>
   );
 };

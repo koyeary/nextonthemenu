@@ -73,7 +73,7 @@ model Item {
   sku           String
   reference    String
   quantity      Int
-  location      String?
+  locations      String[]
 
   @@map("items")
 }
