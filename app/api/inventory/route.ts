@@ -2,8 +2,119 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import Papa from "papaparse";
 import prisma from "@/lib/db/connection";
+import { removeToStayOrGo } from "@/lib/utils/helpers";
 
 export async function GET() {
+  try {
+    const inventory = await prisma.item.findMany({});
+
+    await Promise.all(
+      inventory.map(async (item) => {
+        const count = await prisma.order.count({
+          where: {
+            itemToken: item.token,
+            status: { not: "completed" },
+            //...locationFilter, // <-- FIXED
+          },
+        });
+
+        await prisma.item.updateMany({
+          where: {
+            token: item.token,
+            // ...locationFilter, // <-- FIXED
+          },
+          data: {
+            quantity: item.quantity - count,
+          },
+        });
+      })
+    );
+
+    return NextResponse.json({ success: true, data: inventory });
+  } catch (error) {
+    console.error("Import error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const { location } = await req.json();
+
+    const locationFilter = location && location !== "all" ? { location } : {};
+
+    const inventory = await prisma.item.findMany({
+      select: {
+        token: true,
+        baseQuantity: true,
+      },
+    });
+
+    const updatedItems = await Promise.all(
+      inventory.map(async (item) => {
+        const count = await prisma.order.count({
+          where: {
+            itemToken: item.token,
+            status: { not: "completed" },
+            ...locationFilter,
+          },
+        });
+
+        return prisma.item.update({
+          where: { token: item.token },
+          data: {
+            activeOrders: count,
+            quantity: item.baseQuantity - count,
+          },
+        });
+      })
+    );
+
+    return NextResponse.json({
+      success: true,
+      data: updatedItems,
+    });
+  } catch (error) {
+    console.error("Inventory update error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    const { token, quantity } = await req.json();
+
+    const updatedItem = await prisma.item.update({
+      where: { token: token },
+      data: { quantity },
+    });
+
+    return NextResponse.json({ success: true, data: updatedItem });
+  } catch (error) {
+    console.error("Update error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
+  }
+}
+/* 
+export async function POST() {
   try {
     let categories = [];
     const csvFile = fs.readFileSync("public/square.csv", "utf8");
@@ -27,9 +138,10 @@ export async function GET() {
             category: item["Reporting Category"] || "",
             reference: item["Reference Handle"] || "",
             quantity: parseInt(item["Quantity"]) || 0,
+            locations: item["Locations"] ? item["Locations"].split(",") : [],
           };
           categories.push(itemData.category);
-          /* return prisma.item.create({
+          return prisma.item.create({
             data: {
               token: itemData.token,
               itemName: itemData.itemName,
@@ -40,8 +152,8 @@ export async function GET() {
               reference: itemData.reference,
               quantity: itemData.quantity,
             },
-          }); */
-          // NextResponse.json({ ok: true });
+          });
+          NextResponse.json({ ok: true });
         })
       );
 
@@ -49,8 +161,17 @@ export async function GET() {
 
       console.log(`Processed ${processed}/${results.data.length}`);
     }
-    console.log([...new Set(categories)]);
-    return NextResponse.json({ success: true, categories: categories });
+
+    const allStations = [...new Set(categories)].map((str) =>
+      removeToStayOrGo(str)
+    );
+
+    console.log(allStations);
+    return NextResponse.json({
+      success: true,
+      categories: allStations,
+      tableData: results.data,
+    });
   } catch (error) {
     console.error("Import error:", error);
     return NextResponse.json(
@@ -62,3 +183,20 @@ export async function GET() {
     );
   }
 }
+
+export async function DELETE() {
+  try {
+    await prisma.item.deleteMany({});
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Delete error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
+  }
+}
+ */

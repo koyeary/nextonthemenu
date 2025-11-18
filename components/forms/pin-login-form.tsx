@@ -1,17 +1,16 @@
+"use client";
+
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Delete, X } from "lucide-react";
 
 interface PinLoginFormProps {
-  onPinChange: (pin: string) => void;
-  onSubmit: () => void;
+  onPinChange: (digit: string) => void;
+  onSubmit: (pin: string) => void;
   handleClear: () => void;
   handleDelete: () => void;
-  handleKeyDown: () => void;
   pin: string;
   maxLength?: number;
-  placeholder?: string;
-  title?: string;
 }
 
 const PinLoginForm: React.FC<PinLoginFormProps> = ({
@@ -21,15 +20,14 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
   handleClear,
   pin,
   maxLength = 4,
-}: PinLoginFormProps) => {
-  /* This will be the array of dots for the display */
+}) => {
   const pinDots = Array.from({ length: maxLength }, (_, index) => (
     <div
       key={index}
-      className={`w-4 h-4 rounded-full  transition-all ${
+      className={`w-4 h-4 rounded-full transition-all ${
         index < pin.length ? "bg-blue-600" : "bg-gray-300"
       }`}
-    ></div>
+    />
   ));
 
   const numberButtons = [
@@ -45,8 +43,8 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
         <CardTitle></CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-6 justify-center ">
-        {/* PIN Display */}
+      <CardContent className="space-y-6 justify-center">
+        {/* PIN Dots */}
         <div className="flex justify-center items-center gap-3 pt-1 pb-4">
           {pinDots}
         </div>
@@ -57,10 +55,9 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
             row.map((number, colIndex) => {
               if (number === "") {
                 if (rowIndex === 3 && colIndex === 0) {
-                  // Clear button
+                  // Clear
                   return (
                     <Button
-                      aria-hidden="false"
                       key={`${rowIndex}-${colIndex}`}
                       variant="outline"
                       size="lg"
@@ -72,10 +69,9 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
                     </Button>
                   );
                 } else if (rowIndex === 3 && colIndex === 2) {
-                  // Delete button
+                  // Delete
                   return (
                     <Button
-                      aria-hidden="false"
                       key={`${rowIndex}-${colIndex}`}
                       variant="outline"
                       size="lg"
@@ -87,13 +83,11 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
                     </Button>
                   );
                 }
-                // Empty space
                 return <div key={`${rowIndex}-${colIndex}`} />;
               }
 
               return (
                 <Button
-                  aria-hidden="false"
                   key={`${rowIndex}-${colIndex}`}
                   variant="outline"
                   size="lg"
@@ -110,8 +104,12 @@ const PinLoginForm: React.FC<PinLoginFormProps> = ({
 
         {/* Submit Button */}
         <Button
-          aria-hidden="false"
-          onClick={onSubmit}
+          onClick={() => {
+            console.log("Submit clicked with PIN:", pin); // DEBUG
+            if (pin.length === maxLength) {
+              onSubmit(pin);
+            }
+          }}
           className="w-full mt-10 mb-5"
           disabled={pin.length < maxLength}
         >

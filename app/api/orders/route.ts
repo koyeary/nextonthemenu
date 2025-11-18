@@ -4,10 +4,13 @@ import prisma from "@/lib/db/connection";
 export async function GET() {
   const orders = await prisma.order.findMany({});
 
-  /* const tokens = orders.map((order) => order.itemToken);
+  if (!orders || orders === null || orders.length === 0) {
+    return NextResponse.json(
+      { success: false, error: "No orders found" },
+      { status: 404 }
+    );
+  }
 
-  await prisma.item.findMany({ tokens }) */
-  //console.log(orders);
   return NextResponse.json(orders);
 }
 

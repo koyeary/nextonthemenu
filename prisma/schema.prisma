@@ -65,22 +65,26 @@ enum Role {
 
 model Item {
   id            Int @id @default(autoincrement())
-  token         String
+  token         String @unique
   itemName      String
   category       String
   variationName String
   unitPrecision String
   sku           String
   reference    String
-  quantity      Int
+  quantity      Int 
+  baseQuantity  Int @default(1)
+  activeOrders  Int @default(0)
 
   @@map("items")
 }
 
 model Ip {
-  id      Int @id @default(autoincrement())
-  address String @unique
-  station String
+  id           Int     @id @default(autoincrement())
+  station      String
+  address      String
+  locationCode String @default("L56CFWYF0H5JK")
 
+  @@unique([station, locationCode])
   @@map("ips")
 }

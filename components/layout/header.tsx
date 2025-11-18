@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { IconButton, SegmentedControl, TextField } from "@radix-ui/themes";
 import "@mantine/core/styles.css";
-import StationSelector from "../selectors/station-selector";
 
 type HeaderProps = {
   activeFilter: string;
@@ -100,7 +99,6 @@ const Header = ({
             </TextField.Root>
           )}
         </div>
-        <StationSelector />
         <SegmentedControl.Root
           defaultValue="all"
           size="2"
@@ -151,47 +149,6 @@ const Header = ({
           range={range}
           setRange={setRange}
         />
-        {/* <Button
-          size="sm"
-          className={`text-sm font-semibold  px-1 py-1 bg-indigo-800 transition-all duration-300 ${
-            activeFilter === "searchbar"
-              ? "opacity-0 w-0 p-0"
-              : "opacity-100 w-auto px-3 "
-          }`}
-          onClick={() => openFilter("searchbar")}
-        >
-          <Search className="w-4 h-4 mr-1 " /> Search
-        </Button>
-        <div
-          className={`transition-all duration-300 overflow-hidden  ${
-            activeFilter === "searchbar"
-              ? "w-[250px] opacity-100"
-              : "w-0 opacity-0"
-          }`}
-        >
-          {activeFilter === "searchbar" && (
-            <TextField.Root
-              radius="rounded"
-              placeholder="Name, date, item, etc..."
-              size="2"
-              onChange={handleChange}
-              value={searchTerm}
-            >
-              <TextField.Slot>
-                <Search height="16" width="16" />
-              </TextField.Slot>
-              <TextField.Slot pr="3">
-                <IconButton
-                  size="2"
-                  variant="ghost"
-                  onClick={() => openFilter("none")}
-                >
-                  <X height="16" width="16" />
-                </IconButton>
-              </TextField.Slot>
-            </TextField.Root>
-          )}
-        </div> */}
         <Button
           size="sm"
           className="text-sm font-semibold py-1"

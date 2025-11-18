@@ -15,7 +15,7 @@ const retrieveOrder = async (orderId) => {
     });
 
     const order = res.order;
-    console.log(order);
+
     return order;
   } catch (err) {
     console.error(err);

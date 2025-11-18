@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-//import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-//import { useAuth } from "../../providers/authProvider";
 import DashboardCard from "@/components/layout/dashboard-card";
 import Header from "@/components/layout/header";
 import Script from "next/script";
@@ -61,25 +59,6 @@ const Orders = () => {
   const [filteredOrders, setFilteredOrders] = useState<Order[] | null>(null);
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [open, setOpen] = useState<boolean>(false);
-
-  // --- Print handler ---
-  const handlePrint = async (token: string) => {
-    try {
-      const xml = "test print";
-      const printTicket = await fetch("/api/print", {
-        method: "POST",
-        headers: { "Content-Type": "text/xml; charset=utf-8" },
-        body: JSON.stringify({ xml, token }),
-      });
-
-      if (!printTicket.ok) throw new Error("Failed to print");
-      alert("✓ Receipt printed successfully!");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      alert(`✗ Print failed: ${message}`);
-      console.error("Print error:", error);
-    }
-  };
 
   // --- Filter logic ---
   const openFilter = (filter: FilterType) => {
@@ -200,6 +179,7 @@ const Orders = () => {
       { name: "Thanksgiving", date: new Date(`${year}-11-28`) },
       { name: "Christmas", date: new Date(`${year}-12-25`) },
     ];
+    console.log(holidays.find((h) => h.date > now) || holidays[0]);
     return holidays.find((h) => h.date > now) || holidays[0];
   };
 
@@ -249,10 +229,14 @@ const Orders = () => {
   const handleHoliday = () => {
     const newState = !filterHoliday;
     setFilterHoliday(newState);
-
+    const nextHoliday = getNextHoliday().name;
     if (newState) {
       // Filter for orders that fall on or near a holiday
-      const results = orders.filter((order) => getHoliday(order.due));
+      const holidays = orders.filter((order) => getHoliday(order.due));
+      const results = holidays.filter(
+        (order) => getHoliday(order.due) === nextHoliday
+      );
+
       setFilteredOrders(results);
     } else {
       // Reset to all orders
@@ -279,12 +263,13 @@ const Orders = () => {
     if (activeFilter === "holiday") handleHoliday();
     else if (activeFilter === "Today") handleToday();
     else if (activeFilter === "Tomorrow") handleTomorrow();
-    // etc.
   }, [orders]);
 
   useEffect(() => {
     if (filterHoliday) {
-      const results = orders.filter((order) => getHoliday(order.due));
+      const results = orders.filter(
+        (order) => getHoliday(order.due) === getNextHoliday().name
+      );
       setFilteredOrders(results);
     }
   }, [orders]);
@@ -298,7 +283,6 @@ const Orders = () => {
     );
   if (error) return <p>Error loading orders</p>;
 
-  // --- Render ---
   return (
     <>
       <Script
@@ -347,7 +331,6 @@ const Orders = () => {
           orders={ready}
           formatDate={formatDate}
           seeComplete={seeComplete}
-          handlePrint={handlePrint}
         />
         {seeComplete && (
           <OrderColumn
@@ -357,7 +340,6 @@ const Orders = () => {
             orders={complete}
             formatDate={formatDate}
             seeComplete={seeComplete}
-            handlePrint={handlePrint}
           />
         )}
       </div>
@@ -365,13 +347,12 @@ const Orders = () => {
   );
 };
 
-// --- Reusable column ---
 const OrderColumn = ({
   title,
   orders,
   formatDate,
   seeComplete,
-  handlePrint,
+
   openDrawer,
   setOpenDrawer,
 }: {
@@ -379,7 +360,6 @@ const OrderColumn = ({
   orders: Order[];
   formatDate: (d: string | number | Date) => string;
   seeComplete: boolean;
-  handlePrint?: (token: string) => void;
 }) => (
   <div className="h-screen overflow-auto pb-[100px]">
     <div className="flex items-center justify-between mb-3 ml-5  text-2xl font-bold">
@@ -393,7 +373,6 @@ const OrderColumn = ({
           formatDate={formatDate}
           status={order.status}
           seeComplete={seeComplete}
-          handlePrint={handlePrint}
           openDrawer={openDrawer}
           setOpenDrawer={setOpenDrawer}
         />
