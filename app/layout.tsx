@@ -33,7 +33,7 @@ export default function RootLayout({
               <header className="shadow-lg shadow-gray-200 ">
                 <ColorSchemeScript defaultColorScheme="auto" />
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  {pathname !== "/login" && pathname !== "/" && <Navbar />}
+                  {pathname !== "/login" && <Navbar />}
                 </div>
               </header>
               {children}

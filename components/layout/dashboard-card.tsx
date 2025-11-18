@@ -42,8 +42,6 @@ interface DashboardCardProps {
   status: string;
   order: Order;
   seeComplete?: boolean;
-  openDrawer?: boolean;
-  setOpenDrawer?: (open: boolean) => void;
 }
 
 const fetchOrders = async () => {
@@ -57,8 +55,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   status,
   formatDate,
   seeComplete,
-  openDrawer,
-  setOpenDrawer,
 }) => {
   const { error, isLoading } = useQuery({
     queryKey: ["orders"],
@@ -67,7 +63,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   });
   const [show, setShow] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
-  const [showUpdate, setShowUpdate] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
@@ -118,12 +114,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     } catch (error) {
       console.error("Error deleting order:", error);
     }
-  };
-
-  const handleOpenDrawer = (orderId: string, open, setOpen) => {
-    setOpen(true);
-    console.log(orderId);
-    console.log(open);
   };
 
   const getColor =
@@ -180,8 +170,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     const item = await getItemFromToken(order.itemToken);
 
     if (!item) {
-      console.error("Item not found for token:", order.itemToken);
-      return null;
+      //console.error("Item not found for token:", order.itemToken);
+      return "172.16.1.254";
     }
 
     // 2. Normalize category → station
@@ -251,7 +241,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 
       setTimeout(() => {
         fetchOrders();
-        setShowUpdate(false);
+        setOpenUpdate(false);
         setMessage(null);
         setFormData({});
       }, 1500);
@@ -287,7 +277,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
             </h1>
             <div>
               <div className="flex items-center gap-3">
-                <AlertDialog.Root>
+                <AlertDialog.Root
+                  open={openUpdate}
+                  onOpenChange={setOpenUpdate}
+                >
                   <AlertDialog.Trigger asChild>
                     <Button
                       aria-hidden="false"
@@ -314,6 +307,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                           {items.map((item) => (
                             <Grid
                               gap="2"
+                              x
                               className="mt-3"
                               key={`${item}-${order.id}`}
                             >

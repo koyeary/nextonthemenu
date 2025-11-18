@@ -62,15 +62,17 @@ const Navbar = () => {
         </div>
       </div>
 
-      <div className="flex flex-row gap-3 w-fit">
-        <div className="flex flex-row gap-3"></div>
-        <Button onClick={() => router.push("/orders")}>ORDERS</Button>
-        <Button onClick={() => router.push("/inventory")}>INVENTORY</Button>
-        <UserMinus
-          className="text-primary h-7 w-7 mt-1.25 ml-4 cursor-pointer"
-          onClick={() => logout()}
-        />
-      </div>
+      {isAuthenticated && (
+        <div className="flex flex-row gap-3 w-fit">
+          <div className="flex flex-row gap-3"></div>
+          <Button onClick={() => router.push("/orders")}>ORDERS</Button>
+          <Button onClick={() => router.push("/inventory")}>INVENTORY</Button>
+          <UserMinus
+            className="text-primary h-7 w-7 mt-1.25 ml-4 cursor-pointer"
+            onClick={() => logout()}
+          />
+        </div>
+      )}
     </div>
   );
 };
