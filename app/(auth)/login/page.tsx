@@ -28,8 +28,8 @@ const Login = () => {
         setError("Invalid PIN. Please try again.");
         return;
       }
-
-      router.push("/orders");
+      console.log("Login successful"); // DEBUG
+      return router.push("/orders");
     } catch (err) {
       console.error("Login error:", err);
       setError("Something went wrong. Please try again.");
