@@ -41,6 +41,7 @@ const Navbar = () => {
 
   React.useEffect(() => {
     getAuth();
+    console.log(isAuthenticated);
   }, []);
 
   return (
