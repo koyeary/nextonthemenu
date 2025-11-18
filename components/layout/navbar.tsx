@@ -21,7 +21,7 @@ const Navbar = () => {
       return setIsAuthenticated(false);
     }
     const data = await res.json();
-    console.log("Auth status:", data);
+
     return setIsAuthenticated(data.user !== null);
   };
 
@@ -41,7 +41,6 @@ const Navbar = () => {
 
   React.useEffect(() => {
     getAuth();
-    console.log(isAuthenticated);
   }, []);
 
   return (
