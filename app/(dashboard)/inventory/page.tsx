@@ -22,6 +22,13 @@ type Item = {
   activeOrders: number;
 };
 
+const locations = [
+  { name: "All", code: "all" },
+  { name: "UES", code: "L5MQCWDDVAYA6" },
+  { name: "Times Square", code: "LF6HAV7DTAEKJ" },
+  { name: "Brooklyn", code: "L56CFWYF0H5JK" },
+];
+
 const fetchInventory = async (location: string): Promise<Item[]> => {
   const res = await fetch("/api/inventory", {
     method: "POST",
@@ -107,7 +114,7 @@ const Inventory = () => {
         <h1 className="mt-5 mb-3 text-center">
           Inventory - Select item quantity to edit
         </h1>
-        {/*         <SegmentedControl.Root
+        <SegmentedControl.Root
           defaultValue="all"
           size="2"
           onValueChange={findByLocation}
@@ -117,7 +124,7 @@ const Inventory = () => {
               {l.name}
             </SegmentedControl.Item>
           ))}
-        </SegmentedControl.Root> */}
+        </SegmentedControl.Root>
         <TextField.Root
           radius="rounded"
           placeholder="Search inventory..."

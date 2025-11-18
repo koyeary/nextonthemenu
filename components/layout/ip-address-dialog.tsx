@@ -15,6 +15,12 @@ interface Category {
   category: string;
 }
 
+const locations = [
+  { name: "UES", code: "L5MQCWDDVAYA6" },
+  { name: "Times Square", code: "LF6HAV7DTAEKJ" },
+  { name: "Brooklyn", code: "L56CFWYF0H5JK" },
+];
+
 // --- Fetch inventory categories (to derive station list) ---
 const fetchCategories = async (): Promise<Category[]> => {
   const res = await fetch("/api/inventory", {
@@ -31,7 +37,7 @@ const IPAddressDialog = () => {
     queryKey: ["categories"],
     queryFn: fetchCategories,
   });
-
+  const [selectedLocation, setSelectedLocation] = useState("L5MQCWDDVAYA6"); // default UES
   const [open, setOpen] = useState(false);
   const [ipMap, setIpMap] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -57,71 +63,59 @@ const IPAddressDialog = () => {
   // -----------------------------------------
   // 2. Load existing IPs from backend when dialog opens
   // -----------------------------------------
+
+  const loadIPs = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/ips?location=${selectedLocation}`);
+      if (!res.ok) throw new Error("Failed to load IPs");
+
+      const rows = await res.json(); // [{ station, address, locationCode }]
+      const map: Record<string, string> = {};
+
+      rows.forEach((row) => {
+        map[row.station.toLowerCase()] = row.address;
+      });
+
+      // Ensure every station is present
+      uniqueStations.forEach((station) => {
+        if (!map[station]) map[station] = "";
+      });
+
+      setIpMap(map);
+      setMessage({ type: "success", text: "Loaded IPs" });
+    } catch (err) {
+      setMessage({ type: "error", text: "Failed to load IPs" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (!open) return;
-
-    const loadIPs = async () => {
-      setIsLoading(true);
-      try {
-        const res = await fetch("/api/ips");
-        if (!res.ok) throw new Error("Failed to load IPs");
-        const rows: IPRow[] = await res.json();
-
-        const map: Record<string, string> = {};
-
-        // Normalize DB rows → lowercase keys
-        rows.forEach((row) => {
-          map[row.station.toLowerCase()] = row.address;
-        });
-
-        // Ensure every station exists in map
-        uniqueStations.forEach((station) => {
-          if (!map[station]) map[station] = "";
-        });
-
-        setIpMap(map);
-        setMessage({ type: "success", text: "IP Addresses Loaded" });
-      } catch (err) {
-        console.error("Error loading IPs:", err);
-        setIpMap({});
-        setMessage({ type: "error", text: "Failed to load IPs" });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadIPs();
-  }, [open, uniqueStations]);
+    if (open) loadIPs();
+  }, [open, selectedLocation]);
 
   // -----------------------------------------
   // 3. Submit updated IP map
   // -----------------------------------------
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
     const payload = Object.entries(ipMap).map(([station, address]) => ({
-      station, // already lowercase
-      address: address.trim(),
+      station,
+      address,
+      locationCode: selectedLocation,
     }));
 
-    try {
-      const res = await fetch("/api/ips", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    const res = await fetch("/api/ips", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-      if (!res.ok) throw new Error("Failed to save IPs");
+    if (!res.ok) throw new Error("Failed to save IPs");
 
-      setOpen(false);
-      setMessage({ type: "success", text: "IP Addresses Saved" });
-    } catch (err) {
-      console.error("Submit error:", err);
-      setMessage({ type: "error", text: "Failed to save IPs" });
-    } finally {
-      setIsSubmitting(false);
-    }
+    setOpen(false);
   };
 
   const handleCancel = () => {
@@ -166,6 +160,17 @@ const IPAddressDialog = () => {
               <AlertDialog.Description className="text-sm text-gray-500">
                 Default printer IP is 172.16.1.254 if none set.
               </AlertDialog.Description>
+              <select
+                className="border px-3 py-2 rounded-lg"
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+              >
+                {locations.map((loc) => (
+                  <option key={loc.code} value={loc.code}>
+                    {loc.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Loading */}
