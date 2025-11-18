@@ -80,9 +80,8 @@ model Item {
 }
 
 model Ip {
-  id      Int @id @default(autoincrement())
-  address String @unique
-  station String
-
+  station String @id    // <-- must be unique
+  address String
+  
   @@map("ips")
 }

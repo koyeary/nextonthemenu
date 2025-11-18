@@ -5,7 +5,7 @@ export async function GET(
   req: Request,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = await params;
   console.log("Fetching item with id:", id);
 
   try {

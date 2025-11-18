@@ -7,17 +7,34 @@ import { AlertDialog } from "radix-ui";
 import dayjs from "dayjs";
 import { Button } from "../ui/button";
 import { Printer } from "lucide-react";
+import { removeToStayOrGo } from "../../lib/utils/helpers";
 
-const Ticket: React.FC<{ order: any }> = ({ order, finishPrint }) => {
+const Ticket: React.FC<{ order: any }> = ({ order, getIp, finishPrint }) => {
   const [text, setText] = useState(
     `*********************\n${order.customerName.toUpperCase()} ${order.orderCount === "1" ? "1/1" : order.orderCount}\n${order.item.toUpperCase()}\n*********************\n\nNotes: ${order.notes.length > 0 ? order.notes : "N/A"}\nPick Up ${dayjs(order.due).format("MM-DD h:m A ")}\n\n\n`
   );
-  const [ip, setIp] = useState({ address: "", station: "" });
+  const [ip, setIp] = useState("");
   const { canvasRef } = useTicketCanvas(order, text);
+
+  const getIpFromCategory = async (): Promise<string | null> => {
+    try {
+      const res = await fetch(`/api/inventory/${order.itemToken}`);
+      if (!res.ok) throw new Error("Failed to fetch item details");
+      const data = await res.json();
+      console.log("Item data:", data);
+      return data.data?.category || null;
+    } catch (error) {
+      console.error("Error fetching item details:", error);
+      return null;
+    }
+  };
 
   React.useEffect(() => {
     const fetchAndPrint = async () => {
-      const printerIp = await getIp(order.station);
+      /*       const station = await getIpFromCategory();
+      const cat = await removeToStayOrGo(station || ""); */
+      const printerIp = await getIp(order);
+      console.log(printerIp);
       if (printerIp) {
         setIp(printerIp);
       }
@@ -39,46 +56,6 @@ const Ticket: React.FC<{ order: any }> = ({ order, finishPrint }) => {
       return null;
     }
   };
-
-  const getIp = async (): Promise<string | null> => {
-    console.log("CALLING:", `/api/inventory/${order.itemToken}`);
-    console.log("order:", order);
-    console.log("itemToken:", order.itemToken);
-    console.log("typeof itemToken:", typeof order.itemToken);
-    console.log("encoded:", encodeURIComponent(order.itemToken));
-    const category = await getItemDetails();
-
-    try {
-      const res = await fetch("/api/ips");
-
-      if (!res.ok) throw new Error("Failed to load IPs");
-
-      const data: IPEntry[] = await res.json();
-
-      // Find the IP entry that matches the station
-      const matchingEntry = data.find((item) => item.station === category);
-
-      if (matchingEntry) {
-        console.log(`Found IP for station ${category}:`, matchingEntry.address);
-        return matchingEntry.address;
-      } else {
-        console.warn(`No IP found for station: ${category}`);
-        return null;
-      }
-    } catch (err) {
-      console.error("Error fetching IPs:", err);
-      return null;
-    }
-  };
-
-  // Usage in your component:
-  const printerIp = getIp(order.station);
-  if (printerIp) {
-    // Use printerIp to send to printer
-    console.log("Printing to:", printerIp);
-  } else {
-    console.error("No printer IP found for this station");
-  }
 
   const onSend = () => {
     console.log("sending print job…");
@@ -104,8 +81,9 @@ const Ticket: React.FC<{ order: any }> = ({ order, finishPrint }) => {
     request += builder.createTextElement({ data: text });
     request += builder.createCutPaperElement({ feed: true });
 
+    const finalIp = ip || "172.16.1.254";
     const trader = new window.StarWebPrintTrader({
-      url: `http://${printerIp}/StarWebPRNT/SendMessage`,
+      url: `http://${finalIp}/StarWebPRNT/SendMessage`,
     });
 
     trader.onReceive = () => console.log("success");

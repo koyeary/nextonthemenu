@@ -28,6 +28,7 @@ import Alert from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import Ticket from "../ticket/Ticket";
 import { safeValue, getHoliday } from "../../lib/utils/helpers";
+import { removeToStayOrGo } from "../../lib/utils/helpers";
 
 declare global {
   interface Window {
@@ -144,6 +145,61 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     return fetchOrders();
   };
 
+  let ipCache: Record<string, string> | null = null;
+
+  const loadIpCache = async () => {
+    if (ipCache) return ipCache;
+
+    const res = await fetch("/api/ips");
+    if (!res.ok) throw new Error("Failed to load ip config");
+
+    const rows = await res.json(); // [{ station, address }]
+    ipCache = {};
+
+    rows.forEach((row) => {
+      ipCache![row.station.toLowerCase()] = row.address;
+    });
+
+    return ipCache;
+  };
+
+  const getItemFromToken = async (token: string) => {
+    const res = await fetch(`/api/inventory/${token}`);
+    if (!res.ok) throw new Error("Item lookup failed");
+
+    const data = await res.json();
+    return data.data; // { category, ... }
+  };
+
+  const stationKeyFromCategory = (category: string) => {
+    return removeToStayOrGo(category).toLowerCase().trim();
+  };
+
+  const getIp = async (order) => {
+    // 1. Load item details via itemToken
+    const item = await getItemFromToken(order.itemToken);
+
+    if (!item) {
+      console.error("Item not found for token:", order.itemToken);
+      return null;
+    }
+
+    // 2. Normalize category → station
+    const station = stationKeyFromCategory(item.category);
+
+    // 3. Load IP config (cached after first fetch)
+    const ips = await loadIpCache();
+
+    // 4. Look up IP
+    const ip = ips[station] ?? null;
+
+    if (!ip) {
+      console.warn(`No IP configured for station "${station}"`);
+    }
+
+    return ip;
+  };
+
   const finishPrint = async () => {
     const printedAt = new Date().toISOString();
 
@@ -160,8 +216,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         console.log(`Printed at: ${data.printedAt}`);
         fetchOrders();
       }
-      alert("print successful");
-      setShow(false);
+
+      return setShow(false);
     } catch (err) {
       console.error("Update error:", err);
     }
@@ -416,7 +472,11 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                       setOpen={setShow}
                       message={"PRINT PREVIEW"}
                       description={
-                        <Ticket order={order} finishPrint={finishPrint} />
+                        <Ticket
+                          order={order}
+                          finishPrint={finishPrint}
+                          getIp={getIp}
+                        />
                       }
                       action={
                         <Button

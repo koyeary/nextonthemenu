@@ -60,25 +60,6 @@ const Orders = () => {
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [open, setOpen] = useState<boolean>(false);
 
-  // --- Print handler ---
-  const handlePrint = async (token: string) => {
-    try {
-      const xml = "test print";
-      const printTicket = await fetch("/api/print", {
-        method: "POST",
-        headers: { "Content-Type": "text/xml; charset=utf-8" },
-        body: JSON.stringify({ xml, token }),
-      });
-
-      if (!printTicket.ok) throw new Error("Failed to print");
-      alert("✓ Receipt printed successfully!");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      alert(`✗ Print failed: ${message}`);
-      console.error("Print error:", error);
-    }
-  };
-
   // --- Filter logic ---
   const openFilter = (filter: FilterType) => {
     console.log(activeFilter);
@@ -350,7 +331,6 @@ const Orders = () => {
           orders={ready}
           formatDate={formatDate}
           seeComplete={seeComplete}
-          handlePrint={handlePrint}
         />
         {seeComplete && (
           <OrderColumn
@@ -360,7 +340,6 @@ const Orders = () => {
             orders={complete}
             formatDate={formatDate}
             seeComplete={seeComplete}
-            handlePrint={handlePrint}
           />
         )}
       </div>
@@ -373,7 +352,7 @@ const OrderColumn = ({
   orders,
   formatDate,
   seeComplete,
-  handlePrint,
+
   openDrawer,
   setOpenDrawer,
 }: {
@@ -381,7 +360,6 @@ const OrderColumn = ({
   orders: Order[];
   formatDate: (d: string | number | Date) => string;
   seeComplete: boolean;
-  handlePrint?: (token: string) => void;
 }) => (
   <div className="h-screen overflow-auto pb-[100px]">
     <div className="flex items-center justify-between mb-3 ml-5  text-2xl font-bold">
@@ -395,7 +373,6 @@ const OrderColumn = ({
           formatDate={formatDate}
           status={order.status}
           seeComplete={seeComplete}
-          handlePrint={handlePrint}
           openDrawer={openDrawer}
           setOpenDrawer={setOpenDrawer}
         />
