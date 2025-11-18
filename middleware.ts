@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifySessionToken } from "@/lib/auth/auth-server";
 
+export const runtime = "nodejs";
+
 export async function middleware(req: NextRequest) {
   if (req.nextUrl.pathname === "/login") {
     return NextResponse.next();
@@ -19,5 +21,4 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: ["/orders/:path*", "/inventory/:path*"],
-  runtime: "nodejs",
 };
