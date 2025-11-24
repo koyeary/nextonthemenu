@@ -1,19 +1,16 @@
-import { NextResponse } from "next/server";
+/* import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/auth-server";
 
 import prisma from "@/lib/db/connection";
 
-export async function GET() {
-  const session = await getSession();
+export async function GET(req: NextRequest) {
+  const session = getSession(req);
 
   if (!session) {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 
-  return NextResponse.json({
-    authenticated: true,
-    user: session,
-  });
+  return NextResponse.json({ authenticated: true, user: session });
 }
 
 export const runtime = "nodejs"; // for bcrypt
@@ -34,3 +31,4 @@ export async function PATCH(req: Request) {
 
   return NextResponse.json({ user });
 }
+ */
