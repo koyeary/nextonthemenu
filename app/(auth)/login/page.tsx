@@ -11,28 +11,18 @@ const Login = () => {
 
   const maxLength = 4;
 
-  const handleLogin = async (submittedPin: string) => {
-    console.log("handleLogin called with:", submittedPin); // DEBUG
+  const handleLogin = async () => {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pin }),
+    });
 
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ pin: submittedPin }),
-      });
-
-      console.log("login status", res.status); // DEBUG
-
-      if (!res.ok) {
-        setError("Invalid PIN. Please try again.");
-        return;
-      }
-      console.log("Login successful"); // DEBUG
-      return router.push("/orders");
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Something went wrong. Please try again.");
+    if (res.ok) {
+      router.push("/orders"); // or wherever
+      router.refresh();
+    } else {
+      setError("Invalid PIN");
     }
   };
 

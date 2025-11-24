@@ -1,4 +1,4 @@
-// Edge-compatible JWT verification using Web Crypto
+/* // Edge-compatible JWT verification using Web Crypto
 
 export async function verifyJwtEdge(token: string, secret: string) {
   try {
@@ -27,3 +27,4 @@ export async function verifyJwtEdge(token: string, secret: string) {
     return null;
   }
 }
+ */

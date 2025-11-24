@@ -34,11 +34,12 @@ export default function Navbar() {
       </div>
 
       {!loading && user && (
-        <div className="flex flex-row gap-3 w-fit">
+        <div className="flex flex-row gap-4 w-fit">
           <Button onClick={() => router.push("/orders")}>ORDERS</Button>
           <Button onClick={() => router.push("/inventory")}>INVENTORY</Button>
+
           <UserMinus
-            className="text-primary h-7 w-7 cursor-pointer"
+            className="text-primary h-7 w-7 cursor-pointer ml-4"
             onClick={logout}
           />
         </div>

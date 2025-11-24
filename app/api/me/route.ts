@@ -1,13 +1,15 @@
-// app/api/me/route.ts
+// nextonthemenu/app/api/me/route.ts
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getSession } from "@/lib/auth/auth";
 
 export async function GET() {
-  const authUser = cookies().get("user")?.value;
-
-  if (!authUser) {
-    return NextResponse.json({ user: null }, { status: 200 });
+  const user = getSession();
+  if (!user) {
+    return NextResponse.json(
+      { authenticated: false, user: null },
+      { status: 401 }
+    );
   }
 
-  return NextResponse.json({ user: JSON.parse(authUser) });
+  return NextResponse.json({ authenticated: true, user });
 }

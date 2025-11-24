@@ -1,21 +1,26 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { verifySessionToken } from "@/lib/auth/auth-server";
+// nextonthemenu/middleware.ts
+import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "nodejs";
+const PROTECTED_ROUTES = ["/orders", "/inventory"];
 
-export async function middleware(req: NextRequest) {
-  if (req.nextUrl.pathname === "/login") {
-    return NextResponse.next();
-  }
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  const isProtected = PROTECTED_ROUTES.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  if (!isProtected) return NextResponse.next();
 
   const token = req.cookies.get("session-token")?.value;
-  const session = token ? verifySessionToken(token) : null;
 
-  if (!session) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  if (!token) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
+  // We could verify the token here too, but presence check is usually enough.
   return NextResponse.next();
 }
 

@@ -1,7 +1,23 @@
+/* // lib/auth/auth-server.ts
 import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 
 const SECRET = process.env.SESSION_SECRET!;
+
+export function getSession(req: Request | NextRequest) {
+  const cookieHeader = req.headers.get("cookie") || "";
+  const cookies = Object.fromEntries(
+    cookieHeader.split(";").map((c) => c.trim().split("="))
+  );
+
+  const token = cookies["session-token"];
+  if (!token) return null;
+
+  try {
+    return jwt.verify(token, SECRET);
+  } catch {
+    return null;
+  }
+}
 
 export async function createSessionToken(user) {
   return jwt.sign(
@@ -18,14 +34,4 @@ export async function verifySessionToken(token: string) {
     return null;
   }
 }
-
-export async function getSession() {
-  const token = cookies().get("session-token")?.value;
-  if (!token) return null;
-
-  try {
-    return jwt.verify(token, SECRET);
-  } catch {
-    return null;
-  }
-}
+ */
