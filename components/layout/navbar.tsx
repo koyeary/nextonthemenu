@@ -1,4 +1,3 @@
-// components/layout/navbar.tsx
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
@@ -11,9 +10,13 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
 
+  // 🔐 DO NOT SHOW NAVBAR ON LOGIN PAGE OR IF USER NOT AUTHENTICATED
+  if (pathname === "/login" || loading || !user) return null;
+
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.refresh();
+    router.push("/login");
   };
 
   return (
@@ -33,17 +36,15 @@ export default function Navbar() {
         </h1>
       </div>
 
-      {!loading && user && (
-        <div className="flex flex-row gap-4 w-fit">
-          <Button onClick={() => router.push("/orders")}>ORDERS</Button>
-          <Button onClick={() => router.push("/inventory")}>INVENTORY</Button>
+      <div className="flex flex-row gap-4 w-fit">
+        <Button onClick={() => router.push("/orders")}>ORDERS</Button>
+        <Button onClick={() => router.push("/inventory")}>INVENTORY</Button>
 
-          <UserMinus
-            className="text-primary h-7 w-7 cursor-pointer ml-4"
-            onClick={logout}
-          />
-        </div>
-      )}
+        <UserMinus
+          className="text-primary h-7 w-7 cursor-pointer ml-4"
+          onClick={logout}
+        />
+      </div>
     </div>
   );
 }
