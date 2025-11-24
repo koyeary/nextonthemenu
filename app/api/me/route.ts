@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/auth";
 
 export async function GET() {
-  const user = getSession();
+  const user = await getSession();
   if (!user) {
     return NextResponse.json(
       { authenticated: false, user: null },

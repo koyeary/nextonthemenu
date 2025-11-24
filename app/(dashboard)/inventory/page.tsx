@@ -40,6 +40,7 @@ const fetchInventory = async (location: string): Promise<Item[]> => {
   });
   if (!res.ok) throw new Error("Failed to fetch inventory");
   const results = await res.json();
+  console.log(results);
   return results.data;
 };
 
@@ -103,6 +104,7 @@ const Inventory = () => {
   };
 
   const handleUpdate = async (token: string, quantity: number) => {
+    console.log(selectedLocation);
     await fetch("/api/inventory", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -127,24 +129,21 @@ const Inventory = () => {
 
   return (
     <div className="w-full flex flex-col gap-6">
-      {/* 🔹 Filters Header */}
       <div className="text-center">
         <h1 className="mt-5 mb-3 font-semibold">Inventory — Filter & Edit</h1>
 
-        {/* Location Filter */}
-        <SegmentedControl.Root
+        {/*         <SegmentedControl.Root
           defaultValue="all"
           size="2"
-          onValueChange={setSelectedLocation}
+          onValueChange={(e) => setSelectedLocation(e.target.value)}
         >
           {locations.map((l) => (
             <SegmentedControl.Item key={l.code} value={l.code}>
               {l.name}
             </SegmentedControl.Item>
           ))}
-        </SegmentedControl.Root>
+        </SegmentedControl.Root> */}
 
-        {/* Category Filter */}
         <div className="mt-4 flex justify-center gap-4">
           <Select.Root
             value={selectedCategory}
@@ -160,13 +159,11 @@ const Inventory = () => {
             </Select.Content>
           </Select.Root>
 
-          {/* Toggle Low Stock */}
           <label className="flex items-center gap-2">
             <Switch checked={showLowStock} onCheckedChange={setShowLowStock} />
             Low Stock (&lt;5)
           </label>
 
-          {/* Toggle Active Orders */}
           <label className="flex items-center gap-2">
             <Switch
               checked={showActiveOrders}
@@ -176,7 +173,6 @@ const Inventory = () => {
           </label>
         </div>
 
-        {/* Search */}
         <TextField.Root
           placeholder="Search all fields..."
           size="2"
@@ -195,7 +191,6 @@ const Inventory = () => {
         </TextField.Root>
       </div>
 
-      {/* 🔹 Table */}
       <Table.Root>
         <Table.Header>
           <Table.Row>
@@ -243,7 +238,6 @@ const Inventory = () => {
         </Table.Body>
       </Table.Root>
 
-      {/* 🔹 Pagination */}
       <div className="flex justify-center gap-4 mt-6">
         <Button
           disabled={currentPage === 1}
