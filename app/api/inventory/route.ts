@@ -4,35 +4,37 @@ import Papa from "papaparse";
 import prisma from "@/lib/db/connection";
 import { removeToStayOrGo } from "@/lib/utils/helpers";
 
-export async function GET() {
+/* export async function GET(req: Request) {
   try {
-    const inventory = await prisma.item.findMany({});
+    const { searchParams } = new URL(req.url);
+    const selectedLocation = searchParams.get("location") || "all";
 
-    await Promise.all(
-      inventory.map(async (item) => {
-        const count = await prisma.order.count({
-          where: {
-            itemToken: item.token,
-            status: { not: "completed" },
-            //...locationFilter, // <-- FIXED
-          },
-        });
+    // Fetch all items (Square catalog data already stored in Prisma)
+    const items = await prisma.item.findMany({});
+    console.log(items);
+    // Filter by present_at_location_ids (stored in Prisma as JSON or string array)
+    const filteredItems =
+      selectedLocation === "all"
+        ? items
+        : items.filter((item) =>
+            item.present_at_location_ids?.includes(selectedLocation)
+          );
 
-        await prisma.item.updateMany({
-          where: {
-            token: item.token,
-            // ...locationFilter, // <-- FIXED
-          },
-          data: {
-            quantity: item.quantity - count,
-          },
-        });
-      })
-    );
+    // Format final response
+    const formattedItems = filteredItems.map((item) => ({
+      id: item.id,
+      token: item.token,
+      itemName: item.name,
+      variationName: item.variation,
+      category: item.category,
+      quantity: item.quantity,
+      activeOrders: item.orders.length,
+      // present_at_location_ids: item.present_at_location_ids,
+    }));
 
-    return NextResponse.json({ success: true, data: inventory });
+    return NextResponse.json({ success: true, data: filteredItems });
   } catch (error) {
-    console.error("Import error:", error);
+    console.error("Inventory fetch error:", error);
     return NextResponse.json(
       {
         success: false,
@@ -41,7 +43,7 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+} */
 
 export async function POST(req: Request) {
   try {
@@ -56,13 +58,14 @@ export async function POST(req: Request) {
       },
     });
 
+    console.log(inventory);
+
     const updatedItems = await Promise.all(
       inventory.map(async (item) => {
         const count = await prisma.order.count({
           where: {
             itemToken: item.token,
             status: { not: "completed" },
-            ...locationFilter,
           },
         });
 
