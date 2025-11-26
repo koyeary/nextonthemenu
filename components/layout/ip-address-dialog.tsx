@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { Printer } from "lucide-react";
-import { removeToStayOrGo } from "../../lib/utils/helpers";
+import { camelToTitleCase, removeToStayOrGo } from "../../lib/utils/helpers";
 
 interface IPRow {
   station: string;
@@ -29,6 +29,7 @@ const fetchCategories = async (): Promise<Category[]> => {
   });
   if (!res.ok) throw new Error("Failed to fetch inventory");
   const data = await res.json();
+  console.log(data);
   return data.data;
 };
 
@@ -42,14 +43,12 @@ const IPAddressDialog = () => {
   const [ipMap, setIpMap] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
 
-  // -----------------------------------------
-  // 1. Build canonical lowercase station list
-  // -----------------------------------------
   const uniqueStations = React.useMemo(() => {
     return [
       ...new Set(
@@ -60,17 +59,20 @@ const IPAddressDialog = () => {
     ].sort((a, b) => a.localeCompare(b));
   }, [categories]);
 
-  // -----------------------------------------
-  // 2. Load existing IPs from backend when dialog opens
-  // -----------------------------------------
+  const handleToast = () => {
+    setTimeout(() => {
+      setShowToast(true);
+    }, 5000);
+    setShowToast(false);
+  };
 
   const loadIPs = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/ips?location=${selectedLocation}`);
+      const res = await fetch(`/api/ips/${selectedLocation}`);
       if (!res.ok) throw new Error("Failed to load IPs");
 
-      const rows = await res.json(); // [{ station, address, locationCode }]
+      const rows = await res.json();
       const map: Record<string, string> = {};
 
       rows.forEach((row) => {
@@ -83,10 +85,13 @@ const IPAddressDialog = () => {
       });
 
       setIpMap(map);
-      setMessage({ type: "success", text: "Loaded IPs" });
     } catch (err) {
       setMessage({ type: "error", text: "Failed to load IPs" });
+      setShowToast(true);
     } finally {
+      setTimeout(() => {
+        setShowToast(false);
+      }, 5000);
       setIsLoading(false);
     }
   };
@@ -95,9 +100,6 @@ const IPAddressDialog = () => {
     if (open) loadIPs();
   }, [open, selectedLocation]);
 
-  // -----------------------------------------
-  // 3. Submit updated IP map
-  // -----------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -107,15 +109,22 @@ const IPAddressDialog = () => {
       locationCode: selectedLocation,
     }));
 
-    const res = await fetch("/api/ips", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    console.log(payload);
+    try {
+      const res = await fetch("/api/ips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    if (!res.ok) throw new Error("Failed to save IPs");
-
-    setOpen(false);
+      setMessage({ type: "success", text: "Saved printer IPs" });
+    } catch (err) {
+      setMessage({ type: "error", text: "Failed to save IPs" });
+    } finally {
+      setOpen(false);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
+    }
   };
 
   const handleCancel = () => {
@@ -123,9 +132,6 @@ const IPAddressDialog = () => {
     setIpMap({});
   };
 
-  // -----------------------------------------
-  // Render
-  // -----------------------------------------
   return (
     <>
       {/* Floating Settings Button */}
@@ -237,15 +243,22 @@ const IPAddressDialog = () => {
 
       {/* Status Toast */}
       {message && (
-        <div
-          className={`p-4 rounded-lg mt-4 mx-8 ${
-            message.type === "success"
-              ? "bg-green-50 text-green-800 border border-green-200"
-              : "bg-red-50 text-red-800 border border-red-200"
-          }`}
-        >
-          {message.text}
-        </div>
+        <AlertDialog.Root open={showToast}>
+          <AlertDialog.Content
+            className={`w-100 z-100 rounded-lg shadow-lg px-5 py-3 absolute bottom-25 left-20 ${
+              message.type === "error"
+                ? "bg-rose-700 text-white text-lg"
+                : "bg-emerald-400 text-lg"
+            }`}
+          >
+            <AlertDialog.Title>
+              {camelToTitleCase(message.type)}
+            </AlertDialog.Title>
+            <AlertDialog.Description size="2">
+              {message.text}
+            </AlertDialog.Description>
+          </AlertDialog.Content>
+        </AlertDialog.Root>
       )}
     </>
   );

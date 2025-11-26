@@ -1,3 +1,15 @@
+export const camelToTitleCase = (str: string): string => {
+  return (
+    str
+      // Insert a space before all uppercase letters
+      .replace(/([A-Z])/g, " $1")
+      // Trim any leading space and capitalize the first letter
+      .replace(/^./, (match) => match.toUpperCase())
+      // Trim any extra whitespace
+      .trim()
+  );
+};
+
 export const safeValue = (value: any): string => {
   if (value === undefined || value === null) return "";
   return String(value);
