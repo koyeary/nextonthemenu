@@ -115,8 +115,8 @@ const Inventory = () => {
 
   if (isLoading || isFetching)
     return (
-      <div className="flex justify-center items-center h-[50vh]">
-        <div className="w-10 h-10 border-4 mx-auto border-indigo-800 border-t-transparent rounded-full animate-spin" />
+      <div className="w-[100vw] h-[95vh] flex justify-center">
+        <div className="w-10 h-10 border-4 m-auto border-indigo-900 border-t-transparent rounded-full animate-spin" />
       </div>
     );
 

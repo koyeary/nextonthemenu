@@ -276,9 +276,9 @@ const Orders = () => {
 
   if (isLoading)
     return (
-      <div>
+      <div className="w-[100vw] h-[95vh] flex justify-center">
         {" "}
-        <div className="w-10 h-10 border-4 mx-auto border-indigo-900 border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 m-auto border-indigo-900 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   if (error) return <p>Error loading orders</p>;

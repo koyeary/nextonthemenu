@@ -63,6 +63,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     refetchInterval: 5000,
   });
   const [show, setShow] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -113,6 +114,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       fetchOrders();
       return res.json();
     } catch (error) {
+      setShowToast(true);
       console.error("Error deleting order:", error);
     }
   };
@@ -259,7 +261,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 
   if (isLoading)
     return (
-      <Card key={order.itemToken} className={`p-4 border-l-4 ${getColor} h-20`}>
+      <Card
+        key={order.itemToken}
+        className={`p-4 border-l-4 ${getColor} h-20 `}
+      >
         <p>Updating order status</p>
       </Card>
     );
@@ -308,7 +313,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                           {items.map((item) => (
                             <Grid
                               gap="2"
-                              x
                               className="mt-3"
                               key={`${item}-${order.id}`}
                             >
@@ -346,16 +350,24 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                           ))}
                         </div>
                         {message && (
-                          <div
-                            className={`p-4 rounded-lg mt-4 z-70 ${
-                              message.type === "success"
-                                ? "bg-green-50 text-green-800 border border-green-200"
-                                : "bg-red-50 text-red-800 border border-red-200"
-                            }`}
-                          >
-                            {message.text}
-                          </div>
+                          <AlertDialog.Root open={showToast}>
+                            <AlertDialog.Content
+                              className={`w-100 z-100 rounded-lg shadow-lg px-5 py-3 absolute bottom-25 left-20 ${
+                                message.type === "error"
+                                  ? "bg-rose-700 text-white text-lg"
+                                  : "bg-emerald-400 text-lg"
+                              }`}
+                            >
+                              <AlertDialog.Title>
+                                {camelToTitleCase(message.type)}
+                              </AlertDialog.Title>
+                              <AlertDialog.Description size="2">
+                                {message.text}
+                              </AlertDialog.Description>
+                            </AlertDialog.Content>
+                          </AlertDialog.Root>
                         )}
+
                         <div className="flex justify-center gap-4 mt-6 mb-4">
                           <AlertDialog.Cancel asChild>
                             <Button
