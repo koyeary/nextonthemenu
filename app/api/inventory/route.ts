@@ -34,8 +34,6 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log(inventory);
-
     const updatedItems = await Promise.all(
       inventory.map(async (item) => {
         const count = await prisma.order.count({
