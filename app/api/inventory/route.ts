@@ -4,35 +4,11 @@ import Papa from "papaparse";
 import prisma from "@/lib/db/connection";
 import { removeToStayOrGo } from "@/lib/utils/helpers";
 
-/* export async function GET(req: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(req.url);
-    const selectedLocation = searchParams.get("location") || "all";
-
-    // Fetch all items (Square catalog data already stored in Prisma)
     const items = await prisma.item.findMany({});
-    console.log(items);
-    // Filter by present_at_location_ids (stored in Prisma as JSON or string array)
-    const filteredItems =
-      selectedLocation === "all"
-        ? items
-        : items.filter((item) =>
-            item.present_at_location_ids?.includes(selectedLocation)
-          );
 
-    // Format final response
-    const formattedItems = filteredItems.map((item) => ({
-      id: item.id,
-      token: item.token,
-      itemName: item.name,
-      variationName: item.variation,
-      category: item.category,
-      quantity: item.quantity,
-      activeOrders: item.orders.length,
-      // present_at_location_ids: item.present_at_location_ids,
-    }));
-
-    return NextResponse.json({ success: true, data: filteredItems });
+    return NextResponse.json({ success: true, data: items });
   } catch (error) {
     console.error("Inventory fetch error:", error);
     return NextResponse.json(
@@ -43,7 +19,7 @@ import { removeToStayOrGo } from "@/lib/utils/helpers";
       { status: 500 }
     );
   }
-} */
+}
 
 export async function POST(req: Request) {
   try {

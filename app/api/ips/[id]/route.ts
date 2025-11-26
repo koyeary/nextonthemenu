@@ -1,9 +1,12 @@
+import prisma from "@/lib/db/connection";
+import { NextResponse } from "next/server";
+
 export async function GET(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const ips = await prisma.ip.findMany({
       where: { locationCode: id },
       orderBy: { station: "asc" },
@@ -11,7 +14,7 @@ export async function GET(
 
     return NextResponse.json(ips);
   } catch (error) {
-    console.error("GET /api/ips error:", error);
+    // throw new Error("GET /api/ips error:", error);
     return NextResponse.json(
       {
         success: false,

@@ -29,6 +29,7 @@ const fetchCategories = async (): Promise<Category[]> => {
   });
   if (!res.ok) throw new Error("Failed to fetch inventory");
   const data = await res.json();
+  console.log(data);
   return data.data;
 };
 
@@ -47,9 +48,6 @@ const IPAddressDialog = () => {
     text: string;
   } | null>(null);
 
-  // -----------------------------------------
-  // 1. Build canonical lowercase station list
-  // -----------------------------------------
   const uniqueStations = React.useMemo(() => {
     return [
       ...new Set(
@@ -60,17 +58,13 @@ const IPAddressDialog = () => {
     ].sort((a, b) => a.localeCompare(b));
   }, [categories]);
 
-  // -----------------------------------------
-  // 2. Load existing IPs from backend when dialog opens
-  // -----------------------------------------
-
   const loadIPs = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/ips?location=${selectedLocation}`);
+      const res = await fetch(`/api/ips/${selectedLocation}`);
       if (!res.ok) throw new Error("Failed to load IPs");
 
-      const rows = await res.json(); // [{ station, address, locationCode }]
+      const rows = await res.json();
       const map: Record<string, string> = {};
 
       rows.forEach((row) => {
@@ -95,9 +89,6 @@ const IPAddressDialog = () => {
     if (open) loadIPs();
   }, [open, selectedLocation]);
 
-  // -----------------------------------------
-  // 3. Submit updated IP map
-  // -----------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -107,6 +98,7 @@ const IPAddressDialog = () => {
       locationCode: selectedLocation,
     }));
 
+    console.log(payload);
     const res = await fetch("/api/ips", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -123,9 +115,6 @@ const IPAddressDialog = () => {
     setIpMap({});
   };
 
-  // -----------------------------------------
-  // Render
-  // -----------------------------------------
   return (
     <>
       {/* Floating Settings Button */}
