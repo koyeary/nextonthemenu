@@ -6,6 +6,7 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const { uid, ...updateFields } = body;
 
+    console.log(uid, updateFields);
     if (!uid) {
       return NextResponse.json(
         { error: "Order UID is required" },
@@ -15,16 +16,21 @@ export async function PATCH(req: NextRequest) {
 
     const dataToUpdate: Record<string, any> = {};
 
-    Object.keys(updateFields).forEach((key) => {
+    for (const key in updateFields) {
       const value = updateFields[key];
-      if (value !== null && value !== undefined && value !== "") {
-        if (key === "due" || key === "createdAt") {
-          dataToUpdate[key] = new Date(value);
-        } else {
-          dataToUpdate[key] = value;
-        }
+
+      if (value === null || value === undefined || value === "") {
+        continue; // skip empty fields
       }
-    });
+
+      if (key === "quantity") {
+        dataToUpdate[key] = parseInt(value, 10);
+      } else if (key === "due" || key === "createdAt") {
+        dataToUpdate[key] = new Date(value);
+      } else {
+        dataToUpdate[key] = value;
+      }
+    }
 
     const updatedOrder = await prisma.order.update({
       where: { uid },
