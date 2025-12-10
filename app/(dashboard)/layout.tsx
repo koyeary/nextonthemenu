@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-
+import NavbarWrapper from "@/components/layout/navbar-wrapper";
 export default function DashboardLayout({
   children,
 }: {

@@ -100,6 +100,7 @@ const Header = ({
           )}
         </div>
         <SegmentedControl.Root
+          className="cursor-pointer"
           defaultValue="all"
           size="2"
           onValueChange={setSelectedLocation}
