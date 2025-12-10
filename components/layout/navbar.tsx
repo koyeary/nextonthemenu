@@ -20,31 +20,35 @@ export default function Navbar() {
   };
 
   return (
-    <div className="flex justify-between items-center h-16 w-full">
-      <div className="flex items-center space-x-3">
-        <ChefHat
-          className="h-8 w-8 text-primary cursor-pointer"
-          onClick={() => router.push("/")}
-        />
-        <h1 className="text-text">
-          Mia&apos;s Bakery{" "}
-          {pathname === "/orders"
-            ? "- Orders"
-            : pathname === "/inventory"
-              ? "- Inventory"
-              : ""}
-        </h1>
-      </div>
+    <nav class="w-full  bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+        <div class="flex justify-between h-16 items-center">
+          <div className="flex items-center space-x-3">
+            <ChefHat
+              className="h-8 w-8 text-primary cursor-pointer"
+              onClick={() => router.push("/")}
+            />
+            <h1 className="text-text">
+              Mia&apos;s Bakery{" "}
+              {pathname === "/orders"
+                ? "- Orders"
+                : pathname === "/inventory"
+                  ? "- Inventory"
+                  : ""}
+            </h1>
+          </div>
 
-      <div className="flex flex-row gap-4 w-fit">
-        <Button onClick={() => router.push("/orders")}>ORDERS</Button>
-        <Button onClick={() => router.push("/inventory")}>INVENTORY</Button>
+          <div className="flex flex-row gap-4 w-fit">
+            <Button onClick={() => router.push("/orders")}>ORDERS</Button>
+            <Button onClick={() => router.push("/inventory")}>INVENTORY</Button>
 
-        <UserMinus
-          className="text-primary h-7 w-7 cursor-pointer ml-4"
-          onClick={logout}
-        />
+            <UserMinus
+              className="text-primary h-7 w-7 cursor-pointer ml-4"
+              onClick={logout}
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    </nav>
   );
 }

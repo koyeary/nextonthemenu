@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertDialog } from "radix-ui";
 import { Label } from "@radix-ui/react-label";
 import {
@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import Order from "@/types/Order";
 import { useUpdateOrder } from "@/hooks/useUpdateOrder";
+
 import Alert from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import Ticket from "../ticket/Ticket";
@@ -62,6 +63,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     queryFn: fetchOrders,
     refetchInterval: 5000,
   });
+  const [isProcessing, setIsProcessing] = useState(false);
   const [show, setShow] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -72,6 +74,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     text: string;
   } | null>(null);
   const [formData, setFormData] = useState<Record<string, any>>({});
+  const queryClient = useQueryClient();
 
   const items = [
     "status",
@@ -100,22 +103,26 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   };
 
   const handleDelete = async () => {
+    setIsProcessing(true);
     try {
       const res = await fetch("/api/orders", {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ uid: order.uid }),
       });
 
-      console.log("Delete response:", res);
+      if (!res.ok) throw new Error("Failed to delete order.");
 
-      fetchOrders();
-      return res.json();
-    } catch (error) {
+      setMessage({ type: "success", text: "Order deleted successfully!" });
+      queryClient.invalidateQueries(["orders"]); // REFRESH UI
+    } catch (err) {
+      setMessage({
+        type: "error",
+        text: "Error deleting order. Please try again.",
+      });
+    } finally {
+      setIsProcessing(false);
       setShowToast(true);
-      console.error("Error deleting order:", error);
     }
   };
 
@@ -129,39 +136,58 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   const updateOrder = useUpdateOrder();
 
   const handleStatusChange = async (newStatus: string) => {
-    await updateOrder.mutate({
-      id: order.uid,
-      status: newStatus,
-    });
-
-    console.log(`Status update success: ${(order.uid, newStatus)}`);
-    return fetchOrders();
+    setIsProcessing(true);
+    try {
+      await updateOrder.mutateAsync({ id: order.uid, status: newStatus });
+      setMessage({ type: "success", text: `Order marked as ${newStatus}!` });
+      queryClient.invalidateQueries(["orders"]); // REFRESH UI
+    } catch (err) {
+      setMessage({ type: "error", text: "Status update failed." });
+    } finally {
+      setIsProcessing(false);
+      setShowToast(true);
+    }
+    queryClient.invalidateQueries(["orders"]); // REFRESH UI
   };
 
   let ipCache: Record<string, string> | null = null;
 
   const loadIpCache = async () => {
-    if (ipCache) return ipCache;
+    try {
+      if (ipCache) return ipCache;
 
-    const res = await fetch("/api/ips");
-    if (!res.ok) throw new Error("Failed to load ip config");
+      const res = await fetch("/api/ips");
+      if (!res.ok) throw new Error();
 
-    const rows = await res.json(); // [{ station, address }]
-    ipCache = {};
+      const rows = await res.json();
+      ipCache = {};
 
-    rows.forEach((row) => {
-      ipCache![row.station.toLowerCase()] = row.address;
-    });
+      rows.forEach((row) => {
+        ipCache![row.station.toLowerCase()] = row.address;
+      });
 
-    return ipCache;
+      return ipCache;
+    } catch {
+      setMessage({
+        type: "error",
+        text: "Failed to load printer configuration.",
+      });
+      setShowToast(true);
+      return {};
+    }
   };
 
   const getItemFromToken = async (token: string) => {
-    const res = await fetch(`/api/inventory/${token}`);
-    if (!res.ok) throw new Error("Item lookup failed");
-
-    const data = await res.json();
-    return data.data; // { category, ... }
+    try {
+      const res = await fetch(`/api/inventory/${token}`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      return data.data;
+    } catch {
+      setMessage({ type: "error", text: "Failed to retrieve item details." });
+      setShowToast(true);
+      return null;
+    }
   };
 
   const stationKeyFromCategory = (category: string) => {
@@ -195,7 +221,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 
   const finishPrint = async () => {
     const printedAt = new Date().toISOString();
-
+    setIsProcessing(true);
     try {
       const res = await fetch(`/api/print/${order.uid}`, {
         method: "PATCH",
@@ -203,16 +229,17 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         body: JSON.stringify({ printedAt }),
       });
 
+      if (!res.ok) throw new Error();
       const data = await res.json();
 
-      if (data) {
-        console.log(`Printed at: ${data.printedAt}`);
-        fetchOrders();
-      }
-
-      return setShow(false);
-    } catch (err) {
-      console.error("Update error:", err);
+      setMessage({ type: "success", text: "Print recorded successfully!" });
+    } catch {
+      setMessage({ type: "error", text: "Print update failed." });
+    } finally {
+      setIsProcessing(false);
+      setShowToast(true);
+      setShow(false);
+      queryClient.invalidateQueries(["orders"]); // REFRESH UI
     }
   };
 
@@ -221,41 +248,44 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     setIsSubmitting(true);
     setMessage(null);
 
+    // Only send fields that were changed
     const updateData: Record<string, any> = {
       uid: order.uid,
-      ...formData,
+      ...Object.fromEntries(
+        Object.entries(formData).filter(([_, v]) => v !== undefined && v !== "")
+      ),
     };
 
     try {
       const response = await fetch("/api/orders/update", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
       });
 
+      // 🔴 Handle non-200 responses clearly
       if (!response.ok) {
-        throw new Error("Failed to update order");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.error || "Failed to update order.");
       }
 
-      await response.json();
+      // Success
       setMessage({ type: "success", text: "Order updated successfully!" });
 
       setTimeout(() => {
-        fetchOrders();
+        queryClient.invalidateQueries(["orders"]); // REFRESH UI
         setOpenUpdate(false);
         setMessage(null);
         setFormData({});
       }, 1500);
-    } catch (error) {
-      console.error("Update error:", error);
+    } catch (error: any) {
       setMessage({
         type: "error",
-        text: "Failed to update order. Please try again.",
+        text: error?.message || "Failed to update order. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
+      queryClient.invalidateQueries(["orders"]); // REFRESH UI
     }
   };
 
@@ -263,7 +293,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     return (
       <Card
         key={order.itemToken}
-        className={`p-4 border-l-4 ${getColor} h-20 `}
+        className={`p-4 border-l-4 ${getColor} h-20 align-middle`}
       >
         <p>Updating order status</p>
       </Card>
@@ -349,24 +379,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                             </Grid>
                           ))}
                         </div>
-                        {message && (
-                          <AlertDialog.Root open={showToast}>
-                            <AlertDialog.Content
-                              className={`w-100 z-100 rounded-lg shadow-lg px-5 py-3 absolute bottom-25 left-20 ${
-                                message.type === "error"
-                                  ? "bg-rose-700 text-white text-lg"
-                                  : "bg-emerald-400 text-lg"
-                              }`}
-                            >
-                              <AlertDialog.Title>
-                                {camelToTitleCase(message.type)}
-                              </AlertDialog.Title>
-                              <AlertDialog.Description size="2">
-                                {message.text}
-                              </AlertDialog.Description>
-                            </AlertDialog.Content>
-                          </AlertDialog.Root>
-                        )}
 
                         <div className="flex justify-center gap-4 mt-6 mb-4">
                           <AlertDialog.Cancel asChild>
@@ -526,6 +538,24 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           </div>
         </div>
       </Card>
+      {message && (
+        <AlertDialog.Root open={showToast}>
+          <AlertDialog.Content
+            className={`w-100 z-100 rounded-lg shadow-lg px-5 py-3 absolute bottom-25 left-20 ${
+              message.type === "error"
+                ? "bg-rose-700 text-white text-lg"
+                : "bg-emerald-400 text-lg"
+            }`}
+          >
+            <AlertDialog.Title>
+              {camelToTitleCase(message.type)}
+            </AlertDialog.Title>
+            <AlertDialog.Description size="2">
+              {message.text}
+            </AlertDialog.Description>
+          </AlertDialog.Content>
+        </AlertDialog.Root>
+      )}
     </>
   );
 };
