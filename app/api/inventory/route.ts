@@ -46,6 +46,7 @@ export async function POST(req: Request) {
         return prisma.item.update({
           where: { token: item.token },
           data: {
+            //add location array
             activeOrders: count,
             quantity: item.baseQuantity - count,
           },

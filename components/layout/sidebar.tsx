@@ -204,7 +204,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 
     try {
       const res = await fetch(`/api/print/${order.uid}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ printedAt }),
       });
@@ -238,7 +238,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 
     try {
       const response = await fetch("/api/orders/update", {
-        method: "PATCH",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },

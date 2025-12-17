@@ -31,8 +31,6 @@ const Ticket: React.FC<{ order: any }> = ({ order, getIp, finishPrint }) => {
 
   React.useEffect(() => {
     const fetchAndPrint = async () => {
-      /*       const station = await getIpFromCategory();
-      const cat = await removeToStayOrGo(station || ""); */
       const printerIp = await getIp(order);
       console.log(printerIp);
       if (printerIp) {
@@ -101,11 +99,11 @@ const Ticket: React.FC<{ order: any }> = ({ order, getIp, finishPrint }) => {
         height={375}
       />
       <Button
-        className="bg-violet-800 font-semibold text-white rounded-lg px-3 py-1  flex mt-4 whitespace-nowrap items-center gap-2 hover:bg-violet-500 mx-auto "
+        className="bg-violet-800 font-semibold text-white rounded-lg px-3 py-1 flex mt-4 whitespace-nowrap items-center gap-2 hover:bg-violet-500 mx-auto"
         onClick={onSend}
       >
         <Printer />
-        {"Confirm"}
+        Confirm
       </Button>
     </>
   );
