@@ -197,7 +197,7 @@ const OrderDrawer = ({
                       .closest(".flex.flex-col")
                       ?.querySelector("form");
                     if (form) {
-                      form.dispatchEvent(
+                      form.disPUTEvent(
                         new Event("submit", { cancelable: true, bubbles: true })
                       );
                     }

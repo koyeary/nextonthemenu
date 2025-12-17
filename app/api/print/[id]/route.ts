@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db/connection";
 
-export async function PATCH(
+export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
@@ -20,7 +20,7 @@ export async function PATCH(
     console.log(updated);
     return NextResponse.json(updated);
   } catch (error: unknown) {
-    console.error("PATCH error:", error);
+    console.error("PUT error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

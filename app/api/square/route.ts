@@ -2,7 +2,7 @@ import Square from "square";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/connection";
 
-export async function PATCH(req: NextRequest) {
+export async function PUT(req: NextRequest) {
   const { Client, Environment } = Square;
 
   const client = new Client({
@@ -130,9 +130,11 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  console.log("hit api");
   try {
     const body = await req.json();
     const { items } = body; // Array of items to update
+    console.log(body);
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(

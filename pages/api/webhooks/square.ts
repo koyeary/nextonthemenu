@@ -8,14 +8,14 @@ const retrieveOrder = async (orderId) => {
   try {
     const client = new SquareClient({
       environment: SquareEnvironment.Production,
-      token: process.env.PROD_SQ_ACCESS_TOKEN, //process.env.SQUARE_ACCESS_TOKEN,
+      token: process.env.PROD_SQ_ACCESS_TOKEN,
     });
     const res = await client.orders.get({
       orderId: orderId,
     });
 
     const order = res.order;
-
+    console.log(order);
     return order;
   } catch (err) {
     console.error(err);

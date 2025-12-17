@@ -1,3 +1,12 @@
+import client from "@/lib/db/connection";
+import { SquareClient, SquareEnvironment } from "square";
+import { Prisma } from "@prisma/client";
+
+// Execute seed function
+const main = async (): Promise<void> => {};
+const seedDB = async (): Promise<void> => {};
+export default seedDB;
+
 /* import client from "@/lib/db/connection";
 import { SquareClient, SquareEnvironment } from "square";
 import { Prisma } from "@prisma/client";
@@ -348,4 +357,5 @@ main().catch((error) => {
 });
 
 export default seedOrders;
+
  */

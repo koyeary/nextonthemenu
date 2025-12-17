@@ -155,12 +155,12 @@ const PrintDialog: React.FC<PrintDialogProps> = ({ order }) => {
       url: url,
     });
 
-    // DEV-ONLY patch for mock server
+    // DEV-ONLY PUT for mock server
     /* trader.sendMessage = function (args) {
       console.log("Mock sendMessage called:", args.request?.slice?.(0, 200));
       this.onReceive({ traderSuccess: "true" });
     }; */
-    //end dev patch
+    //end dev PUT
 
     trader.onReceive = (response: TraderResponse) => {
       hideNowPrinting();

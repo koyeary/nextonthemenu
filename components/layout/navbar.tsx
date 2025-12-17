@@ -20,9 +20,9 @@ export default function Navbar() {
   };
 
   return (
-    <nav class="w-full  bg-white">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
-        <div class="flex justify-between h-16 items-center">
+    <nav className="w-full  bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+        <div className="flex justify-between h-16 items-center">
           <div className="flex items-center space-x-3">
             <ChefHat
               className="h-8 w-8 text-primary cursor-pointer"
