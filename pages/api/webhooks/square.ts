@@ -8,7 +8,7 @@ const retrieveOrder = async (orderId) => {
   try {
     const client = new SquareClient({
       environment: SquareEnvironment.Production,
-      token: process.env.PROD_SQ_ACCESS_TOKEN,
+      token: process.env.SQUARE_ACCESS_TOKEN || "",
     });
     const res = await client.orders.get({
       orderId: orderId,
@@ -74,12 +74,12 @@ export default async function handler(req: NextRequest, res: NextResponse) {
               where: { uid: orderData.uid },
               update: orderData,
               create: orderData,
-            })
-          )
+            }),
+          ),
         );
 
         console.log(
-          `Processed ${orderDataArray.length} items for order ${order.id}`
+          `Processed ${orderDataArray.length} items for order ${order.id}`,
         );
       };
 
