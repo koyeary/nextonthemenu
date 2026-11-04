@@ -3,24 +3,44 @@
 
 **Role:** Independent Software Architect & Sole Engineer  
 **Client:** Multi-location NYC bakery business  
-**Status:** Production deployment
+**Status:** Deployed in production
 
-## Project Overview
+## The Business Problem
 
-Engaged directly by the owners of a New York City bakery business to independently architect, develop, and deploy a custom kitchen operations platform.
+A multi-location New York City bakery business relied on handwritten catering orders to coordinate kitchen production.
 
-Responsible for the full technical lifecycle, from translating operational requirements into system design through application development, integration, and production deployment.
+The existing process lacked several capabilities essential to managing orders reliably:
 
-## Technical Scope
+- **Station-specific order routing:** Catering orders could not be automatically printed at the appropriate kitchen stations.
+- **Centralized order visibility:** Orders were not aggregated into a searchable system where staff could monitor their progress.
+- **Order status tracking:** Kitchen staff lacked a shared digital workflow for tracking orders through production.
+- **Point-of-sale integration:** The workflow was not synchronized with Square, leaving order information disconnected from the bakery's operational systems.
+- **Inventory visibility:** Without centralized order data and integration, a global inventory view across bakery locations was not feasible.
 
-- Full-stack application architecture and implementation
-- Database design and persistence
-- Third-party service and webhook integrations
-- Operational workflows and role-based access
-- Production deployment and application configuration
+These limitations created a need for a unified system connecting order intake, kitchen production, and the bakery's existing point-of-sale infrastructure.
 
-## Architecture & Engineering
+## The Solution
 
-This case study examines the system architecture, major technical decisions, integration boundaries, and tradeoffs involved in delivering software for a real operational environment.
+I was engaged directly by the bakery's owners to independently architect, develop, and deploy a custom kitchen operations platform.
 
-It also considers how the architecture could evolve to support additional operational requirements and greater scale.
+The system was designed to centralize catering orders, support kitchen-specific production workflows, integrate with Square, and establish the technical foundation for better operational visibility across locations.
+
+I owned the technical delivery end to end, including application architecture, database design, integrations, implementation, and deployment.
+
+## Architectural Objectives
+
+1. Establish a centralized, searchable source of order information.
+2. Support reliable routing of orders to appropriate kitchen stations.
+3. Provide visibility into order status throughout production.
+4. Integrate order information with Square.
+5. Establish a data foundation for future cross-location inventory management.
+
+## Technical Implementation
+
+**Stack:** Next.js, TypeScript, PostgreSQL, Prisma, Square webhooks, and StarWebPRNT.
+
+The architecture and implementation will be documented through system diagrams, architectural decision records, and selected code examples.
+
+## Future Evolution
+
+The architecture also provides a useful basis for examining additional capabilities, including cross-location inventory synchronization, integration reliability, and operational observability.
