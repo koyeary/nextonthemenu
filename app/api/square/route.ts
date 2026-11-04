@@ -6,7 +6,7 @@ export async function PUT(req: NextRequest) {
   const { Client, Environment } = Square;
 
   const client = new Client({
-    accessToken: process.env.PROD_SQ_ACCESS_TOKEN,
+    accessToken: process.env.SQUARE_ACCESS_TOKEN || "",
     environment:
       process.env.NODE_ENV === "production" ? "production" : "sandbox",
   });
@@ -27,7 +27,7 @@ export async function PUT(req: NextRequest) {
     if (!itemId) {
       return NextResponse.json(
         { error: "Item ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -60,7 +60,7 @@ export async function PUT(req: NextRequest) {
     // Update variation if price, sku, or availability changed
     if (variationId && currentItem.itemData?.variations) {
       const variationIndex = currentItem.itemData.variations.findIndex(
-        (v: any) => v.id === variationId
+        (v: any) => v.id === variationId,
       );
 
       if (variationIndex !== -1) {
@@ -115,7 +115,7 @@ export async function PUT(req: NextRequest) {
           error: "Square API error",
           details: error.result.errors || error.message,
         },
-        { status: error.statusCode || 500 }
+        { status: error.statusCode || 500 },
       );
     }
 
@@ -124,7 +124,7 @@ export async function PUT(req: NextRequest) {
         error: "Failed to update item in Square",
         details: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { error: "Items array is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
       // Retrieve current version
       const { result } = await client.catalogApi.retrieveCatalogObject(
         itemId,
-        true
+        true,
       );
 
       if (result.object) {
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
         error: "Failed to batch update items",
         details: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
